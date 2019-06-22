@@ -8,7 +8,7 @@ import java.util.ArrayList;
  *
  */
 public class User {
-    private long chatId;
+    private final long chatId;
     private Rule currRule;
     private UserStatus status;
     private ArrayList<Word> words;
@@ -66,12 +66,12 @@ public class User {
 
     public String getResult() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("всего слов в тестирование " + count + "\n");
+        stringBuilder.append("всего слов в тестирование ").append(count).append("\n");
         stringBuilder.append("слова в которых допущены ошибки" + "\n");
         for (Word words : wrongWords){
-            stringBuilder.append(words.getWrightName() + "\n");
+            stringBuilder.append(words.getWrightName()).append("\n");
         }
-        stringBuilder.append("всего " + wrongWords.size() + " слов" + "\n");
+        stringBuilder.append("всего ").append(wrongWords.size()).append(" слов").append("\n");
         return stringBuilder.toString();
     }
 }

@@ -11,7 +11,7 @@ public class Word {
 
     private final String wrightName;
     private final String name;
-    private String section;
+    private final String section;
     private final String answer;
 
     public String getSection() {
@@ -55,10 +55,6 @@ public class Word {
             stage = SchoolStage.SECONDARY_AND_HIGH;
         }
         return new Word(wrightName, name, section, answer, stage);
-    }
-
-    public static Logger getLogger() {
-        return logger;
     }
 
     public String getWrightName() {

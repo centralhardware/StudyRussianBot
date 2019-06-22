@@ -12,12 +12,15 @@ public class Config {
     private final ResourceBundle config;
     private static final String USER_NAME_KEY = "BOT_USER_NAME";
     private static final String TOKEN_KEY = "BOT_TOKEN";
+    private static final String USER_TESTING_NAME_KEY = "BOT_TESTING_USER_NAME";
+    private static final String TOKEN_TESTING_KEY = "BOT_TESTING_TOKEN";
     private static final String PROXY_HOST_KEY = "PROXY_HOST";
     private static final String PROXY_PORT_KEY = "PROXY_PORT";
     private static final String PROXY_USER_KEY = "PROXY_USER";
     private static final String PROXY_PASSWORD_KEY = "PROXY_PASSWORD";
     private static final String STARTUP_MESSAGE_KEY = "START_MESSAGE";
     private static final String HELP_MESSAGE_KEY = "HELP_MESSAGE";
+    private static final String IS_TESTING_KEY = "IS_TESTING";
 
     private Config() {
         config = ResourceBundle.getBundle("config");
@@ -29,6 +32,14 @@ public class Config {
 
     public String getBotToken(){
         return config.getString(TOKEN_KEY);
+    }
+
+    public String getBotUserTestingName(){
+        return config.getString(USER_TESTING_NAME_KEY);
+    }
+
+    public String getBotTestingToken(){
+        return config.getString(TOKEN_TESTING_KEY);
     }
 
     public String getProxyHost(){
@@ -53,5 +64,9 @@ public class Config {
 
     public String getHelpMessage(){
         return config.getString(HELP_MESSAGE_KEY);
+    }
+
+    public boolean isTesting(){
+        return Boolean.parseBoolean(config.getString(IS_TESTING_KEY));
     }
 }

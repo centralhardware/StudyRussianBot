@@ -1,4 +1,4 @@
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
 
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -9,12 +9,13 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.User;
 
 public class TelegramBot extends TelegramLongPollingBot {
 
     private final Logger logger = Logger.getLogger(TelegramBot.class);
-    private Parser parser;
+    private TelegramParser telegramParser;
 
     private TelegramBot(DefaultBotOptions botOptions) {
         super(botOptions);
@@ -56,16 +57,16 @@ public class TelegramBot extends TelegramLongPollingBot {
      * @param update
      */
     public void onUpdateReceived(Update update) {
-        if (parser == null){
-            parser = new Parser(this);
+        if (telegramParser == null){
+            telegramParser = new TelegramParser(this);
         }
         if (update.hasCallbackQuery()){
-            if (!parser.getUsers().containsKey(update.getCallbackQuery().getMessage().getChatId())){
-                parser.getUsers().put(update.getCallbackQuery().getMessage().getChatId(), new User(update.getCallbackQuery().getMessage().getChatId()));
+            if (!telegramParser.getUsers().containsKey(update.getCallbackQuery().getMessage().getChatId())){
+                telegramParser.getUsers().put(update.getCallbackQuery().getMessage().getChatId(), new User(update.getCallbackQuery().getMessage().getChatId()));
             }
         } else {
-            if (!parser.getUsers().containsKey(update.getMessage().getChatId())){
-                parser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
+            if (!telegramParser.getUsers().containsKey(update.getMessage().getChatId())){
+                telegramParser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
             }
         }
         if (update.hasCallbackQuery()){
@@ -73,13 +74,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                     update.getCallbackQuery().getFrom().getFirstName() + " " +
                     update.getCallbackQuery().getFrom().getLastName() + " " +
                     update.getCallbackQuery().getFrom().getUserName());
-            parser.parsCallback(update);
+            telegramParser.parsCallback(update);
         } else {
             logger.info("receive message " + update.getMessage().getText() +
                     " from " + update.getMessage().getFrom().getFirstName() + " " +
                     update.getMessage().getFrom().getLastName() + " " +
                     update.getMessage().getFrom().getUserName());
-            parser.parseText(update);
+            telegramParser.parseText(update);
         }
     }
 
@@ -88,17 +89,15 @@ public class TelegramBot extends TelegramLongPollingBot {
      * @param chatId id of chat where to send message
      * @return result of sending
      */
-    public boolean sendMessage(String message, long chatId){
+    public void sendMessage(String message, long chatId){
         logger.info("send message " + message);
         SendMessage msg = new SendMessage().
                 setChatId(chatId).
                 setText(message);
         try{
             execute(msg);
-            return true;
         } catch (TelegramApiException e) {
             logger.warn("fail to send message", e);
-            return false;
         }
     }
 
@@ -114,15 +113,25 @@ public class TelegramBot extends TelegramLongPollingBot {
      * @return
      */
     public String getBotUsername() {
-        logger.info("getting bot user name");
-        return Config.getInstance().getBotUserName();
+        if (Config.getInstance().isTesting()){
+            logger.info("getting testing bot user name");
+            return Config.getInstance().getBotUserTestingName();
+        } else {
+            logger.info("getting production bot user name");
+            return Config.getInstance().getBotUserName();
+        }
     }
 
     /**
      * @return
      */
     public String getBotToken() {
-        logger.info("getting bot token");
-        return Config.getInstance().getBotToken();
+        if (Config.getInstance().isTesting()){
+            logger.info("getting testing bot token");
+            return Config.getInstance().getBotTestingToken();
+        } else {
+            logger.info("getting production bot token");
+            return Config.getInstance().getBotToken();
+        }
     }
 }

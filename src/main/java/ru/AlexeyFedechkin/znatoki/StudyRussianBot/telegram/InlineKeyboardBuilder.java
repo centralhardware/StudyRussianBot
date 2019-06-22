@@ -1,4 +1,4 @@
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -17,8 +17,7 @@ public class InlineKeyboardBuilder {
     private InlineKeyboardBuilder() {}
 
     public static InlineKeyboardBuilder create() {
-        InlineKeyboardBuilder builder = new InlineKeyboardBuilder();
-        return builder;
+        return new InlineKeyboardBuilder();
     }
 
     public static InlineKeyboardBuilder create(Long chatId) {

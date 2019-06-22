@@ -2,6 +2,7 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.ApiContextInitializer;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram.TelegramBot;
 
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class);
