@@ -1,21 +1,21 @@
 /*
  * Author: Fedechkin Alexey Borisovich
- * last modified: 22.06.19 12:55
+ * last modified: 22.06.19 14:08
  * Copyright (c) 2019
  */
 
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Rule;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Word;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -29,13 +29,13 @@ public class WordManager {
      * @throws IOException
      */
     public void init() throws IOException {
-        File word = getFileFromResources("word.json");
-        File rule = getFileFromResources("rule.json");
-        File wrongMessage = getFileFromResources("wrongMessage.json");
+//        File word = getStringFromResources("word.json");
+//        File rule = getStringFromResources("rule.json");
+//        File wrongMessage = getStringFromResources("wrongMessage.json");
 
-        String wordString = FileUtils.readFileToString(word, "utf-8");
-        String ruleString = FileUtils.readFileToString(rule, "utf-8");
-        String wrongMessageString = FileUtils.readFileToString(wrongMessage, "utf-8");
+        String wordString = getStringFromResources("word.json");
+        String ruleString = getStringFromResources("rule.json");
+        String wrongMessageString = getStringFromResources("wrongMessage.json");
 
         JSONObject wrongMessageObject = new JSONObject(wrongMessageString);
         JSONArray wrongMessageArray = wrongMessageObject.getJSONArray("data");
@@ -90,14 +90,12 @@ public class WordManager {
      * @param fileName name of file to search
      * @return
      */
-    private File getFileFromResources(String fileName) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resource = classLoader.getResource(fileName);
-        if (resource == null) {
-            throw new IllegalArgumentException("file is not found!");
-        } else {
-            return new File(resource.getFile().replace("%20"," "));
-        }
+    private String getStringFromResources(String fileName) throws IOException {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+        StringWriter writer = new StringWriter();
+        IOUtils.copy(inputStream, writer);
+        return writer.toString();
     }
 
     private Random random = new Random();
