@@ -1,6 +1,6 @@
 /*
  * Author: Fedechkin Alexey Borisovich
- * last modified: 22.06.19 22:15
+ * last modified: 23.06.19 0:38
  * Copyright (c) 2019
  */
 
@@ -28,6 +28,9 @@ public class Config {
     private static final String HELP_MESSAGE_KEY = "HELP_MESSAGE";
     private static final String IS_TESTING_KEY = "IS_TESTING";
     private static final String IS_USE_PROXY_KEY = "IS_USE_PROXY";
+    private static final String REDIS_HOST_KEY = "REDIS_HOST";
+    private static final String REDIS_PORT_KEY = "REDIS_PORT";
+    private static final String REDIS_PASSWORD_KEY = "REDIS_PASSWORD";
 
     private Config() {
         config = ResourceBundle.getBundle("config");
@@ -67,6 +70,18 @@ public class Config {
 
     public String getProxyPassword(){
         return config.getString(PROXY_PASSWORD_KEY);
+    }
+
+    public String getRedisHost(){
+        return config.getString(REDIS_HOST_KEY);
+    }
+
+    public int getRedisPort(){
+        return Integer.parseInt(config.getString(REDIS_PORT_KEY));
+    }
+
+    public String getRedisPassword(){
+        return config.getString(REDIS_PASSWORD_KEY);
     }
 
     public String getStartupMessage(){
