@@ -1,6 +1,6 @@
 /*
  * Author: Fedechkin Alexey Borisovich
- * last modified: 22.06.19 12:55
+ * last modified: 22.06.19 22:15
  * Copyright (c) 2019
  */
 
@@ -18,6 +18,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.User;
 
+import java.net.Authenticator;
+import java.net.InetAddress;
+import java.net.PasswordAuthentication;
+import java.net.URL;
+
 public class TelegramBot extends TelegramLongPollingBot {
 
     private final Logger logger = Logger.getLogger(TelegramBot.class);
@@ -34,28 +39,39 @@ public class TelegramBot extends TelegramLongPollingBot {
      * init telegram bot and configure proxy
      */
     public void init(){
-//        Authenticator.setDefault(new Authenticator() {
-//            @Override
-//            public PasswordAuthentication requestPasswordAuthenticationInstance(String host, InetAddress addr,
-//                                                                                int port, String protocol,
-//                                                                                String prompt, String scheme, URL url,
-//                                                                                RequestorType reqType) {
-//                return new PasswordAuthentication(Config.getInstance().getProxyUser(),
-//                        Config.getInstance().getProxyPassword().toCharArray());
-//            }
-//        });
-        TelegramBotsApi botsApi = new TelegramBotsApi();
-        DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
-        botOptions.setProxyHost(Config.getInstance().getProxyHost());
-        botOptions.setProxyPort(Config.getInstance().getProxyPort());
-        botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
-        logger.info("proxy configure");
-        try {
-            botsApi.registerBot(new TelegramBot(botOptions));
-            logger.info("bot register");
-        } catch (TelegramApiRequestException e) {
-            logger.fatal("bot start fail", e);
-            System.exit(20);
+        if (Config.getInstance().isUseProxy()){
+            Authenticator.setDefault(new Authenticator() {
+                @Override
+                public PasswordAuthentication requestPasswordAuthenticationInstance(String host, InetAddress addr,
+                                                                                    int port, String protocol,
+                                                                                    String prompt, String scheme, URL url,
+                                                                                    RequestorType reqType) {
+                    return new PasswordAuthentication(Config.getInstance().getProxyUser(),
+                            Config.getInstance().getProxyPassword().toCharArray());
+                }
+            });
+            TelegramBotsApi botsApi = new TelegramBotsApi();
+            DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
+            botOptions.setProxyHost(Config.getInstance().getProxyHost());
+            botOptions.setProxyPort(Config.getInstance().getProxyPort());
+            botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
+            logger.info("proxy configure");
+            try {
+                botsApi.registerBot(new TelegramBot(botOptions));
+                logger.info("bot register");
+            } catch (TelegramApiRequestException e) {
+                logger.fatal("bot start fail", e);
+                System.exit(20);
+            }
+        } else {
+            TelegramBotsApi botsApi = new TelegramBotsApi();
+            try {
+                botsApi.registerBot(new TelegramBot());
+                logger.info("bot register");
+            } catch (TelegramApiRequestException e) {
+                logger.fatal("bot start fail", e);
+                System.exit(20);
+            }
         }
     }
 

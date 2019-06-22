@@ -1,6 +1,6 @@
 /*
  * Author: Fedechkin Alexey Borisovich
- * last modified: 22.06.19 12:55
+ * last modified: 22.06.19 22:15
  * Copyright (c) 2019
  */
 
@@ -27,9 +27,14 @@ public class Config {
     private static final String STARTUP_MESSAGE_KEY = "START_MESSAGE";
     private static final String HELP_MESSAGE_KEY = "HELP_MESSAGE";
     private static final String IS_TESTING_KEY = "IS_TESTING";
+    private static final String IS_USE_PROXY_KEY = "IS_USE_PROXY";
 
     private Config() {
         config = ResourceBundle.getBundle("config");
+    }
+
+    public boolean isUseProxy(){
+        return Boolean.parseBoolean(config.getString(IS_USE_PROXY_KEY));
     }
 
     public String getBotUserName(){

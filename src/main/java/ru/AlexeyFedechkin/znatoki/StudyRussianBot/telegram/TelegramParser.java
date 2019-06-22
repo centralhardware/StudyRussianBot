@@ -1,6 +1,6 @@
 /*
  * Author: Fedechkin Alexey Borisovich
- * last modified: 22.06.19 15:19
+ * last modified: 22.06.19 15:53
  * Copyright (c) 2019
  */
 
@@ -53,6 +53,7 @@ public class TelegramParser {
                 break;
             case "/rules":
                 sendRuleInlineKeyboard(chatId);
+                break;
             default:
                 if (user.getStatus() == UserStatus.WAIT_COUNT_OF_WORD) {
                     int count;
