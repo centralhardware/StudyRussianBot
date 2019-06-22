@@ -1,6 +1,6 @@
 /*
  * Author: Fedechkin Alexey Borisovich
- * last modified: 22.06.19 14:43
+ * last modified: 22.06.19 15:19
  * Copyright (c) 2019
  */
 
@@ -73,7 +73,7 @@ public class TelegramParser {
                     }
                     break;
                 } else if (user.getStatus() == UserStatus.TESTING){
-                    if (user.getCurrRule().getWords().get(0).getAnswer().toLowerCase().equals(message.toLowerCase())){
+                    if (user.getWords().get(0).getAnswer().toLowerCase().equals(message.toLowerCase())){
                         telegramBot.sendMessage(resource.getStringByKey("STR_3"), chatId);
                         user.getWords().remove(0);
                         if (user.getWords().size() == 0){
