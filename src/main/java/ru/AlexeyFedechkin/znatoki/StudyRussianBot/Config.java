@@ -8,6 +8,9 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
 import java.util.ResourceBundle;
 
+/**
+ * provides access to config file
+ */
 public class Config {
     private static final Config ourInstance = new Config();
 
@@ -30,7 +33,6 @@ public class Config {
     private static final String IS_USE_PROXY_KEY = "IS_USE_PROXY";
     private static final String REDIS_HOST_KEY = "REDIS_HOST";
     private static final String REDIS_PORT_KEY = "REDIS_PORT";
-    private static final String REDIS_PASSWORD_KEY = "REDIS_PASSWORD";
 
     private Config() {
         config = ResourceBundle.getBundle("config");
@@ -78,10 +80,6 @@ public class Config {
 
     public int getRedisPort(){
         return Integer.parseInt(config.getString(REDIS_PORT_KEY));
-    }
-
-    public String getRedisPassword(){
-        return config.getString(REDIS_PASSWORD_KEY);
     }
 
     public String getStartupMessage(){

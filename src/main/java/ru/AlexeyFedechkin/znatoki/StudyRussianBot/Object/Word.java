@@ -50,7 +50,7 @@ public class Word {
             logger.warn("error in data file " + str);
         }
         String name = args[0].replace("%20", " ");
-        String wrightName = args[1];
+        String wrightName = args[1].replace("%20", " ");
         String answer = args[2];
         String section = args[3];
         SchoolStage stage = null;

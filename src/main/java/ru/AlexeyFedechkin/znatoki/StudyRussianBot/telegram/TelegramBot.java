@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.User;
 
 import java.net.Authenticator;
@@ -23,15 +24,25 @@ import java.net.InetAddress;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 
+/**
+ * telegram bot class
+ */
 public class TelegramBot extends TelegramLongPollingBot {
 
     private final Logger logger = Logger.getLogger(TelegramBot.class);
     private TelegramParser telegramParser;
 
+    /**
+     * set proxy setting
+     * @param botOptions proxy option
+     */
     private TelegramBot(DefaultBotOptions botOptions) {
         super(botOptions);
     }
 
+    /**
+     * need to create class from main class
+     */
     public TelegramBot(){
     }
 
@@ -107,9 +118,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     /**
+     * send message to telegram user
      * @param message string with message to user
      * @param chatId id of chat where to send message
-     * @return result of sending
      */
     public void sendMessage(String message, long chatId){
         logger.info("send message " + message);
@@ -118,21 +129,28 @@ public class TelegramBot extends TelegramLongPollingBot {
                 setText(message);
         try{
             execute(msg);
-        } catch (TelegramApiException e) {
-            logger.warn("fail to send message", e);
-        }
-    }
-
-    public void sendMessage(SendMessage sendMessage){
-        try{
-            execute(sendMessage);
+            JedisData.getInstance().sent(chatId);
         } catch (TelegramApiException e) {
             logger.warn("fail to send message", e);
         }
     }
 
     /**
-     * @return
+     * send SendMessage to telegram user
+     * @param sendMessage
+     */
+    public void sendMessage(SendMessage sendMessage){
+        logger.info("send message " + sendMessage.getText());
+        try{
+            execute(sendMessage);
+            JedisData.getInstance().sent(Long.parseLong(sendMessage.getChatId()));
+        } catch (TelegramApiException e) {
+            logger.warn("fail to send message", e);
+        }
+    }
+
+    /**
+     * @return product or testing bot username
      */
     public String getBotUsername() {
         if (Config.getInstance().isTesting()){
@@ -145,7 +163,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     /**
-     * @return
+     * @return production or testing bot token
      */
     public String getBotToken() {
         if (Config.getInstance().isTesting()){

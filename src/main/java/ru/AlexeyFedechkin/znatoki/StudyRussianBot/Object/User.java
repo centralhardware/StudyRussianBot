@@ -7,8 +7,10 @@
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object;
 
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums.UserStatus;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -17,8 +19,8 @@ public class User {
     private final long chatId;
     private Rule currRule;
     private UserStatus status;
-    private ArrayList<Word> words;
-    private ArrayList<Word> wrongWords;
+    private final ArrayList<Word> words;
+    private final ArrayList<Word> wrongWords;
     private int count = 0;
 
     public User(long chatId){
@@ -27,6 +29,7 @@ public class User {
         words = new ArrayList<>();
         wrongWords = new ArrayList<>();
     }
+
 
     public ArrayList<Word> getWords() {
         return words;
@@ -56,28 +59,38 @@ public class User {
         return wrongWords;
     }
 
-    public int getCount() {
-        return count;
-    }
-
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public int getCount() {
+        return count;
     }
 
     public void reset() {
         status = UserStatus.NONE;
         words.clear();
         wrongWords.clear();
+        count = 0;
     }
 
+    private final Resource resource = new Resource();
     public String getResult() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("всего слов в тестирование ").append(count).append("\n");
-        stringBuilder.append("слова в которых допущены ошибки" + "\n");
-        for (Word words : wrongWords){
-            stringBuilder.append(words.getWrightName()).append("\n");
+        stringBuilder.append(resource.getStringByKey("STR_10")).append(count).append("\n");
+        stringBuilder.append(resource.getStringByKey("STR_11") + "\n");
+        HashMap<String, Integer> result = new HashMap<>();
+        for (Word word : wrongWords){
+            if (!result.containsKey(word.getWrightName())){
+                result.put(word.getWrightName(), 1);
+            } else {
+                result.put(word.getWrightName(), result.get(word.getWrightName()) + 1);
+            }
         }
-        stringBuilder.append("всего ").append(wrongWords.size()).append(" слов").append("\n");
+        for (String key : result.keySet()){
+            stringBuilder.append(key).append(" - ").append(result.get(key)).append("\n");
+        }
+        stringBuilder.append("всего ").append(result.size()).append(" слов").append("\n");
         return stringBuilder.toString();
     }
 }

@@ -10,6 +10,9 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
+/**
+ * provides access to WordManager
+ */
 public class Data {
     private final Logger logger = Logger.getLogger(Data.class);
     private static final Data ourInstance = new Data();
@@ -28,6 +31,7 @@ public class Data {
     }
 
     public final WordManager wordManager;
+
 
     public WordManager getWordManager() {
         return wordManager;

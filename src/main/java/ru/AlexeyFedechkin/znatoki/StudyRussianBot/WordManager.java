@@ -17,22 +17,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
+/**
+ * class that parse json file and generate object collections, provide collection to other classes
+ */
 public class WordManager {
     private final Logger logger = Logger.getLogger(WordManager.class);
     private ArrayList<String> wrongMessages = new ArrayList<>();
     private ArrayList<Rule> rules = new ArrayList<>();
 
+
     /**
      * parseText all data file and generate collections of object
-     * @throws IOException
+     * @throws IOException file not find or other IO problem
      */
     public void init() throws IOException {
-//        File word = getStringFromResources("word.json");
-//        File rule = getStringFromResources("rule.json");
-//        File wrongMessage = getStringFromResources("wrongMessage.json");
-
         String wordString = getStringFromResources("word.json");
         String ruleString = getStringFromResources("rule.json");
         String wrongMessageString = getStringFromResources("wrongMessage.json");
@@ -86,15 +87,15 @@ public class WordManager {
     }
 
     /**
-     * get File from resource folder
+     * get string from resource folder file
      * @param fileName name of file to search
-     * @return
+     * @return string from file that placed in resource folder
      */
     private String getStringFromResources(String fileName) throws IOException {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(fileName);
         StringWriter writer = new StringWriter();
-        IOUtils.copy(inputStream, writer);
+        IOUtils.copy(Objects.requireNonNull(inputStream), writer);
         return writer.toString();
     }
 
@@ -109,5 +110,14 @@ public class WordManager {
 
     public ArrayList<Rule> getRules(){
         return rules;
+    }
+
+    public Rule getRule(String rule){
+        for (Rule r : rules){
+            if (r.getName().equals(rule)){
+                return r;
+            }
+        }
+        return null;
     }
 }

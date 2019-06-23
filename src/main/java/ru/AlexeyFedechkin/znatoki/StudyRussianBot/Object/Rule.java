@@ -47,7 +47,7 @@ public class Rule {
         return words;
     }
 
-    private Random random = new Random();
+    private final Random random = new Random();
     public  Collection<Word> getWord(int count) {
         HashSet<Word> wordSet = new HashSet<>();
         while (wordSet.size() < count){
