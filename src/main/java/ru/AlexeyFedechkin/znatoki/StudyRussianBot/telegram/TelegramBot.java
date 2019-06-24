@@ -12,6 +12,8 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
@@ -146,6 +148,24 @@ public class TelegramBot extends TelegramLongPollingBot {
             JedisData.getInstance().sent(Long.parseLong(sendMessage.getChatId()));
         } catch (TelegramApiException e) {
             logger.warn("fail to send message", e);
+        }
+    }
+
+    public void sendMessage(EditMessageReplyMarkup messageReplyMarkup){
+        logger.info("send edit reply markup " + messageReplyMarkup.getReplyMarkup());
+        try{
+            execute(messageReplyMarkup);
+        } catch (TelegramApiException e) {
+            logger.warn("fail to send edit reply markup", e);
+        }
+    }
+
+    public void sendMessage(DeleteMessage message){
+        logger.info("delete message " + message.getMessageId());
+        try{
+            execute(message);
+        } catch (TelegramApiException e) {
+            logger.warn("fail delete message", e);
         }
     }
 

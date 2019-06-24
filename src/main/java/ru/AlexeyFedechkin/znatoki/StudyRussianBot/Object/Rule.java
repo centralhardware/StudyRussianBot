@@ -6,6 +6,8 @@
 
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object;
 
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,6 +25,8 @@ public class Rule {
     private Rule parent;
     private final String section;
     private ArrayList<Word> words;
+    private byte pageNumber;
+    public static final int pageCountRule = 10;
 
     public String getSection() {
         return section;
@@ -33,6 +37,14 @@ public class Rule {
         this.parent = parent;
         this.words = words;
         this.section = section;
+    }
+
+    public byte getPageNumber() {
+        return pageNumber;
+    }
+
+    public void setPageNumber(byte pageNumber) {
+        this.pageNumber = pageNumber;
     }
 
     public Rule getParent() {
@@ -54,5 +66,15 @@ public class Rule {
             wordSet.add(words.get(random.nextInt(words.size())));
         }
         return new ArrayList<>(wordSet);
+    }
+
+    public static int getMaxPage(){
+        int max = 0;
+        for (var rule : Data.getInstance().wordManager.getRules()){
+            if (rule.getPageNumber() > max){
+                max = rule.getPageNumber();
+            }
+        }
+        return max;
     }
 }

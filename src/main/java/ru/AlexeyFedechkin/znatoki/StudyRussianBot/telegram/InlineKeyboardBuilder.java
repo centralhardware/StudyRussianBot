@@ -66,4 +66,17 @@ public class InlineKeyboardBuilder {
 
         return message;
     }
+
+//    public EditMessageReplyMarkup buildMarkup(long messageId){
+//        EditMessageReplyMarkup message = new EditMessageReplyMarkup();
+//        message.setChatId(chatId);
+//        message.setInlineMessageId(null);
+//        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+//
+//        keyboardMarkup.setKeyboard(keyboard);
+//        message.setReplyMarkup(keyboardMarkup);
+////        message.setMessageId(messageId);
+//
+//        return message;
+//    }
 }

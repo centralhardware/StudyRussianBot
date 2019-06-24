@@ -78,7 +78,7 @@ public class User {
     public String getResult() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(resource.getStringByKey("STR_10")).append(count).append("\n");
-        stringBuilder.append(resource.getStringByKey("STR_11") + "\n");
+        stringBuilder.append(resource.getStringByKey("STR_11")).append("\n");
         HashMap<String, Integer> result = new HashMap<>();
         for (Word word : wrongWords){
             if (!result.containsKey(word.getWrightName())){

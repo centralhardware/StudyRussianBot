@@ -81,6 +81,12 @@ public class WordManager {
             }
         }
 
+        int count = 1;
+        for (var rule : rules) {
+            rule.setPageNumber((byte) (count/ Rule.pageCountRule));
+            count++;
+        }
+
         for (Rule r : rules){
             logger.info("in rule " + r.getName() + " added " + r.getWords().size() + "  words");
         }

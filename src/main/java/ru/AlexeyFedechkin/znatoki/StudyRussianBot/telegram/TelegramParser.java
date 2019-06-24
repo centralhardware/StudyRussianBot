@@ -7,6 +7,7 @@
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
 
 import org.apache.log4j.Logger;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
@@ -58,7 +59,7 @@ public class TelegramParser {
                 telegramBot.sendMessage(Config.getInstance().getHelpMessage(), chatId);
                 break;
             case "/rules":
-                sendRuleInlineKeyboard(chatId);
+                sendRuleInlineKeyboard(update, 0);
                 break;
             case "/profile":
                 sendProfile(user);
@@ -126,7 +127,7 @@ public class TelegramParser {
                     telegramBot.sendMessage(user.getWords().get(0).getName(), chatId);
                     return;
                 case "testing":
-                    sendRuleInlineKeyboard(chatId);
+                    sendRuleInlineKeyboard(update, 0);
                     break;
                 case "profile":
                     sendProfile(user);
@@ -134,6 +135,9 @@ public class TelegramParser {
                 case "help":
                     telegramBot.sendMessage(Config.getInstance().getHelpMessage(), chatId);
                     break;
+            }
+            if (callback.startsWith("to_")){
+                sendRuleInlineKeyboard(update, Integer.parseInt(callback.replace("to_", "")));
             }
             if (user.getStatus() == UserStatus.NONE) {
                 for (Rule rule : Data.getInstance().getWordManager().getRules()) {
@@ -164,11 +168,7 @@ public class TelegramParser {
                 setText("меню").
                 row().
                 button("выбор правила", "testing").
-//                endRow().
-//                row().
                 button("профиль", "profile").
-//                endRow().
-//                row().
                 button("справка", "help").
                 endRow();
         telegramBot.sendMessage(builder.build());
@@ -176,24 +176,60 @@ public class TelegramParser {
 
     /**
      * send inlineKeyboard with list of available rule
-     * @param chatId id of telegram user
      */
-        private void sendRuleInlineKeyboard (long chatId){
+        private void sendRuleInlineKeyboard (Update update, int pageNumber){
+            long chatId;
+            if (update.hasCallbackQuery()){
+                chatId = update.getCallbackQuery().getMessage().getChatId();
+            } else {
+              chatId = update.getMessage().getChatId();
+            }
             logger.info("send inline keyboard rules");
             InlineKeyboardBuilder builder = InlineKeyboardBuilder.
                     create(chatId).setText(resource.getStringByKey("STR_8"));
             for (Rule rule : Data.getInstance().getWordManager().getRules()) {
-                builder.row();
-                if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
-                    builder.button("✅" + rule.getName(), rule.getSection());
-                } else {
-                    builder.button(rule.getName(), rule.getSection());
+                if (rule.getPageNumber() == pageNumber){
+                    builder.row();
+                    if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
+                        builder.button("✅" + rule.getName(), rule.getSection());
+                    } else {
+                        builder.button(rule.getName(), rule.getSection());
+                    }
+                    builder.endRow();
                 }
-                builder.endRow();
+            }
+            if (pageNumber == 0){
+                builder.row().
+                        button("на 2 страницу", "to_1").
+                        endRow();
+            } else if (pageNumber < Rule.getMaxPage()){
+                builder.row().
+                        button("на " + (pageNumber - 1), "to_" + (pageNumber - 1)).
+                        button("на " + (pageNumber + 1), "to_" + (pageNumber + 1)).
+                        endRow();
+                DeleteMessage deleteMessage = new DeleteMessage();
+                deleteMessage.setChatId(chatId);
+                deleteMessage.setMessageId(update.getCallbackQuery().getMessage().getMessageId());
+                return;
+            } else if (pageNumber == Rule.getMaxPage()){
+                builder.row().
+                        button("на " + (pageNumber - 1), "to_" + (pageNumber - 1)).
+                        endRow();
+                DeleteMessage deleteMessage = new DeleteMessage();
+                deleteMessage.setChatId(chatId);
+                Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
+                deleteMessage.setMessageId(messageId);
+                telegramBot.sendMessage(deleteMessage);
+                telegramBot.sendMessage(builder.build());
+                return;
             }
             telegramBot.sendMessage(builder.build());
         }
 
+    /**
+     * send profile data
+     * @param user the user for whom to send information about profile
+     */
     private void sendProfile(User user) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("статистика:").append("\n").
