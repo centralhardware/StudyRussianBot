@@ -7,16 +7,12 @@
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
 
 import org.apache.log4j.Logger;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.*;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Rule;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Word;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
 
 import java.util.HashMap;
 
@@ -28,6 +24,7 @@ public class TelegramParser {
     private final TelegramBot telegramBot;
     private final HashMap<Long, User> users = new HashMap<>();
     private final Resource resource = new Resource();
+    private final RSA rsa = new RSA();
 
     public HashMap<Long, User> getUsers() {
         return users;
@@ -45,18 +42,18 @@ public class TelegramParser {
      * @param update
      */
     public void parseText(Update update) {
-        String message = update.getMessage().getText();
-        long chatId = update.getMessage().getChatId();
-        User user = users.get(chatId);
+        var message = update.getMessage().getText();
+        var chatId = update.getMessage().getChatId();
+        var user = users.get(chatId);
         JedisData.getInstance().received(chatId);
         switch (message) {
             case "/start":
-                telegramBot.sendMessage(Config.getInstance().getStartupMessage(),
+                telegramBot.send(Config.getInstance().getStartupMessage(),
                         update.getMessage().getChatId());
                 sendMenu(chatId);
                 break;
-            case "/info":
-                telegramBot.sendMessage(Config.getInstance().getHelpMessage(), chatId);
+            case "/help":
+                telegramBot.send(Config.getInstance().getHelpMessage(), chatId);
                 break;
             case "/rules":
                 sendRuleInlineKeyboard(update, 0);
@@ -64,46 +61,60 @@ public class TelegramParser {
             case "/profile":
                 sendProfile(user);
                 break;
+            case "ping":
+                telegramBot.send("pong", chatId);
+                break;
+            case "pong":
+                telegramBot.send(":(", chatId);
+                break;
             default:
+                if (message.startsWith("/gen ")){
+                    if (update.getMessage().getFrom().getId() == Config.getInstance().getAdminId()){
+                        telegramBot.send(rsa.generateKey(message.replace("/gen ", "")), chatId);
+
+                    } else {
+                        telegramBot.send("access denied", update.getMessage().getChatId());
+                    }
+                }
                 if (user.getStatus() == UserStatus.WAIT_COUNT_OF_WORD) {
                     int count;
                     try {
                         count = Integer.parseInt(message);
                         user.setCount(count);
                         if (count > user.getCurrRule().getWords().size()){
-                            telegramBot.sendMessage(resource.getStringByKey("STR_1"), chatId);
+                            telegramBot.send(resource.getStringByKey("STR_1"), chatId);
                             user.setStatus(UserStatus.NONE);
                             user.getWords().clear();
                         } else {
                             user.setStatus(UserStatus.TESTING);
                             user.getWords().addAll(user.getCurrRule().getWord(count));
-                            telegramBot.sendMessage(user.getWords().get(0).getName(), chatId);
+                            telegramBot.send(user.getWords().get(0).getName(), chatId);
                         }
                     } catch (NumberFormatException e) {
-                        telegramBot.sendMessage(resource.getStringByKey("STR_2"), chatId);
+                        telegramBot.send(resource.getStringByKey("STR_2"), chatId);
                     }
                     break;
                 } else if (user.getStatus() == UserStatus.TESTING){
                     if (user.getWords().get(0).getAnswer().toLowerCase().equals(message.toLowerCase())){
-                        telegramBot.sendMessage(resource.getStringByKey("STR_3"), chatId);
+                        telegramBot.send(resource.getStringByKey("STR_3"), chatId);
                         user.getWords().remove(0);
                         if (user.getWords().size() == 0){
-                            telegramBot.sendMessage(resource.getStringByKey("STR_4"), chatId);
-                            telegramBot.sendMessage(user.getResult(), chatId);
+                            telegramBot.send(resource.getStringByKey("STR_4"), chatId);
+                            telegramBot.send(user.getResult(), chatId);
                             JedisData.getInstance().checkRule(user);
                             sendMenu(chatId);
                             user.reset();
                             return;
                         }
-                        telegramBot.sendMessage(user.getWords().get(0).getName(), chatId);
+                        telegramBot.send(user.getWords().get(0).getName(), chatId);
                         JedisData.getInstance().checkWord(user);
                     } else{
-                        telegramBot.sendMessage(resource.getStringByKey("STR_5"), chatId);
+                        telegramBot.send(resource.getStringByKey("STR_5"), chatId);
                         Word temp = user.getWords().get(0);
                         user.getWords().remove(0);
                         user.getWords().add(temp);
                         user.getWrongWords().add(temp);
-                        telegramBot.sendMessage(user.getWords().get(0).getName(),chatId);
+                        telegramBot.send(user.getWords().get(0).getName(),chatId);
                     }
                 }
         }
@@ -114,9 +125,9 @@ public class TelegramParser {
      * @param update
      */
         public void parsCallback (Update update){
-            String callback = update.getCallbackQuery().getData();
-            long chatId = update.getCallbackQuery().getMessage().getChatId();
-            User user = users.get(chatId);
+            var callback = update.getCallbackQuery().getData();
+            var chatId = update.getCallbackQuery().getMessage().getChatId();
+            var user = users.get(chatId);
             JedisData.getInstance().received(chatId);
             switch (callback){
                 case "reset_testing":
@@ -124,7 +135,7 @@ public class TelegramParser {
                     sendMenu(chatId);
                     break;
                 case "noreset_testing":
-                    telegramBot.sendMessage(user.getWords().get(0).getName(), chatId);
+                    telegramBot.send(user.getWords().get(0).getName(), chatId);
                     return;
                 case "testing":
                     sendRuleInlineKeyboard(update, 0);
@@ -133,45 +144,55 @@ public class TelegramParser {
                     sendProfile(user);
                     break;
                 case "help":
-                    telegramBot.sendMessage(Config.getInstance().getHelpMessage(), chatId);
+                    telegramBot.send(Config.getInstance().getHelpMessage(), chatId);
                     break;
+                case "menu":
+                    telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+                    sendMenu(chatId);
+                    break;
+                case "info":
+                    return;
+                case "enter_key":
+                    telegramBot.send(resource.getStringByKey("STR_22"), chatId);
+                    user.setStatus(UserStatus.WAIT_KEY);
+                    return;
             }
             if (callback.startsWith("to_")){
                 sendRuleInlineKeyboard(update, Integer.parseInt(callback.replace("to_", "")));
             }
             if (user.getStatus() == UserStatus.NONE) {
-                for (Rule rule : Data.getInstance().getWordManager().getRules()) {
+                for (var rule : Data.getInstance().getWordManager().getRules()) {
                     if (rule.getSection().equals(callback)) {
                         user.setStatus(UserStatus.WAIT_COUNT_OF_WORD);
                         user.setCurrRule(rule);
-                        telegramBot.sendMessage(resource.getStringByKey("STR_6") + rule.getName() , chatId);
-                        telegramBot.sendMessage(resource.getStringByKey("STR_7"), chatId);
+                        telegramBot.send(resource.getStringByKey("STR_6") + rule.getName() , chatId);
+                        telegramBot.send(resource.getStringByKey("STR_7"), chatId);
                         return;
                     }
                 }
             } else {
-                InlineKeyboardBuilder builder = InlineKeyboardBuilder.
+                var builder = InlineKeyboardBuilder.
                         create(chatId).
                         setText(resource.getStringByKey("STR_9")).
                         row().
                         button(resource.getStringByKey("YES"), "reset_testing").
                         button(resource.getStringByKey("NO"), "noreset_testing").
                         endRow();
-                telegramBot.sendMessage(builder.build());
+                telegramBot.send(builder.build());
             }
         }
 
-    private void sendMenu(long chatId){
+    public void sendMenu(long chatId){
         logger.info("send inline keyboard menu");
-        InlineKeyboardBuilder builder = InlineKeyboardBuilder.
+        var builder = InlineKeyboardBuilder.
                 create(chatId).
-                setText("меню").
+                setText(resource.getStringByKey("STR_24")).
                 row().
-                button("выбор правила", "testing").
-                button("профиль", "profile").
-                button("справка", "help").
+                button(resource.getStringByKey("STR_23"), "testing").
+                button(resource.getStringByKey("STR_25"), "profile").
+                button(resource.getStringByKey("STR_26"), "help").
                 endRow();
-        telegramBot.sendMessage(builder.build());
+        telegramBot.send(builder.build());
     }
 
     /**
@@ -179,15 +200,17 @@ public class TelegramParser {
      */
         private void sendRuleInlineKeyboard (Update update, int pageNumber){
             long chatId;
+            String message = "";
             if (update.hasCallbackQuery()){
                 chatId = update.getCallbackQuery().getMessage().getChatId();
             } else {
               chatId = update.getMessage().getChatId();
+              message = update.getMessage().getText();
             }
             logger.info("send inline keyboard rules");
-            InlineKeyboardBuilder builder = InlineKeyboardBuilder.
+            var builder = InlineKeyboardBuilder.
                     create(chatId).setText(resource.getStringByKey("STR_8"));
-            for (Rule rule : Data.getInstance().getWordManager().getRules()) {
+            for (var rule : Data.getInstance().getWordManager().getRules()) {
                 if (rule.getPageNumber() == pageNumber){
                     builder.row();
                     if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
@@ -200,30 +223,31 @@ public class TelegramParser {
             }
             if (pageNumber == 0){
                 builder.row().
-                        button("на 2 страницу", "to_1").
+                        button(resource.getStringByKey("STR_17"), "to_1").
+                        button(resource.getStringByKey("STR_24"), "menu").
                         endRow();
+                if (!message.equals("/rules")){
+                    telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+                }
             } else if (pageNumber < Rule.getMaxPage()){
                 builder.row().
-                        button("на " + (pageNumber - 1), "to_" + (pageNumber - 1)).
-                        button("на " + (pageNumber + 1), "to_" + (pageNumber + 1)).
+                        button(resource.getStringByKey("STR_18"), "to_" + (pageNumber - 1)).
+                        button(resource.getStringByKey("STR_17") + (pageNumber + 1), "to_" + (pageNumber + 1)).
+                        button(resource.getStringByKey("STR_24"), "menu").
                         endRow();
-                DeleteMessage deleteMessage = new DeleteMessage();
-                deleteMessage.setChatId(chatId);
-                deleteMessage.setMessageId(update.getCallbackQuery().getMessage().getMessageId());
+                telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+                telegramBot.send(builder.build());
                 return;
             } else if (pageNumber == Rule.getMaxPage()){
                 builder.row().
-                        button("на " + (pageNumber - 1), "to_" + (pageNumber - 1)).
+                        button(resource.getStringByKey("STR_18"), "to_" + (pageNumber - 1)).
+                        button(resource.getStringByKey("STR_24"), "menu").
                         endRow();
-                DeleteMessage deleteMessage = new DeleteMessage();
-                deleteMessage.setChatId(chatId);
-                Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-                deleteMessage.setMessageId(messageId);
-                telegramBot.sendMessage(deleteMessage);
-                telegramBot.sendMessage(builder.build());
+                telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+                telegramBot.send(builder.build());
                 return;
             }
-            telegramBot.sendMessage(builder.build());
+            telegramBot.send(builder.build());
         }
 
     /**
@@ -231,17 +255,30 @@ public class TelegramParser {
      * @param user the user for whom to send information about profile
      */
     private void sendProfile(User user) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("статистика:").append("\n").
-                append("сообщений отправлено: ").append(JedisData.getInstance().getCountOfSentMessage(user.getChatId())).append("\n")
-                .append("сообщений принято: ").append(JedisData.getInstance().getCountOfReceivedMessage(user.getChatId())).append("\n").
-                append("слов отвечено правильно: ").append(JedisData.getInstance().getCountOfCheckedWord(user.getChatId())).append("\n").
-                append("пройденные правила:").append("\n");
-        for (Rule rule : Data.getInstance().getWordManager().getRules()){
+        var builder = new StringBuilder();
+        builder.append(resource.getStringByKey("STR_12")).append("\n").
+                append(resource.getStringByKey("STR_13")).append(JedisData.getInstance().getCountOfSentMessage(user.getChatId())).append("\n")
+                .append(resource.getStringByKey("STR_14")).append(JedisData.getInstance().getCountOfReceivedMessage(user.getChatId())).append("\n").
+                append(resource.getStringByKey("STR_15")).append(JedisData.getInstance().getCountOfCheckedWord(user.getChatId())).append("\n").
+                append(resource.getStringByKey("STR_16")).append("\n");
+        for (var rule : Data.getInstance().getWordManager().getRules()){
             if (JedisData.getInstance().isCheckRule(user.getChatId(), rule.getName())){
-                stringBuilder.append(" - ").append("\"").append(rule.getName()).append("\"").append("\n");
+                builder.append(" - ").append("\"").append(rule.getName()).append("\"").append("\n");
             }
         }
-        telegramBot.sendMessage(stringBuilder.toString(), user.getChatId());
+        telegramBot.send(builder.toString(), user.getChatId());
+    }
+
+    /**
+     * @param chatId
+     */
+    public void sendLoginInfo(long chatId){
+        var builder = InlineKeyboardBuilder.create(chatId).
+                setText(resource.getStringByKey("STR_28")).
+                row().
+                button(resource.getStringByKey("STR_29"), "enter_key").
+                button(resource.getStringByKey("STR_30"), "info").
+                endRow();
+        telegramBot.send(builder.build());
     }
 }

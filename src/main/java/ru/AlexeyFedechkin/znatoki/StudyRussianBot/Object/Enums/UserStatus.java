@@ -6,6 +6,12 @@
 
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums;
 
+/**
+ *
+ */
 public enum UserStatus {
-    NONE, TESTING, WAIT_COUNT_OF_WORD
+    NONE,
+    TESTING, // passing the rules
+    WAIT_COUNT_OF_WORD, // input count of word for testing
+    WAIT_KEY // input activated key
 }

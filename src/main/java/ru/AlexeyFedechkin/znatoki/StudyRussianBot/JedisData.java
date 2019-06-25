@@ -13,6 +13,7 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Word;
 public class JedisData {
     private static final JedisData ourInstance = new JedisData();
     private final Logger logger = Logger.getLogger(Jedis.class);
+    private final RSA rsa = new RSA();
 
     public static JedisData getInstance() {
         return ourInstance;
@@ -31,13 +32,15 @@ public class JedisData {
     private final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";
     private final String CHECKED_WORD_POSTFIX = "_checked_word";
     private final String CHECKED_RULE_POSTFIX = "_checked_rule";
+    private final String KEY_POSTFIX = "_key";
+    private final String ACTIVATED_KEYS_KEY = "activated_keys";
 
     /**
      * store data in redis about count of received messages
      * @param chatId id of user
      */
     public void received(long chatId){
-        String count_of_received_message_key = chatId + COUNT_OF_RECEIVED_MESSAGE_POSTFIX;
+        var count_of_received_message_key = chatId + COUNT_OF_RECEIVED_MESSAGE_POSTFIX;
         if (jedis.get(count_of_received_message_key) == null){
             jedis.set(count_of_received_message_key, "1");
         } else {
@@ -58,7 +61,7 @@ public class JedisData {
      * @param chatId id of user
      */
     public void sent(long chatId){
-        String count_of_sent_message_key = chatId + COUNT_OF_SENT_MESSAGE_POSTFIX;
+        var count_of_sent_message_key = chatId + COUNT_OF_SENT_MESSAGE_POSTFIX;
         if (jedis.get(count_of_sent_message_key) == null){
             jedis.set(count_of_sent_message_key, "1");
         } else {
@@ -75,8 +78,8 @@ public class JedisData {
     }
 
     public void checkRule(User user){
-        String checkWordKey = user.getChatId() + CHECKED_WORD_POSTFIX;
-        String checkRuleKey = user.getChatId() + CHECKED_RULE_POSTFIX;
+        var checkWordKey = user.getChatId() + CHECKED_WORD_POSTFIX;
+        var checkRuleKey = user.getChatId() + CHECKED_RULE_POSTFIX;
         int checkedCount = 0;
         for (Word word : Data.getInstance().wordManager.getRule(user.getCurrRule().getName()).getWords()){
             if (jedis.sismember(checkWordKey, word.getName())){
@@ -96,22 +99,22 @@ public class JedisData {
     }
 
     public boolean isCheckRule(long chatId, String rule){
-        String checkRuleKey = chatId + CHECKED_RULE_POSTFIX;
+        var checkRuleKey = chatId + CHECKED_RULE_POSTFIX;
         return jedis.sismember(checkRuleKey, rule);
     }
 
     public String getCountOfSentMessage(long chatId){
-        String count_of_received_message_key = chatId + COUNT_OF_RECEIVED_MESSAGE_POSTFIX;
+        var count_of_received_message_key = chatId + COUNT_OF_RECEIVED_MESSAGE_POSTFIX;
         return jedis.get(count_of_received_message_key);
     }
 
     public String getCountOfReceivedMessage(long chatId){
-        String count_of_sent_message_key = chatId + COUNT_OF_SENT_MESSAGE_POSTFIX;
+        var count_of_sent_message_key = chatId + COUNT_OF_SENT_MESSAGE_POSTFIX;
         return jedis.get(count_of_sent_message_key);
     }
 
     public int getCountOfCheckedWord(long chatId){
-        String checkWordKey = chatId + CHECKED_WORD_POSTFIX;
+        var checkWordKey = chatId + CHECKED_WORD_POSTFIX;
         int count = 0;
         for (Rule rule : Data.getInstance().wordManager.getRules()){
             for (Word word : rule.getWords()){
@@ -123,9 +126,53 @@ public class JedisData {
         return count;
     }
 
+    /**
+     * @param user user that check word
+     */
     public void checkWord(User user){
-        String checkWordKey = user.getChatId() + CHECKED_WORD_POSTFIX;
+        var checkWordKey = user.getChatId() + CHECKED_WORD_POSTFIX;
         jedis.sadd(checkWordKey, user.getWords().get(0).getName());
         logger.info("add value " + user.getWords().get(0).getName() + " to set by key " + checkWordKey);
+    }
+
+    /**
+     * @param user_id
+     * @return
+     */
+    public boolean checkRight(long user_id){
+        var checkRightKey = user_id + KEY_POSTFIX;
+        var key = jedis.get(checkRightKey);
+        if (key != null){
+            logger.info("right for user = " + user_id + " valid");
+            return true;
+        } else {
+            logger.info("right for user = " + user_id + " don't valid");
+            return false;
+        }
+    }
+
+    /**
+     * @param user_id
+     * @param key
+     * @return
+     */
+    public boolean setRight(long user_id, String key){
+        var checkRightKey = user_id + KEY_POSTFIX;
+        if (jedis.get(ACTIVATED_KEYS_KEY) == null){
+            jedis.set(checkRightKey, key);
+            jedis.set(ACTIVATED_KEYS_KEY, key);
+            logger.info("set right for key = " + key + " and user = " + user_id);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void deleteKey(String key){
+        jedis.del(key);
+    }
+
+    public String getKey(String key){
+        return jedis.get(key);
     }
 }

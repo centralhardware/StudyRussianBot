@@ -45,18 +45,19 @@ public class Word {
      */
     public static Word parse(String str){
         logger.info("parsing string " + str);
-        String[] args = str.split(" ");
+        var args = str.split(" ");
         if (args.length != 7){
             logger.warn("error in data file " + str);
+            return null;
         }
-        String name = args[0].replace("%20", " ");
-        String wrightName = args[1].replace("%20", " ");
-        String answer = args[2];
-        String section = args[3];
+        var name = args[0].replace("%20", " ");
+        var wrightName = args[1].replace("%20", " ");
+        var answer = args[2];
+        var section = args[3];
         SchoolStage stage = null;
-        boolean isHigh = Boolean.parseBoolean(args[4]);
-        boolean isSecondary = Boolean.parseBoolean(args[5]);
-        boolean isPrimary = Boolean.parseBoolean(args[6]);
+        var isHigh = Boolean.parseBoolean(args[4]);
+        var isSecondary = Boolean.parseBoolean(args[5]);
+        var isPrimary = Boolean.parseBoolean(args[6]);
         if (isHigh && isSecondary) {
             stage = SchoolStage.SECONDARY_AND_HIGH;
         }

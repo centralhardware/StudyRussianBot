@@ -33,9 +33,25 @@ public class Config {
     private static final String IS_USE_PROXY_KEY = "IS_USE_PROXY";
     private static final String REDIS_HOST_KEY = "REDIS_HOST";
     private static final String REDIS_PORT_KEY = "REDIS_PORT";
+    private static final String DB_HOST_KEY = "DATABASE_HOST";
+    private static final String ADMIN_ID = "ADMIN_ID";
+    private static final String RSA_PRIVATE_KEY = "RSA_PRIVATE_KEY";
+    private static final String RSA_PUBLIC_KEY = "RSA_PUBLIC_KEY";
 
     private Config() {
         config = ResourceBundle.getBundle("config");
+    }
+
+    public long getAdminId(){
+        return Long.parseLong(config.getString(ADMIN_ID));
+    }
+
+    public String getRsaPrivateKey(){
+        return config.getString(RSA_PRIVATE_KEY);
+    }
+
+    public String getRsaPublicKey(){
+        return config.getString(RSA_PUBLIC_KEY);
     }
 
     public boolean isUseProxy(){

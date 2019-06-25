@@ -7,5 +7,8 @@
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums;
 
 public enum SchoolStage {
-    PRIMARY, SECONDARY, HIGH, SECONDARY_AND_HIGH
+    PRIMARY, //1 - 4 class
+    SECONDARY, // 5 - 9 class
+    HIGH, // 10 - 11 class
+    SECONDARY_AND_HIGH // 5 - 11 class
 }

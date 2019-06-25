@@ -8,13 +8,11 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Rule;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Word;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -34,60 +32,63 @@ public class WordManager {
      * @throws IOException file not find or other IO problem
      */
     public void init() throws IOException {
-        String wordString = getStringFromResources("word.json");
-        String ruleString = getStringFromResources("rule.json");
-        String wrongMessageString = getStringFromResources("wrongMessage.json");
+        var wordString = getStringFromResources("word.json");
+        var ruleString = getStringFromResources("rule.json");
+        var wrongMessageString = getStringFromResources("wrongMessage.json");
 
-        JSONObject wrongMessageObject = new JSONObject(wrongMessageString);
-        JSONArray wrongMessageArray = wrongMessageObject.getJSONArray("data");
+        var wrongMessageObject = new JSONObject(wrongMessageString);
+        var wrongMessageArray = wrongMessageObject.getJSONArray("data");
         for (int i = 0; i < wrongMessageArray.length(); i++) {
             wrongMessages.add(wrongMessageArray.getString(i));
         }
 
-        JSONObject ruleObject = new JSONObject(ruleString);
-        JSONObject ruleData = ruleObject.getJSONObject("data");
+        var ruleObject = new JSONObject(ruleString);
+        var ruleData = ruleObject.getJSONObject("data");
         for (int i = 1; i < ruleObject.getInt("count"); i++) {
             JSONObject object = ruleData.getJSONObject(String.valueOf(i));
             rules.add(new Rule(object.getString("name"), null, object.getString("section"), new ArrayList<>()));
         }
         for (int i = 1; i < ruleObject.getInt("count"); i++) {
-            JSONObject object = ruleData.getJSONObject(String.valueOf(i));
+            var object = ruleData.getJSONObject(String.valueOf(i));
             if (object.getInt("parent") != -1){
                 rules.get(i).setParent(rules.get(object.getInt("parent")-1));
             }
         }
 
-        JSONObject wordObject = new JSONObject(wordString);
-        JSONArray wordArray = wordObject.getJSONArray("word");
-        ArrayList<Word> words = new ArrayList<>();
+        var wordObject = new JSONObject(wordString);
+        var wordArray = wordObject.getJSONArray("word");
+        var words = new ArrayList<Word>();
         for (int i = 0; i < wordArray.length(); i++) {
-            words.add(Word.parse(wordArray.getString(i)));
+            Word word = Word.parse(wordArray.getString(i));
+            if (word != null){
+                words.add(word);
+            }
         }
 
-        for (Rule r : rules){
+        for (var r : rules){
             if (r.getSection().equals("all")){
                 r.getWords().addAll(words);
             }
-            for (Word w : words){
+            for (var w : words){
                 if (r.getSection().equals(w.getSection())){
                     r.getWords().add(w);
                 }
             }
         }
 
-        for (Rule r : rules){
+        for (var r : rules){
             if (r.getParent() != null){
                 r.getParent().getWords().addAll(r.getWords());
             }
         }
 
-        int count = 1;
+        var count = 1;
         for (var rule : rules) {
             rule.setPageNumber((byte) (count/ Rule.pageCountRule));
             count++;
         }
 
-        for (Rule r : rules){
+        for (var r : rules){
             logger.info("in rule " + r.getName() + " added " + r.getWords().size() + "  words");
         }
     }
@@ -98,14 +99,14 @@ public class WordManager {
      * @return string from file that placed in resource folder
      */
     private String getStringFromResources(String fileName) throws IOException {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(fileName);
-        StringWriter writer = new StringWriter();
+        var classLoader = ClassLoader.getSystemClassLoader();
+        var inputStream = classLoader.getResourceAsStream(fileName);
+        var writer = new StringWriter();
         IOUtils.copy(Objects.requireNonNull(inputStream), writer);
         return writer.toString();
     }
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     /**
      * @return random string with remark about error
@@ -119,7 +120,7 @@ public class WordManager {
     }
 
     public Rule getRule(String rule){
-        for (Rule r : rules){
+        for (var r : rules){
             if (r.getName().equals(rule)){
                 return r;
             }

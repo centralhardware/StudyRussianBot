@@ -21,7 +21,7 @@ public class InlineKeyboardBuilder {
     }
 
     public static InlineKeyboardBuilder create(Long chatId) {
-        InlineKeyboardBuilder builder = new InlineKeyboardBuilder();
+        var builder = new InlineKeyboardBuilder();
         builder.setChatId(chatId);
         return builder;
     }
@@ -54,29 +54,12 @@ public class InlineKeyboardBuilder {
 
 
     public SendMessage build() {
-        SendMessage message = new SendMessage();
-
+        var message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
-
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-
         keyboardMarkup.setKeyboard(keyboard);
         message.setReplyMarkup(keyboardMarkup);
-
         return message;
     }
-
-//    public EditMessageReplyMarkup buildMarkup(long messageId){
-//        EditMessageReplyMarkup message = new EditMessageReplyMarkup();
-//        message.setChatId(chatId);
-//        message.setInlineMessageId(null);
-//        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-//
-//        keyboardMarkup.setKeyboard(keyboard);
-//        message.setReplyMarkup(keyboardMarkup);
-////        message.setMessageId(messageId);
-//
-//        return message;
-//    }
 }

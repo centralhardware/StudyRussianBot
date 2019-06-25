@@ -76,21 +76,21 @@ public class User {
 
     private final Resource resource = new Resource();
     public String getResult() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(resource.getStringByKey("STR_10")).append(count).append("\n");
-        stringBuilder.append(resource.getStringByKey("STR_11")).append("\n");
+        var builder = new StringBuilder();
+        builder.append(resource.getStringByKey("STR_10")).append(count).append("\n");
+        builder.append(resource.getStringByKey("STR_11")).append("\n");
         HashMap<String, Integer> result = new HashMap<>();
-        for (Word word : wrongWords){
+        for (var word : wrongWords){
             if (!result.containsKey(word.getWrightName())){
                 result.put(word.getWrightName(), 1);
             } else {
                 result.put(word.getWrightName(), result.get(word.getWrightName()) + 1);
             }
         }
-        for (String key : result.keySet()){
-            stringBuilder.append(key).append(" - ").append(result.get(key)).append("\n");
+        for (var key : result.keySet()){
+            builder.append(key).append(" - ").append(result.get(key)).append("\n");
         }
-        stringBuilder.append("всего ").append(result.size()).append(" слов").append("\n");
-        return stringBuilder.toString();
+        builder.append("всего ").append(result.size()).append(" слов").append("\n");
+        return builder.toString();
     }
 }

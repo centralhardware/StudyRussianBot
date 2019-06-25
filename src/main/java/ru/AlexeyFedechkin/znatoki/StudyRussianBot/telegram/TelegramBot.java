@@ -13,13 +13,15 @@ import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.User;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.RSA;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
 
 import java.net.Authenticator;
 import java.net.InetAddress;
@@ -33,6 +35,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final Logger logger = Logger.getLogger(TelegramBot.class);
     private TelegramParser telegramParser;
+    private final RSA rsa = new RSA();
+    private final Resource resource = new Resource();
 
     /**
      * set proxy setting
@@ -63,8 +67,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                             Config.getInstance().getProxyPassword().toCharArray());
                 }
             });
-            TelegramBotsApi botsApi = new TelegramBotsApi();
-            DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
+            var botsApi = new TelegramBotsApi();
+            var botOptions = ApiContext.getInstance(DefaultBotOptions.class);
             botOptions.setProxyHost(Config.getInstance().getProxyHost());
             botOptions.setProxyPort(Config.getInstance().getProxyPort());
             botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
@@ -77,7 +81,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 System.exit(20);
             }
         } else {
-            TelegramBotsApi botsApi = new TelegramBotsApi();
+            var botsApi = new TelegramBotsApi();
             try {
                 botsApi.registerBot(new TelegramBot());
                 logger.info("bot register");
@@ -95,13 +99,42 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (telegramParser == null){
             telegramParser = new TelegramParser(this);
         }
+        long userId;
+        long chatId;
         if (update.hasCallbackQuery()){
             if (!telegramParser.getUsers().containsKey(update.getCallbackQuery().getMessage().getChatId())){
                 telegramParser.getUsers().put(update.getCallbackQuery().getMessage().getChatId(), new User(update.getCallbackQuery().getMessage().getChatId()));
             }
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+            userId = update.getCallbackQuery().getFrom().getId();
         } else {
             if (!telegramParser.getUsers().containsKey(update.getMessage().getChatId())){
                 telegramParser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
+            }
+            chatId = update.getMessage().getChatId();
+            userId = update.getMessage().getFrom().getId();
+        }
+        if (!JedisData.getInstance().checkRight(userId) && userId != Config.getInstance().getAdminId()){
+            if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_KEY){
+                if (rsa.validateKey(update.getMessage().getFrom().getFirstName(), update.getMessage().getText())){
+                    telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
+                    if (JedisData.getInstance().setRight(userId, update.getMessage().getText())){
+                        send(resource.getStringByKey("STR_19"), chatId);
+                        telegramParser.sendMenu(chatId);
+                    } else {
+                        send(resource.getStringByKey("STR_20"), chatId);
+                        return;
+                    }
+                } else {
+                    send(resource.getStringByKey("STR_21"), chatId);
+                }
+            } else {
+                if (update.hasCallbackQuery()){
+                  telegramParser.parsCallback(update);
+                } else {
+                    telegramParser.sendLoginInfo(chatId);
+                }
+                return;
             }
         }
         if (update.hasCallbackQuery()){
@@ -114,7 +147,8 @@ public class TelegramBot extends TelegramLongPollingBot {
             logger.info("receive message " + update.getMessage().getText() +
                     " from " + update.getMessage().getFrom().getFirstName() + " " +
                     update.getMessage().getFrom().getLastName() + " " +
-                    update.getMessage().getFrom().getUserName());
+                    update.getMessage().getFrom().getUserName() + " " +
+                    update.getMessage().getFrom().getId().toString());
             telegramParser.parseText(update);
         }
     }
@@ -124,9 +158,9 @@ public class TelegramBot extends TelegramLongPollingBot {
      * @param message string with message to user
      * @param chatId id of chat where to send message
      */
-    public void sendMessage(String message, long chatId){
+    public void send(String message, long chatId){
         logger.info("send message " + message);
-        SendMessage msg = new SendMessage().
+        var msg = new SendMessage().
                 setChatId(chatId).
                 setText(message);
         try{
@@ -141,7 +175,7 @@ public class TelegramBot extends TelegramLongPollingBot {
      * send SendMessage to telegram user
      * @param sendMessage
      */
-    public void sendMessage(SendMessage sendMessage){
+    public void send(SendMessage sendMessage){
         logger.info("send message " + sendMessage.getText());
         try{
             execute(sendMessage);
@@ -151,21 +185,15 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendMessage(EditMessageReplyMarkup messageReplyMarkup){
-        logger.info("send edit reply markup " + messageReplyMarkup.getReplyMarkup());
+    public void delete(Long chatId, Integer messageId){
+        logger.info("delete message " + chatId + " " + messageId);
+        var deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(chatId);
+        deleteMessage.setMessageId(messageId);
         try{
-            execute(messageReplyMarkup);
+            execute(deleteMessage);
         } catch (TelegramApiException e) {
-            logger.warn("fail to send edit reply markup", e);
-        }
-    }
-
-    public void sendMessage(DeleteMessage message){
-        logger.info("delete message " + message.getMessageId());
-        try{
-            execute(message);
-        } catch (TelegramApiException e) {
-            logger.warn("fail delete message", e);
+            logger.info("delete fail " + chatId + " " + messageId);
         }
     }
 
