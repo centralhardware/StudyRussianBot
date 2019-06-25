@@ -75,6 +75,15 @@ public class TelegramParser {
                     } else {
                         telegramBot.send("access denied", update.getMessage().getChatId());
                     }
+                } else if (message.startsWith("/ver ")) {
+                    var args = message.replace("/ver ", "").split(" ");
+                    String key = args[0];
+                    String msg = args[1];
+                    if (update.getMessage().getFrom().getId() == Config.getInstance().getAdminId()){
+                        telegramBot.send(String.valueOf(rsa.validateKey(msg, key)), chatId);
+                    } else {
+                        telegramBot.send("access denied", update.getMessage().getChatId());
+                    }
                 }
                 if (user.getStatus() == UserStatus.WAIT_COUNT_OF_WORD) {
                     int count;
@@ -156,6 +165,10 @@ public class TelegramParser {
                     telegramBot.send(resource.getStringByKey("STR_22"), chatId);
                     user.setStatus(UserStatus.WAIT_KEY);
                     return;
+                case "login":
+                    telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+                    sendLoginInfo(chatId);
+                    return;
             }
             if (callback.startsWith("to_")){
                 sendRuleInlineKeyboard(update, Integer.parseInt(callback.replace("to_", "")));
@@ -182,6 +195,9 @@ public class TelegramParser {
             }
         }
 
+    /**
+     * @param chatId
+     */
     public void sendMenu(long chatId){
         logger.info("send inline keyboard menu");
         var builder = InlineKeyboardBuilder.
@@ -192,6 +208,11 @@ public class TelegramParser {
                 button(resource.getStringByKey("STR_25"), "profile").
                 button(resource.getStringByKey("STR_26"), "help").
                 endRow();
+        if (!JedisData.getInstance().checkRight(chatId) && chatId != Config.getInstance().getAdminId()){
+            builder.row().
+                    button("получить полный доступ", "login").
+                    endRow();
+        }
         telegramBot.send(builder.build());
     }
 
@@ -210,8 +231,15 @@ public class TelegramParser {
             logger.info("send inline keyboard rules");
             var builder = InlineKeyboardBuilder.
                     create(chatId).setText(resource.getStringByKey("STR_8"));
-            for (var rule : Data.getInstance().getWordManager().getRules()) {
-                if (rule.getPageNumber() == pageNumber){
+            long userId;
+            if (update.hasCallbackQuery()){
+                userId = update.getCallbackQuery().getFrom().getId();
+            } else {
+                userId = update.getMessage().getFrom().getId();
+            }
+            if (!JedisData.getInstance().checkRight(userId) && userId != Config.getInstance().getAdminId()){
+                for (var i = 0; i < 3; i++) {
+                    var rule = Data.getInstance().wordManager.getRules().get(i);
                     builder.row();
                     if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
                         builder.button("✅" + rule.getName(), rule.getSection());
@@ -219,6 +247,18 @@ public class TelegramParser {
                         builder.button(rule.getName(), rule.getSection());
                     }
                     builder.endRow();
+                }
+            } else {
+                for (var rule : Data.getInstance().getWordManager().getRules()) {
+                    if (rule.getPageNumber() == pageNumber){
+                        builder.row();
+                        if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
+                            builder.button("✅" + rule.getName(), rule.getSection());
+                        } else {
+                            builder.button(rule.getName(), rule.getSection());
+                        }
+                        builder.endRow();
+                    }
                 }
             }
             if (pageNumber == 0){
@@ -266,6 +306,13 @@ public class TelegramParser {
                 builder.append(" - ").append("\"").append(rule.getName()).append("\"").append("\n");
             }
         }
+        if (Config.getInstance().getAdminId() == user.getChatId()){
+            builder.append("тип профиля:").append(" администратор");
+        } else if  (JedisData.getInstance().checkRight(user.getChatId())){
+            builder.append("тип профиля:").append(" полный доступ");
+        } else {
+            builder.append("тип профиля:").append(" демо доступ");
+        }
         telegramBot.send(builder.toString(), user.getChatId());
     }
 
@@ -278,6 +325,9 @@ public class TelegramParser {
                 row().
                 button(resource.getStringByKey("STR_29"), "enter_key").
                 button(resource.getStringByKey("STR_30"), "info").
+                endRow().
+                row().
+                button("демо", "menu").
                 endRow();
         telegramBot.send(builder.build());
     }

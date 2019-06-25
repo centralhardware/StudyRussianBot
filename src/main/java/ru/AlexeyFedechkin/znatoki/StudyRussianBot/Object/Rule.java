@@ -60,6 +60,11 @@ public class Rule {
     }
 
     private final Random random = new Random();
+
+    /**
+     * @param count
+     * @return
+     */
     public  Collection<Word> getWord(int count) {
         HashSet<Word> wordSet = new HashSet<>();
         while (wordSet.size() < count){
@@ -68,6 +73,9 @@ public class Rule {
         return new ArrayList<>(wordSet);
     }
 
+    /**
+     * @return
+     */
     public static int getMaxPage(){
         int max = 0;
         for (var rule : Data.getInstance().wordManager.getRules()){

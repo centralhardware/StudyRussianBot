@@ -75,6 +75,10 @@ public class User {
     }
 
     private final Resource resource = new Resource();
+
+    /**
+     * @return
+     */
     public String getResult() {
         var builder = new StringBuilder();
         builder.append(resource.getStringByKey("STR_10")).append(count).append("\n");

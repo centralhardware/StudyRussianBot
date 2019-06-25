@@ -116,18 +116,27 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
         if (!JedisData.getInstance().checkRight(userId) && userId != Config.getInstance().getAdminId()){
             if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_KEY){
-                if (rsa.validateKey(update.getMessage().getFrom().getFirstName(), update.getMessage().getText())){
-                    telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
-                    if (JedisData.getInstance().setRight(userId, update.getMessage().getText())){
-                        send(resource.getStringByKey("STR_19"), chatId);
-                        telegramParser.sendMenu(chatId);
+                if (!update.hasCallbackQuery()){
+                    if (rsa.validateKey(update.getMessage().getFrom().getFirstName(), update.getMessage().getText())){
+                        telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
+                        if (JedisData.getInstance().setRight(userId, update.getMessage().getText())){
+                            send(resource.getStringByKey("STR_19"), chatId);
+                            telegramParser.sendMenu(chatId);
+                        } else {
+                            send(resource.getStringByKey("STR_20"), chatId);
+                            return;
+                        }
                     } else {
-                        send(resource.getStringByKey("STR_20"), chatId);
-                        return;
+                        if (update.hasCallbackQuery()){
+                            telegramParser.parsCallback(update);
+                            return;
+                        }
+                        send(resource.getStringByKey("STR_21"), chatId);
                     }
-                } else {
-                    send(resource.getStringByKey("STR_21"), chatId);
                 }
+            } else if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_COUNT_OF_WORD || telegramParser.getUsers().get(chatId).getStatus() == UserStatus.TESTING){
+                telegramParser.parseText(update);
+                return;
             } else {
                 if (update.hasCallbackQuery()){
                   telegramParser.parsCallback(update);
@@ -136,20 +145,21 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
                 return;
             }
-        }
-        if (update.hasCallbackQuery()){
-            logger.info("receive callback " + update.getCallbackQuery().getData() + " " +
-                    update.getCallbackQuery().getFrom().getFirstName() + " " +
-                    update.getCallbackQuery().getFrom().getLastName() + " " +
-                    update.getCallbackQuery().getFrom().getUserName());
-            telegramParser.parsCallback(update);
         } else {
-            logger.info("receive message " + update.getMessage().getText() +
-                    " from " + update.getMessage().getFrom().getFirstName() + " " +
-                    update.getMessage().getFrom().getLastName() + " " +
-                    update.getMessage().getFrom().getUserName() + " " +
-                    update.getMessage().getFrom().getId().toString());
-            telegramParser.parseText(update);
+            if (update.hasCallbackQuery()){
+                logger.info("receive callback " + update.getCallbackQuery().getData() + " " +
+                        update.getCallbackQuery().getFrom().getFirstName() + " " +
+                        update.getCallbackQuery().getFrom().getLastName() + " " +
+                        update.getCallbackQuery().getFrom().getUserName());
+                telegramParser.parsCallback(update);
+            } else {
+                logger.info("receive message " + update.getMessage().getText() +
+                        " from " + update.getMessage().getFrom().getFirstName() + " " +
+                        update.getMessage().getFrom().getLastName() + " " +
+                        update.getMessage().getFrom().getUserName() + " " +
+                        update.getMessage().getFrom().getId().toString());
+                telegramParser.parseText(update);
+            }
         }
     }
 

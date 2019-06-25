@@ -77,6 +77,9 @@ public class JedisData {
         logger.info("set key " + COUNT_OF_SENT_MESSAGE_KEY + " value " + jedis.get(COUNT_OF_SENT_MESSAGE_KEY));
     }
 
+    /**
+     * @param user
+     */
     public void checkRule(User user){
         var checkWordKey = user.getChatId() + CHECKED_WORD_POSTFIX;
         var checkRuleKey = user.getChatId() + CHECKED_RULE_POSTFIX;
@@ -98,21 +101,38 @@ public class JedisData {
         }
     }
 
+    /**
+     * @param chatId
+     * @param rule
+     * @return
+     */
     public boolean isCheckRule(long chatId, String rule){
         var checkRuleKey = chatId + CHECKED_RULE_POSTFIX;
         return jedis.sismember(checkRuleKey, rule);
     }
 
+    /**
+     * @param chatId
+     * @return
+     */
     public String getCountOfSentMessage(long chatId){
         var count_of_received_message_key = chatId + COUNT_OF_RECEIVED_MESSAGE_POSTFIX;
         return jedis.get(count_of_received_message_key);
     }
 
+    /**
+     * @param chatId
+     * @return
+     */
     public String getCountOfReceivedMessage(long chatId){
         var count_of_sent_message_key = chatId + COUNT_OF_SENT_MESSAGE_POSTFIX;
         return jedis.get(count_of_sent_message_key);
     }
 
+    /**
+     * @param chatId
+     * @return
+     */
     public int getCountOfCheckedWord(long chatId){
         var checkWordKey = chatId + CHECKED_WORD_POSTFIX;
         int count = 0;
@@ -168,10 +188,17 @@ public class JedisData {
         }
     }
 
+    /**
+     * @param key
+     */
     public void deleteKey(String key){
         jedis.del(key);
     }
 
+    /**
+     * @param key
+     * @return
+     */
     public String getKey(String key){
         return jedis.get(key);
     }
