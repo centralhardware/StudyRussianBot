@@ -1,0 +1,194 @@
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
+
+import org.apache.log4j.Logger;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Rule;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
+
+public class InlineKeyboard {
+    private final Resource resource = new Resource();
+    private final Logger logger = Logger.getLogger(InlineKeyboardBuilder.class);
+    private TelegramBot telegramBot;
+
+    public InlineKeyboard(TelegramBot telegramBot){
+        this.telegramBot = telegramBot;
+    }
+
+    public void sendBookInlineKeyBoard(Update update, int pageNumber){
+        long chatId;
+        String message = "";
+        if (update.hasCallbackQuery()){
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+        } else {
+            chatId = update.getMessage().getChatId();
+            message = update.getMessage().getText();
+        }
+        logger.info("send book keyboard rules");
+        var builder = InlineKeyboardBuilder.
+                create(chatId).setText(resource.getStringByKey("STR_42"));
+        long userId;
+        if (update.hasCallbackQuery()){
+            userId = update.getCallbackQuery().getFrom().getId();
+        } else {
+            userId = update.getMessage().getFrom().getId();
+        }
+        if (!JedisData.getInstance().checkRight(userId) &&  Config.getInstance().getAdminsId().contains(userId)){
+            for (var i = 0; i < 3; i++) {
+                var ruleDescription = Data.getInstance().wordManager.getRuleDescriptions().get(i);
+                builder.row().
+                        button(ruleDescription.getName(), "book"+ruleDescription.getId()).
+                        endRow();
+            }
+        } else {
+            for (var ruleDescription : Data.getInstance().getWordManager().getRuleDescriptions()) {
+                if (ruleDescription.getPageNumber() == pageNumber){
+                    builder.
+                            row().
+                            button(ruleDescription.getName(), "book"+ruleDescription.getId()).
+                            endRow();
+                }
+            }
+        }
+        if (pageNumber == 0){
+            builder.row().
+                    button(resource.getStringByKey("STR_17"), "book_to_1").
+                    button(resource.getStringByKey("STR_24"), "menu").
+                    endRow();
+            if (!message.equals("/book")){
+                telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            }
+        } else if (pageNumber < Rule.getMaxPage()){
+            builder.row().
+                    button(resource.getStringByKey("STR_18"), "book_to_" + (pageNumber - 1)).
+                    button(resource.getStringByKey("STR_17") + (pageNumber + 1), "book_to_" + (pageNumber + 1)).
+                    button(resource.getStringByKey("STR_24"), "menu").
+                    endRow();
+            telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            telegramBot.send(builder.build());
+            return;
+        } else if (pageNumber == Rule.getMaxPage()){
+            builder.row().
+                    button(resource.getStringByKey("STR_18"), "book_to_" + (pageNumber - 1)).
+                    button(resource.getStringByKey("STR_24"), "menu").
+                    endRow();
+            telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            telegramBot.send(builder.build());
+            return;
+        }
+        telegramBot.send(builder.build());
+    }
+
+    public void sendRuleInlineKeyboard(Update update, int pageNumber){
+        long chatId;
+        String message = "";
+        if (update.hasCallbackQuery()){
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+        } else {
+            chatId = update.getMessage().getChatId();
+            message = update.getMessage().getText();
+        }
+        logger.info("send inline keyboard rules");
+        var builder = InlineKeyboardBuilder.
+                create(chatId).setText(resource.getStringByKey("STR_8"));
+        long userId;
+        if (update.hasCallbackQuery()){
+            userId = update.getCallbackQuery().getFrom().getId();
+        } else {
+            userId = update.getMessage().getFrom().getId();
+        }
+        if (!JedisData.getInstance().checkRight(userId) &&  Config.getInstance().getAdminsId().contains(userId)){
+            for (var i = 1; i < 4; i++) {
+                var rule = Data.getInstance().wordManager.getRules().get(i);
+                builder.row();
+                if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
+                    builder.button("✅" + rule.getName(), rule.getSection());
+                } else {
+                    builder.button(rule.getName(), rule.getSection());
+                }
+                builder.endRow();
+            }
+        } else {
+            for (var rule : Data.getInstance().getWordManager().getRules()) {
+                if (rule.getPageNumber() == pageNumber){
+                    builder.row();
+                    if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
+                        builder.button("✅" + rule.getName(), rule.getSection());
+                    } else {
+                        builder.button(rule.getName(), rule.getSection());
+                    }
+                    builder.endRow();
+                }
+            }
+        }
+        if (pageNumber == 0){
+            builder.row().
+                    button(resource.getStringByKey("STR_17"), "to_1").
+                    button(resource.getStringByKey("STR_24"), "menu").
+                    endRow();
+            if (!message.equals("/rules")){
+                telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            }
+        } else if (pageNumber < Rule.getMaxPage()){
+            builder.row().
+                    button(resource.getStringByKey("STR_18"), "to_" + (pageNumber - 1)).
+                    button(resource.getStringByKey("STR_17") + (pageNumber + 1), "to_" + (pageNumber + 1)).
+                    button(resource.getStringByKey("STR_24"), "menu").
+                    endRow();
+            telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            telegramBot.send(builder.build());
+            return;
+        } else if (pageNumber == Rule.getMaxPage()){
+            builder.row().
+                    button(resource.getStringByKey("STR_18"), "to_" + (pageNumber - 1)).
+                    button(resource.getStringByKey("STR_24"), "menu").
+                    endRow();
+            telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            telegramBot.send(builder.build());
+            return;
+        }
+        telegramBot.send(builder.build());
+    }
+
+    public void sendLoginInfo(long chatId){
+        var builder = InlineKeyboardBuilder.create(chatId).
+                setText(resource.getStringByKey("STR_28")).
+                row().
+                button(resource.getStringByKey("STR_29"), "enter_key").
+                button(resource.getStringByKey("STR_30"), "info").
+                endRow().
+                row().
+                button(resource.getStringByKey("STR_41"), "menu").
+                endRow().
+                row().
+                button(resource.getStringByKey("STR_40"), "buy_key").
+                endRow().
+                row().
+                button(resource.getStringByKey("STR_26"), "help").
+                endRow();
+        telegramBot.send(builder.build());
+    }
+
+    public void sendMenu(long chatId){
+        logger.info("send inline keyboard menu");
+        var builder = InlineKeyboardBuilder.
+                create(chatId).
+                setText(resource.getStringByKey("STR_24")).
+                row().
+                button(resource.getStringByKey("STR_23"), "testing").
+                button(resource.getStringByKey("STR_25"), "profile").
+                button(resource.getStringByKey("STR_26"), "help").
+                endRow().
+                row().
+                button(resource.getStringByKey("STR_34"), "book").
+                endRow();
+        if (!JedisData.getInstance().checkRight(chatId) &&  !Config.getInstance().getAdminsId().contains(chatId)){
+            builder.row().
+                    button(resource.getStringByKey("STR_36"), "login").
+                    endRow();
+        }
+        telegramBot.send(builder.build());
+    }
+}

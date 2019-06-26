@@ -37,6 +37,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private TelegramParser telegramParser;
     private final RSA rsa = new RSA();
     private final Resource resource = new Resource();
+    private final InlineKeyboard inlineKeyboard = new InlineKeyboard(this);
 
     /**
      * set proxy setting
@@ -96,36 +97,46 @@ public class TelegramBot extends TelegramLongPollingBot {
      * @param update
      */
     public void onUpdateReceived(Update update) {
+        if (update.hasCallbackQuery()){
+            logger.info("receive callback " + update.getCallbackQuery().getData() + " " +
+                    update.getCallbackQuery().getFrom().getFirstName() + " " +
+                    update.getCallbackQuery().getFrom().getLastName() + " " +
+                    update.getCallbackQuery().getFrom().getUserName());
+        } else {
+            logger.info("receive message " + update.getMessage().getText() +
+                    " from " + update.getMessage().getFrom().getFirstName() + " " +
+                    update.getMessage().getFrom().getLastName() + " " +
+                    update.getMessage().getFrom().getUserName() + " " +
+                    update.getMessage().getFrom().getId().toString());
+            if (update.getMessage().getText().equals("ping")){
+                send("pong",update.getMessage().getChatId());
+            } else if (update.getMessage().getText().equals("pong")){
+                send("ping", update.getMessage().getChatId());
+            }
+        }
         if (telegramParser == null){
             telegramParser = new TelegramParser(this);
         }
-        long userId;
         long chatId;
         if (update.hasCallbackQuery()){
             if (!telegramParser.getUsers().containsKey(update.getCallbackQuery().getMessage().getChatId())){
                 telegramParser.getUsers().put(update.getCallbackQuery().getMessage().getChatId(), new User(update.getCallbackQuery().getMessage().getChatId()));
             }
             chatId = update.getCallbackQuery().getMessage().getChatId();
-            userId = update.getCallbackQuery().getFrom().getId();
         } else {
             if (!telegramParser.getUsers().containsKey(update.getMessage().getChatId())){
                 telegramParser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
             }
             chatId = update.getMessage().getChatId();
-            userId = update.getMessage().getFrom().getId();
         }
-        if (!JedisData.getInstance().checkRight(userId) && userId != Config.getInstance().getAdminId()){
+        if (!JedisData.getInstance().checkRight(chatId) &&  !Config.getInstance().getAdminsId().contains(chatId)){
             if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_KEY){
                 if (!update.hasCallbackQuery()){
-                    if (rsa.validateKey(update.getMessage().getFrom().getFirstName(), update.getMessage().getText())){
+                    if (rsa.validateKey(update.getMessage().getFrom().getUserName(), update.getMessage().getText())){
                         telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
-                        if (JedisData.getInstance().setRight(userId, update.getMessage().getText())){
-                            send(resource.getStringByKey("STR_19"), chatId);
-                            telegramParser.sendMenu(chatId);
-                        } else {
-                            send(resource.getStringByKey("STR_20"), chatId);
-                            return;
-                        }
+                        JedisData.getInstance().setRight(chatId, update.getMessage().getText());
+                        send(resource.getStringByKey("STR_19"), chatId);
+                        inlineKeyboard.sendMenu(chatId);
                     } else {
                         if (update.hasCallbackQuery()){
                             telegramParser.parsCallback(update);
@@ -134,30 +145,20 @@ public class TelegramBot extends TelegramLongPollingBot {
                         send(resource.getStringByKey("STR_21"), chatId);
                     }
                 }
-            } else if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_COUNT_OF_WORD || telegramParser.getUsers().get(chatId).getStatus() == UserStatus.TESTING){
+            } else if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_COUNT_OF_WORD ||
+                    telegramParser.getUsers().get(chatId).getStatus() == UserStatus.TESTING){
                 telegramParser.parseText(update);
-                return;
             } else {
                 if (update.hasCallbackQuery()){
                   telegramParser.parsCallback(update);
                 } else {
-                    telegramParser.sendLoginInfo(chatId);
+                    inlineKeyboard.sendLoginInfo(chatId);
                 }
-                return;
             }
         } else {
             if (update.hasCallbackQuery()){
-                logger.info("receive callback " + update.getCallbackQuery().getData() + " " +
-                        update.getCallbackQuery().getFrom().getFirstName() + " " +
-                        update.getCallbackQuery().getFrom().getLastName() + " " +
-                        update.getCallbackQuery().getFrom().getUserName());
                 telegramParser.parsCallback(update);
             } else {
-                logger.info("receive message " + update.getMessage().getText() +
-                        " from " + update.getMessage().getFrom().getFirstName() + " " +
-                        update.getMessage().getFrom().getLastName() + " " +
-                        update.getMessage().getFrom().getUserName() + " " +
-                        update.getMessage().getFrom().getId().toString());
                 telegramParser.parseText(update);
             }
         }
@@ -195,6 +196,10 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    /**
+     * @param chatId
+     * @param messageId
+     */
     public void delete(Long chatId, Integer messageId){
         logger.info("delete message " + chatId + " " + messageId);
         var deleteMessage = new DeleteMessage();

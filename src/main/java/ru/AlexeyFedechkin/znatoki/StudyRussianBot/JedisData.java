@@ -33,7 +33,6 @@ public class JedisData {
     private final String CHECKED_WORD_POSTFIX = "_checked_word";
     private final String CHECKED_RULE_POSTFIX = "_checked_rule";
     private final String KEY_POSTFIX = "_key";
-    private final String ACTIVATED_KEYS_KEY = "activated_keys";
 
     /**
      * store data in redis about count of received messages
@@ -176,16 +175,10 @@ public class JedisData {
      * @param key
      * @return
      */
-    public boolean setRight(long user_id, String key){
+    public void setRight(long user_id, String key){
         var checkRightKey = user_id + KEY_POSTFIX;
-        if (jedis.get(ACTIVATED_KEYS_KEY) == null){
-            jedis.set(checkRightKey, key);
-            jedis.set(ACTIVATED_KEYS_KEY, key);
-            logger.info("set right for key = " + key + " and user = " + user_id);
-            return true;
-        } else {
-            return false;
-        }
+        jedis.set(checkRightKey, key);
+        logger.info("set right for key = " + key + " and user = " + user_id);
     }
 
     /**

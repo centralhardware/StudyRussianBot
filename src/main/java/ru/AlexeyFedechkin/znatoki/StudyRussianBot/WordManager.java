@@ -8,8 +8,10 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Rule;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.RuleDescription;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Word;
 
 import java.io.IOException;
@@ -25,7 +27,7 @@ public class WordManager {
     private final Logger logger = Logger.getLogger(WordManager.class);
     private ArrayList<String> wrongMessages = new ArrayList<>();
     private ArrayList<Rule> rules = new ArrayList<>();
-
+    private ArrayList<RuleDescription> ruleDescriptions = new ArrayList<>();
 
     /**
      * parseText all data file and generate collections of object
@@ -35,6 +37,7 @@ public class WordManager {
         var wordString = getStringFromResources("word.json");
         var ruleString = getStringFromResources("rule.json");
         var wrongMessageString = getStringFromResources("wrongMessage.json");
+        var ruleDescriptionString = getStringFromResources("ruleDesc.json");
 
         var wrongMessageObject = new JSONObject(wrongMessageString);
         var wrongMessageArray = wrongMessageObject.getJSONArray("data");
@@ -91,6 +94,17 @@ public class WordManager {
         for (var r : rules){
             logger.info("in rule " + r.getName() + " added " + r.getWords().size() + "  words");
         }
+
+        var ruleDescriptionArray = new JSONArray(ruleDescriptionString);
+        for (var ruleDesc : ruleDescriptionArray){
+            var object = (JSONObject) ruleDesc;
+            ruleDescriptions.add(new RuleDescription(object.getString("name"), object.getString("description"), object.getInt("id")));
+        }
+        count = 1;
+        for (var ruleDesc : ruleDescriptions) {
+            ruleDesc.setPageNumber((byte) (count/ Rule.pageCountRule));
+            count++;
+        }
     }
 
     /**
@@ -117,6 +131,19 @@ public class WordManager {
 
     public ArrayList<Rule> getRules(){
         return rules;
+    }
+
+    public ArrayList<RuleDescription> getRuleDescriptions() {
+        return ruleDescriptions;
+    }
+
+    public RuleDescription getRuleDescriptionById(int id){
+        for (var ruleDescription : ruleDescriptions){
+            if (ruleDescription.getId() == id){
+                return ruleDescription;
+            }
+        }
+        return null;
     }
 
     public Rule getRule(String rule){
