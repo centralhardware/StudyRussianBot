@@ -18,8 +18,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums.UserStatus;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.User;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.RSA;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
 
@@ -94,7 +94,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     /**
-     * @param update
+     * method by which the library telegram sends
+     * the received messages for processing by the server part
+     * @param update received message
      */
     public void onUpdateReceived(Update update) {
         if (update.hasCallbackQuery()){
@@ -129,7 +131,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
             chatId = update.getMessage().getChatId();
         }
-        if (!JedisData.getInstance().checkRight(chatId) &&  !Config.getInstance().getAdminsId().contains(chatId)){
+        if (!(JedisData.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
             if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_KEY){
                 if (!update.hasCallbackQuery()){
                     if (rsa.validateKey(update.getMessage().getFrom().getUserName(), update.getMessage().getText())){
@@ -144,6 +146,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                         }
                         send(resource.getStringByKey("STR_21"), chatId);
                     }
+                } else {
+                    telegramParser.parsCallback(update);
                 }
             } else if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_COUNT_OF_WORD ||
                     telegramParser.getUsers().get(chatId).getStatus() == UserStatus.TESTING){
@@ -184,7 +188,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     /**
      * send SendMessage to telegram user
-     * @param sendMessage
+     * @param sendMessage object that contain data for send message to telegram
      */
     public void send(SendMessage sendMessage){
         logger.info("send message " + sendMessage.getText());
@@ -197,8 +201,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     /**
-     * @param chatId
-     * @param messageId
+     * delete message
+     * @param chatId id of chat with user
+     * @param messageId id of deleting message
      */
     public void delete(Long chatId, Integer messageId){
         logger.info("delete message " + chatId + " " + messageId);
@@ -213,6 +218,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     /**
+     * get bot user name
      * @return product or testing bot username
      */
     public String getBotUsername() {
@@ -226,6 +232,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     /**
+     * get bot token
      * @return production or testing bot token
      */
     public String getBotToken() {

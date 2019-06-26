@@ -2,9 +2,9 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
 import org.apache.log4j.Logger;
 import redis.clients.jedis.Jedis;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Rule;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.User;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Word;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
 
 /**
  * wrapper for work with redis server
@@ -77,7 +77,8 @@ public class JedisData {
     }
 
     /**
-     * @param user
+     * store data about passing rule task
+     * @param user user that pass rule
      */
     public void checkRule(User user){
         var checkWordKey = user.getChatId() + CHECKED_WORD_POSTFIX;
@@ -101,8 +102,9 @@ public class JedisData {
     }
 
     /**
-     * @param chatId
-     * @param rule
+     * check on passing rule
+     * @param chatId id of user
+     * @param rule name of rule
      * @return
      */
     public boolean isCheckRule(long chatId, String rule){
@@ -111,8 +113,9 @@ public class JedisData {
     }
 
     /**
-     * @param chatId
-     * @return
+     * get count of send message for user
+     * @param chatId id of user
+     * @return count of sen message
      */
     public String getCountOfSentMessage(long chatId){
         var count_of_received_message_key = chatId + COUNT_OF_RECEIVED_MESSAGE_POSTFIX;
@@ -120,8 +123,9 @@ public class JedisData {
     }
 
     /**
-     * @param chatId
-     * @return
+     * get count of received message for user
+     * @param chatId id of user
+     * @return count of received message
      */
     public String getCountOfReceivedMessage(long chatId){
         var count_of_sent_message_key = chatId + COUNT_OF_SENT_MESSAGE_POSTFIX;
@@ -129,8 +133,9 @@ public class JedisData {
     }
 
     /**
-     * @param chatId
-     * @return
+     * get count of checked word
+     * @param chatId id of user
+     * @return count of checked word
      */
     public int getCountOfCheckedWord(long chatId){
         var checkWordKey = chatId + CHECKED_WORD_POSTFIX;
@@ -146,6 +151,7 @@ public class JedisData {
     }
 
     /**
+     * note that the word was answered correctly for the given user
      * @param user user that check word
      */
     public void checkWord(User user){
@@ -155,6 +161,7 @@ public class JedisData {
     }
 
     /**
+     * check license status
      * @param user_id
      * @return
      */
@@ -171,9 +178,9 @@ public class JedisData {
     }
 
     /**
-     * @param user_id
-     * @param key
-     * @return
+     * set activated code
+     * @param user_id id of user
+     * @param key activated code
      */
     public void setRight(long user_id, String key){
         var checkRightKey = user_id + KEY_POSTFIX;
@@ -182,17 +189,19 @@ public class JedisData {
     }
 
     /**
-     * @param key
+     * delete value by key
+     * @param key key of value to delete
      */
     public void deleteKey(String key){
         jedis.del(key);
     }
 
     /**
-     * @param key
-     * @return
+     * get value by giving key
+     * @param key key for getting
+     * @return String with value by giving key
      */
-    public String getKey(String key){
+    public String getvalue(String key) {
         return jedis.get(key);
     }
 }

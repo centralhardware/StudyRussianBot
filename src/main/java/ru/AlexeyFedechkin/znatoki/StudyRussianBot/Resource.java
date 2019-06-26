@@ -19,6 +19,7 @@ public class Resource {
     private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("string");
 
     /**
+     * get string from resource bundle file
      * @param key key of string constant
      * @return string by giving constant if value is exist
      */

@@ -4,10 +4,10 @@
  * Copyright (c) 2019
  */
 
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums;
 
 /**
- *
+ *enumeration describe user status.
  */
 public enum UserStatus {
     NONE,

@@ -1,5 +1,8 @@
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
+/**
+ * Data about description of rule
+ */
 public class RuleDescription {
     private String name;
     private String description;

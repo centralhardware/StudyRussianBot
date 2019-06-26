@@ -5,18 +5,32 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Rule;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
 
+/**
+ * methods to send InlineKeyboardMarkup
+ */
 public class InlineKeyboard {
     private final Resource resource = new Resource();
     private final Logger logger = Logger.getLogger(InlineKeyboardBuilder.class);
     private TelegramBot telegramBot;
 
+    /**
+     * set telegramBot
+     *
+     * @param telegramBot instance of telegram bot
+     */
     public InlineKeyboard(TelegramBot telegramBot){
         this.telegramBot = telegramBot;
     }
 
+    /**
+     * send the user a message from the language selection help menu
+     * for user who have demo access limited to three points
+     * @param update object with received message
+     * @param pageNumber number of page to select
+     */
     public void sendBookInlineKeyBoard(Update update, int pageNumber){
         long chatId;
         String message = "";
@@ -35,7 +49,7 @@ public class InlineKeyboard {
         } else {
             userId = update.getMessage().getFrom().getId();
         }
-        if (!JedisData.getInstance().checkRight(userId) &&  Config.getInstance().getAdminsId().contains(userId)){
+        if (!(JedisData.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))){
             for (var i = 0; i < 3; i++) {
                 var ruleDescription = Data.getInstance().wordManager.getRuleDescriptions().get(i);
                 builder.row().
@@ -81,6 +95,12 @@ public class InlineKeyboard {
         telegramBot.send(builder.build());
     }
 
+    /**
+     * send the user a message from the rule selection menu
+     * for user who have demo access limited to three points
+     * @param update object with received message
+     * @param pageNumber number of page to select
+     */
     public void sendRuleInlineKeyboard(Update update, int pageNumber){
         long chatId;
         String message = "";
@@ -99,7 +119,7 @@ public class InlineKeyboard {
         } else {
             userId = update.getMessage().getFrom().getId();
         }
-        if (!JedisData.getInstance().checkRight(userId) &&  Config.getInstance().getAdminsId().contains(userId)){
+        if (!(JedisData.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))){
             for (var i = 1; i < 4; i++) {
                 var rule = Data.getInstance().wordManager.getRules().get(i);
                 builder.row();
@@ -152,25 +172,38 @@ public class InlineKeyboard {
         telegramBot.send(builder.build());
     }
 
-    public void sendLoginInfo(long chatId){
-        var builder = InlineKeyboardBuilder.create(chatId).
-                setText(resource.getStringByKey("STR_28")).
-                row().
-                button(resource.getStringByKey("STR_29"), "enter_key").
-                button(resource.getStringByKey("STR_30"), "info").
-                endRow().
-                row().
-                button(resource.getStringByKey("STR_41"), "menu").
-                endRow().
-                row().
-                button(resource.getStringByKey("STR_40"), "buy_key").
-                endRow().
-                row().
-                button(resource.getStringByKey("STR_26"), "help").
-                endRow();
-        telegramBot.send(builder.build());
+    /**
+     * send login menu for user who have demo access
+     * don't send for user who have full or admin access
+     * @param chatId id of user
+     */
+    public void sendLoginInfo(long chatId) {
+        if (JedisData.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId)) {
+            telegramBot.send("У вас уже есть полный доступ", chatId);
+        } else {
+            var builder = InlineKeyboardBuilder.create(chatId).
+                    setText(resource.getStringByKey("STR_28")).
+                    row().
+                    button(resource.getStringByKey("STR_29"), "enter_key").
+                    endRow().
+                    row().
+                    button(resource.getStringByKey("STR_41"), "menu").
+                    endRow().
+                    row().
+                    button(resource.getStringByKey("STR_40"), "buy_key").
+                    endRow().
+                    row().
+                    button(resource.getStringByKey("STR_26"), "help").
+                    endRow();
+            telegramBot.send(builder.build());
+        }
     }
 
+    /**
+     * send main menu
+     * for user who have demo access will show button with text "get full access"
+     * @param chatId id of user
+     */
     public void sendMenu(long chatId){
         logger.info("send inline keyboard menu");
         var builder = InlineKeyboardBuilder.

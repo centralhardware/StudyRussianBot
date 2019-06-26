@@ -4,13 +4,13 @@
  * Copyright (c) 2019
  */
 
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
 import org.apache.log4j.Logger;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums.SchoolStage;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.SchoolStage;
 
 /**
- *
+ *Data about word
  */
 public class Word {
     private static final Logger logger = Logger.getLogger(Word.class);

@@ -9,9 +9,9 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.*;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums.UserStatus;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.User;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Word;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
 
 import java.util.HashMap;
 
@@ -31,6 +31,7 @@ public class TelegramParser {
     }
 
     /**
+     * set telegramBot and create InlineKeyboard
      * @param telegramBot instance of register bot
      */
     public TelegramParser(TelegramBot telegramBot) {
@@ -40,7 +41,7 @@ public class TelegramParser {
 
     /**
      * parse text message
-     * @param update
+     * @param update received message
      */
     public void parseText(Update update) {
         var message = update.getMessage().getText();
@@ -81,7 +82,7 @@ public class TelegramParser {
                     var args = message.replace("/ver ", "").split(" ");
                     String key = args[0];
                     String msg = args[1];
-                    if (Config.getInstance().getAdminsId().contains(update.getMessage().getFrom().getId())){
+                    if (Config.getInstance().getAdminsId().contains(chatId)) {
                         telegramBot.send(String.valueOf(rsa.validateKey(msg, key)), chatId);
                     } else {
                         telegramBot.send("access denied", update.getMessage().getChatId());
@@ -137,7 +138,7 @@ public class TelegramParser {
 
     /**
      * parse callback
-     * @param update
+     * @param update received message
      */
         public void parsCallback (Update update){
             var callback = update.getCallbackQuery().getData();
@@ -159,7 +160,7 @@ public class TelegramParser {
                     telegramBot.send(user.getProfile(),chatId);
                     break;
                 case "help":
-                    if (!JedisData.getInstance().checkRight(chatId) && Config.getInstance().getAdminsId().contains(chatId)){
+                    if (!(JedisData.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
                         telegramBot.send(resource.getStringByKey("STR_32"), chatId);
                     } else {
                         telegramBot.send(Config.getInstance().getHelpMessage(), chatId);
@@ -169,8 +170,6 @@ public class TelegramParser {
                     telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
                     inlineKeyboard.sendMenu(chatId);
                     break;
-                case "info":
-                    return;
                 case "enter_key":
                     telegramBot.send(resource.getStringByKey("STR_22"), chatId);
                     user.setStatus(UserStatus.WAIT_KEY);
@@ -180,7 +179,7 @@ public class TelegramParser {
                     inlineKeyboard.sendLoginInfo(chatId);
                     return;
                 case "buy_key":
-                    telegramBot.send(resource.getStringByKey("STR_33"), chatId);
+//                    telegramBot.send(resource.getStringByKey("STR_33"), chatId);
                     return;
                 case "book":
                     telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
@@ -212,6 +211,8 @@ public class TelegramParser {
                         return;
                     }
                 }
+            } else if (user.getStatus() == UserStatus.WAIT_KEY) {
+
             } else {
                 var builder = InlineKeyboardBuilder.
                         create(chatId).

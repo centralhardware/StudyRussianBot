@@ -7,6 +7,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * builder for inlineKeyboardMarkup
+ */
 public class InlineKeyboardBuilder {
     private Long chatId;
     private String text;

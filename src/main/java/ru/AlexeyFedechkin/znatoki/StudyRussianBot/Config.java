@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
- * provides access to config file
+ * access provides to config file
  */
 public class Config {
     private static final Config ourInstance = new Config();
@@ -42,6 +42,11 @@ public class Config {
         config = ResourceBundle.getBundle("config");
     }
 
+    /**
+     * get list of user that have administration permission
+     *
+     * @return admin id list
+     */
     public ArrayList<Long> getAdminsId(){
         var admins = config.getString(ADMIN_ID).split(",");
         var adminsList = new ArrayList<Long>();

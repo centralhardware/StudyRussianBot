@@ -4,19 +4,19 @@
  * Copyright (c) 2019
  */
 
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums.UserStatus;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- *
+ *Data about user
  */
 public class User {
     private final long chatId;
@@ -80,7 +80,8 @@ public class User {
     private final Resource resource = new Resource();
 
     /**
-     * @return
+     * get string with result of testing for last rule task
+     * @return result string
      */
     public String getTestingResult() {
         var builder = new StringBuilder();
@@ -101,6 +102,11 @@ public class User {
         return builder.toString();
     }
 
+    /**
+     * get String with data about profile of user
+     *
+     * @return string with profile data
+     */
     public String getProfile(){
         var builder = new StringBuilder();
         builder.append(resource.getStringByKey("STR_12")).append("\n").

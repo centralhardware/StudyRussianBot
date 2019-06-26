@@ -1,4 +1,4 @@
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;

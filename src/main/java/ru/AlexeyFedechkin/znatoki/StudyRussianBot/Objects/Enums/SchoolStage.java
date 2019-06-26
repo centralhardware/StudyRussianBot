@@ -4,8 +4,11 @@
  * Copyright (c) 2019
  */
 
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object.Enums;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums;
 
+/**
+ * enumeration describe school stages and its combination
+ */
 public enum SchoolStage {
     PRIMARY, //1 - 4 class
     SECONDARY, // 5 - 9 class

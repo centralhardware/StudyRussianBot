@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 
 /**
- * provides access to WordManager
+ * provides access to instance WordManager
  */
 public class Data {
     private final Logger logger = Logger.getLogger(Data.class);
@@ -21,6 +21,9 @@ public class Data {
         return ourInstance;
     }
 
+    /**
+     * init wordManager
+     */
     private Data() {
         wordManager = new WordManager();
         try {

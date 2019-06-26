@@ -4,7 +4,7 @@
  * Copyright (c) 2019
  */
 
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Object;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
 
@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Random;
 
 /**
- *
+ *Data about rule
  */
 public class Rule {
     public String getName() {
@@ -62,19 +62,8 @@ public class Rule {
     private final Random random = new Random();
 
     /**
-     * @param count
-     * @return
-     */
-    public  Collection<Word> getWord(int count) {
-        HashSet<Word> wordSet = new HashSet<>();
-        while (wordSet.size() < count){
-            wordSet.add(words.get(random.nextInt(words.size())));
-        }
-        return new ArrayList<>(wordSet);
-    }
-
-    /**
-     * @return
+     * get max number of page
+     * @return max count of page
      */
     public static int getMaxPage(){
         int max = 0;
@@ -84,5 +73,19 @@ public class Rule {
             }
         }
         return max;
+    }
+
+    /**
+     * get Collection with giving count of word
+     *
+     * @param count needed count of word
+     * @return Collection of word
+     */
+    public Collection<Word> getWord(int count) {
+        HashSet<Word> wordSet = new HashSet<>();
+        while (wordSet.size() < count) {
+            wordSet.add(words.get(random.nextInt(words.size())));
+        }
+        return new ArrayList<>(wordSet);
     }
 }
