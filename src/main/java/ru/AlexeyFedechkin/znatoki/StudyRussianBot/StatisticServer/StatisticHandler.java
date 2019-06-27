@@ -27,6 +27,5 @@ public class StatisticHandler implements HttpHandler {
         OutputStream os = exchange.getResponseBody();
         os.write(bytes);
         os.close();
-        os.flush();
     }
 }
