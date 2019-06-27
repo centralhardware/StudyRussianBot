@@ -78,7 +78,8 @@ public class TelegramParser {
                     } else {
                         telegramBot.send("access denied", update.getMessage().getChatId());
                     }
-                } else if (message.startsWith("/ver ")) {
+                }
+                if (message.startsWith("/ver ")) {
                     var args = message.replace("/ver ", "").split(" ");
                     String key = args[0];
                     String msg = args[1];
@@ -86,6 +87,19 @@ public class TelegramParser {
                         telegramBot.send(String.valueOf(rsa.validateKey(msg, key)), chatId);
                     } else {
                         telegramBot.send("access denied", update.getMessage().getChatId());
+                    }
+                }
+                if (message.equals("/stat")) {
+                    if (Config.getInstance().getAdminsId().contains(chatId)) {
+                        StringBuilder builder = new StringBuilder();
+                        builder.append("bot statistic:").append("\n");
+                        for (String str : JedisData.getInstance().getAllKeys()) {
+                            builder.append(str).append("=")
+                                    .append(JedisData.getInstance().getvalue(str)).append("\n");
+                        }
+                        telegramBot.send(builder.toString(), chatId);
+                    } else {
+                        telegramBot.send("access denied", chatId);
                     }
                 }
                 if (user.getStatus() == UserStatus.WAIT_COUNT_OF_WORD) {

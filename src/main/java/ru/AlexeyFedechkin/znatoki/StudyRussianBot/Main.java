@@ -8,7 +8,6 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.ApiContextInitializer;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.StatisticServer.Server;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram.TelegramBot;
 
 @SuppressWarnings("HardCodedStringLiteral")
@@ -25,8 +24,5 @@ public class Main {
         var telegramBot = new TelegramBot();
         telegramBot.init();
         logger.info("telegram bot run");
-        Server server = new Server();
-        server.init();
-        logger.info("http server start");
     }
 }
