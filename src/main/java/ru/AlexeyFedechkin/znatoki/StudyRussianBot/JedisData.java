@@ -6,6 +6,7 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +17,6 @@ import java.util.Set;
 public class JedisData {
     private static final JedisData ourInstance = new JedisData();
     private final Logger logger = Logger.getLogger(Jedis.class);
-    private final RSA rsa = new RSA();
 
     public static JedisData getInstance() {
         return ourInstance;
@@ -34,6 +34,7 @@ public class JedisData {
     private final String COUNT_OF_SENT_MESSAGE_POSTFIX = "_count_of_sent_message";
     private final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";
     private final String CHECKED_WORD_POSTFIX = "_checked_word";
+    private final String CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word";
     private final String CHECKED_RULE_POSTFIX = "_checked_rule";
     private final String KEY_POSTFIX = "_key";
 
@@ -108,7 +109,7 @@ public class JedisData {
      * check on passing rule
      * @param chatId id of user
      * @param rule name of rule
-     * @return
+     * @return true if rule was passing
      */
     public boolean isCheckRule(long chatId, String rule){
         var checkRuleKey = chatId + CHECKED_RULE_POSTFIX;
@@ -154,6 +155,26 @@ public class JedisData {
     }
 
     /**
+     * get count of wrong checked word
+     *
+     * @param chatId id of user
+     * @return count of checked word
+     */
+    public int getCountOfWrongCheckedWord(long chatId) {
+        HashMap<String, Integer> res = new HashMap<>();
+        var checkWordKey = chatId + CHECKED_WRONG_WORD_POSTFIX;
+        int count = 0;
+        for (Rule rule : Data.getInstance().wordManager.getRules()) {
+            for (Word word : rule.getWords()) {
+                if (jedis.sismember(checkWordKey, word.getName())) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
      * note that the word was answered correctly for the given user
      * @param user user that check word
      */
@@ -164,11 +185,26 @@ public class JedisData {
     }
 
     /**
-     * check license status
-     * @param user_id
-     * @return
+     * note that the word was not answered correctly for the given user
+     *
+     * @param user user that check word
      */
-    public boolean checkRight(long user_id){
+    public void checkWrongWord(User user) {
+        var checkWordKey = user.getChatId() + CHECKED_WRONG_WORD_POSTFIX;
+        jedis.sadd(checkWordKey, user.getWords().get(0).getName());
+        logger.info("add value " + user.getWords().get(0).getName() + " to set by key " + checkWordKey);
+    }
+
+    /**
+     * check license status
+     * @param user_id id of user
+     * @return true if user don't have demo access
+     */
+    public boolean checkRight(long user_id) {
+        if (Config.getInstance().getAdminsId().contains(user_id)) {
+            logger.info("user \"" + user_id + "\" have admin permission");
+            return true;
+        }
         var checkRightKey = user_id + KEY_POSTFIX;
         var key = jedis.get(checkRightKey);
         if (key != null){
@@ -204,7 +240,7 @@ public class JedisData {
      * @param key key for getting
      * @return String with value by giving key
      */
-    public String getvalue(String key) {
+    public String getValue(String key) {
         return jedis.get(key);
     }
 

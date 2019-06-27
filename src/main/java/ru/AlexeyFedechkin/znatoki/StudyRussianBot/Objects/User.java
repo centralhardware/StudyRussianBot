@@ -108,11 +108,19 @@ public class User {
      * @return string with profile data
      */
     public String getProfile(){
+        float rightPercent;
+        if (JedisData.getInstance().getCountOfWrongCheckedWord(chatId) != 0) {
+            rightPercent = JedisData.getInstance().getCountOfCheckedWord(chatId) / JedisData.getInstance().getCountOfWrongCheckedWord(chatId) * 100;
+        } else {
+            rightPercent = 100;
+        }
         var builder = new StringBuilder();
         builder.append(resource.getStringByKey("STR_12")).append("\n").
                 append(resource.getStringByKey("STR_13")).append(JedisData.getInstance().getCountOfSentMessage(chatId)).append("\n")
                 .append(resource.getStringByKey("STR_14")).append(JedisData.getInstance().getCountOfReceivedMessage(chatId)).append("\n").
                 append(resource.getStringByKey("STR_15")).append(JedisData.getInstance().getCountOfCheckedWord(chatId)).append("\n").
+                append("слов отвечено не правильно ").append(JedisData.getInstance().getCountOfWrongCheckedWord(chatId)).append("\n").
+                append("процент правильных ответов ").append(rightPercent).append("%").append("\n").
                 append(resource.getStringByKey("STR_16")).append("\n");
         for (var rule : Data.getInstance().getWordManager().getRules()){
             if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){

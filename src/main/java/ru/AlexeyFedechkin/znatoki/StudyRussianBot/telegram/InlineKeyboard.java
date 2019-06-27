@@ -179,7 +179,7 @@ public class InlineKeyboard {
      */
     public void sendLoginInfo(long chatId) {
         if (JedisData.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId)) {
-            telegramBot.send("У вас уже есть полный доступ", chatId);
+            telegramBot.send(resource.getStringByKey("STR_44"), chatId);
         } else {
             var builder = InlineKeyboardBuilder.create(chatId).
                     setText(resource.getStringByKey("STR_28")).

@@ -95,7 +95,7 @@ public class TelegramParser {
                         builder.append("bot statistic:").append("\n");
                         for (String str : JedisData.getInstance().getAllKeys()) {
                             builder.append(str).append("=")
-                                    .append(JedisData.getInstance().getvalue(str)).append("\n");
+                                    .append(JedisData.getInstance().getValue(str)).append("\n");
                         }
                         telegramBot.send(builder.toString(), chatId);
                     } else {
@@ -140,6 +140,7 @@ public class TelegramParser {
                         JedisData.getInstance().checkWord(user);
                     } else{
                         telegramBot.send(resource.getStringByKey("STR_5"), chatId);
+                        JedisData.getInstance().checkWrongWord(user);
                         Word temp = user.getWords().get(0);
                         user.getWords().remove(0);
                         user.getWords().add(temp);
