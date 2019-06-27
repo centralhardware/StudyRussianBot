@@ -94,7 +94,7 @@ public class WordManager {
         }
 
         for (var r : rules){
-            logger.info("in rule " + r.getName() + " added " + r.getWords().size() + "  words");
+            logger.info("in rule \"" + r.getName() + "\" added " + r.getWords().size() + "  words");
         }
         // parse ruleDesc.json
         var ruleDescriptionArray = new JSONArray(ruleDescriptionString);

@@ -42,7 +42,7 @@ public class RSA {
             signature.update(message.getBytes(StandardCharsets.UTF_8));
             var realSignature = signature.sign();
             String res = base64.encodeAsString(realSignature);
-            logger.info("generated key " + res);
+            logger.info("generated key \"" + res + "\"");
             return res;
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | InvalidKeySpecException e) {
             logger.fatal("generate key fail", e);
@@ -72,7 +72,7 @@ public class RSA {
             byte[] keyBinary = base64.decode(key);
             boolean isVerify = signature.verify(keyBinary);
             if (isVerify){
-                logger.info("key "  + key + " verify");
+                logger.info("key \"" + key + "\" verify");
             } else {
                 logger.info("key don't"  + key + " verify");
             }

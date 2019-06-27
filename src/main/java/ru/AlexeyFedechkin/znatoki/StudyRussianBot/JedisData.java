@@ -6,6 +6,9 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * wrapper for work with redis server
  */
@@ -169,10 +172,10 @@ public class JedisData {
         var checkRightKey = user_id + KEY_POSTFIX;
         var key = jedis.get(checkRightKey);
         if (key != null){
-            logger.info("right for user = " + user_id + " valid");
+            logger.info("right for user = \"" + user_id + "\" valid");
             return true;
         } else {
-            logger.info("right for user = " + user_id + " don't valid");
+            logger.info("right for user = \"" + user_id + "\" don't valid");
             return false;
         }
     }
@@ -185,7 +188,7 @@ public class JedisData {
     public void setRight(long user_id, String key){
         var checkRightKey = user_id + KEY_POSTFIX;
         jedis.set(checkRightKey, key);
-        logger.info("set right for key = " + key + " and user = " + user_id);
+        logger.info("set right for key = \"" + key + "\" and user = \"" + user_id + "\"");
     }
 
     /**
@@ -203,5 +206,21 @@ public class JedisData {
      */
     public String getvalue(String key) {
         return jedis.get(key);
+    }
+
+
+    /**
+     * get set of redis keys without keys with activated code
+     *
+     * @return all redis keys set
+     */
+    public Set<String> getAllKeys() {
+        var keys = new HashSet<String>();
+        for (String str : jedis.keys("*")) {
+            if (!str.endsWith(KEY_POSTFIX)) {
+                keys.add(str);
+            }
+        }
+        return keys;
     }
 }
