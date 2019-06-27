@@ -50,6 +50,7 @@ public class TelegramParser {
         JedisData.getInstance().received(chatId);
         switch (message) {
             case "/start":
+                user.reset();
                 telegramBot.send(Config.getInstance().getStartupMessage(),
                         update.getMessage().getChatId());
                 inlineKeyboard.sendMenu(chatId);
@@ -162,10 +163,12 @@ public class TelegramParser {
             JedisData.getInstance().received(chatId);
             switch (callback){
                 case "reset_testing":
+                    telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
                     user.reset();
                     inlineKeyboard.sendMenu(chatId);
                     break;
                 case "noreset_testing":
+                    telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
                     telegramBot.send(user.getWords().get(0).getName(), chatId);
                     return;
                 case "testing":
@@ -182,8 +185,10 @@ public class TelegramParser {
                     }
                     break;
                 case "menu":
-                    telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
-                    inlineKeyboard.sendMenu(chatId);
+                    if (user.getStatus() != UserStatus.TESTING && user.getStatus() != UserStatus.WAIT_COUNT_OF_WORD) {
+                        telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+                        inlineKeyboard.sendMenu(chatId);
+                    }
                     break;
                 case "enter_key":
                     telegramBot.send(resource.getStringByKey("STR_22"), chatId);
@@ -202,7 +207,9 @@ public class TelegramParser {
                     return;
             }
             if (callback.startsWith("to_")){
-                inlineKeyboard.sendRuleInlineKeyboard(update, Integer.parseInt(callback.replace("to_", "")));
+                if (user.getStatus() != UserStatus.WAIT_COUNT_OF_WORD && user.getStatus() != UserStatus.TESTING) {
+                    inlineKeyboard.sendRuleInlineKeyboard(update, Integer.parseInt(callback.replace("to_", "")));
+                }
             }
             if (callback.startsWith("book_to_")){
                 inlineKeyboard.sendBookInlineKeyBoard(update, Integer.parseInt(callback.replace("book_to_", "")));
