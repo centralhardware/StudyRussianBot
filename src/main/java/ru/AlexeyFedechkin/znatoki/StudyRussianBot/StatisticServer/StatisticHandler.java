@@ -16,7 +16,7 @@ public class StatisticHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         logger.info("open statistic page");
         StringBuilder builder = new StringBuilder();
-        builder.append("<h1>URI: ").append("статистика:").append("</h1>");
+        builder.append("<h1>URI: ").append("bot statistic:").append("</h1>");
         Headers headers = exchange.getRequestHeaders();
         for (String str : JedisData.getInstance().getAllKeys()) {
             builder.append("<p>").append(str).append("=")
@@ -27,5 +27,6 @@ public class StatisticHandler implements HttpHandler {
         OutputStream os = exchange.getResponseBody();
         os.write(bytes);
         os.close();
+        os.flush();
     }
 }
