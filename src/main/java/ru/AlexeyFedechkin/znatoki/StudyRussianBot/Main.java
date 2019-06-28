@@ -18,6 +18,7 @@ public class Main {
      * @param args never use
      */
     public static void main(String[] args) {
+        Statistic.getInstance().init();
         logger.info("program start");
         ApiContextInitializer.init();
         logger.info("api context init");

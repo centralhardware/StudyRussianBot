@@ -119,8 +119,8 @@ public class User {
                 append(resource.getStringByKey("STR_13")).append(JedisData.getInstance().getCountOfSentMessage(chatId)).append("\n")
                 .append(resource.getStringByKey("STR_14")).append(JedisData.getInstance().getCountOfReceivedMessage(chatId)).append("\n").
                 append(resource.getStringByKey("STR_15")).append(JedisData.getInstance().getCountOfCheckedWord(chatId)).append("\n").
-                append("слов отвечено не правильно ").append(JedisData.getInstance().getCountOfWrongCheckedWord(chatId)).append("\n").
-                append("процент правильных ответов ").append(rightPercent).append("%").append("\n").
+                append(resource.getStringByKey("STR_45")).append(JedisData.getInstance().getCountOfWrongCheckedWord(chatId)).append("\n").
+                append(resource.getStringByKey("STR_46")).append(rightPercent).append("%").append("\n").
                 append(resource.getStringByKey("STR_16")).append("\n");
         for (var rule : Data.getInstance().getWordManager().getRules()){
             if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){

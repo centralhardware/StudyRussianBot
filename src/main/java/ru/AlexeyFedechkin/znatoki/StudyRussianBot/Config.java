@@ -28,8 +28,6 @@ public class Config {
     private static final String PROXY_PORT_KEY = "PROXY_PORT";
     private static final String PROXY_USER_KEY = "PROXY_USER";
     private static final String PROXY_PASSWORD_KEY = "PROXY_PASSWORD";
-    private static final String STARTUP_MESSAGE_KEY = "START_MESSAGE";
-    private static final String HELP_MESSAGE_KEY = "HELP_MESSAGE";
     private static final String IS_TESTING_KEY = "IS_TESTING";
     private static final String IS_USE_PROXY_KEY = "IS_USE_PROXY";
     private static final String REDIS_HOST_KEY = "REDIS_HOST";
@@ -106,14 +104,6 @@ public class Config {
 
     public int getRedisPort(){
         return Integer.parseInt(config.getString(REDIS_PORT_KEY));
-    }
-
-    public String getStartupMessage(){
-        return config.getString(STARTUP_MESSAGE_KEY);
-    }
-
-    public String getHelpMessage(){
-        return config.getString(HELP_MESSAGE_KEY);
     }
 
     public boolean isTesting(){

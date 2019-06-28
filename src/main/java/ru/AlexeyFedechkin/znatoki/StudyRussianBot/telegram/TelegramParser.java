@@ -51,12 +51,12 @@ public class TelegramParser {
         switch (message) {
             case "/start":
                 user.reset();
-                telegramBot.send(Config.getInstance().getStartupMessage(),
+                telegramBot.send(resource.getStringByKey("START_MESSAGE"),
                         update.getMessage().getChatId());
                 inlineKeyboard.sendMenu(chatId);
                 break;
             case "/help":
-                telegramBot.send(Config.getInstance().getHelpMessage(), chatId);
+                telegramBot.send(resource.getStringByKey("HELP_MESSAGE"), chatId);
                 break;
             case "/rules":
                 inlineKeyboard.sendRuleInlineKeyboard(update, 0);
@@ -181,7 +181,7 @@ public class TelegramParser {
                     if (!(JedisData.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
                         telegramBot.send(resource.getStringByKey("STR_32"), chatId);
                     } else {
-                        telegramBot.send(Config.getInstance().getHelpMessage(), chatId);
+                        telegramBot.send(resource.getStringByKey("HELP_MESSAGE"), chatId);
                     }
                     break;
                 case "menu":

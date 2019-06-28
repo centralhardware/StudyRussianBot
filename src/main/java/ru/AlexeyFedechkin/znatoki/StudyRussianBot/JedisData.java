@@ -22,7 +22,7 @@ public class JedisData {
         return ourInstance;
     }
 
-    private Jedis jedis;
+    private final Jedis jedis;
 
     private JedisData() {
         logger.info("redis configure");
@@ -244,15 +244,18 @@ public class JedisData {
         return jedis.get(key);
     }
 
+    public void setKey(String key, String value) {
+        jedis.set(key, value);
+    }
 
     /**
      * get set of redis keys without keys with activated code
      *
      * @return all redis keys set
      */
-    public Set<String> getAllKeys() {
+    public Set<String> getAllKeys(String pattern) {
         var keys = new HashSet<String>();
-        for (String str : jedis.keys("*")) {
+        for (String str : jedis.keys(pattern)) {
             if (!str.endsWith(KEY_POSTFIX)) {
                 keys.add(str);
             }

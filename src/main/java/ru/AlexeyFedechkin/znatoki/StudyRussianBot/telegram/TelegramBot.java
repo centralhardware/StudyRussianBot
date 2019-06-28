@@ -16,12 +16,9 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.*;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.RSA;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
 
 import java.net.Authenticator;
 import java.net.InetAddress;
@@ -125,11 +122,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                 telegramParser.getUsers().put(update.getCallbackQuery().getMessage().getChatId(), new User(update.getCallbackQuery().getMessage().getChatId()));
             }
             chatId = update.getCallbackQuery().getMessage().getChatId();
+            Statistic.getInstance().checkReceived(chatId);
         } else {
             if (!telegramParser.getUsers().containsKey(update.getMessage().getChatId())){
                 telegramParser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
             }
             chatId = update.getMessage().getChatId();
+            Statistic.getInstance().checkReceived(chatId);
         }
         if (!(JedisData.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
             if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_KEY){
@@ -181,6 +180,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try{
             execute(msg);
             JedisData.getInstance().sent(chatId);
+            Statistic.getInstance().checkSent(chatId);
         } catch (TelegramApiException e) {
             logger.warn("fail to send message", e);
         }
@@ -195,6 +195,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try{
             execute(sendMessage);
             JedisData.getInstance().sent(Long.parseLong(sendMessage.getChatId()));
+            Statistic.getInstance().checkSent(Long.parseLong(sendMessage.getChatId()));
         } catch (TelegramApiException e) {
             logger.warn("fail to send message", e);
         }

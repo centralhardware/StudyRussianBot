@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * builder for inlineKeyboardMarkup
  */
+@SuppressWarnings("CanBeFinal")
 public class InlineKeyboardBuilder {
     private Long chatId;
     private String text;
