@@ -94,7 +94,7 @@ public class TelegramParser {
                     if (Config.getInstance().getAdminsId().contains(chatId)) {
                         StringBuilder builder = new StringBuilder();
                         builder.append("bot statistic:").append("\n");
-                        for (String str : JedisData.getInstance().getAllKeys()) {
+                        for (String str : JedisData.getInstance().getAllKeys("*")) {
                             builder.append(str).append("=")
                                     .append(JedisData.getInstance().getValue(str)).append("\n");
                         }
