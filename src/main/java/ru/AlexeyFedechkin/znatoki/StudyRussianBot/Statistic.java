@@ -46,10 +46,10 @@ public class Statistic {
                 JedisData.getInstance().setKey(dateString + TOTAL_SENT_PREFIX, String.valueOf(totalSent));
                 JedisData.getInstance().setKey(dateString + TOTAL_RECEIVED_PREFIX, String.valueOf(totalReceived));
                 for (Long key : countSentForUser.keySet()) {
-                    JedisData.getInstance().setKey(key + USER_SENT_PREFIX, String.valueOf(countSentForUser.get(key)));
+                    JedisData.getInstance().setKey(dateString + "_" + key + USER_SENT_PREFIX, String.valueOf(countSentForUser.get(key)));
                 }
                 for (Long key : countReceivedForUser.keySet()) {
-                    JedisData.getInstance().setKey(key + USER_RECEIVED_PREFIX, String.valueOf(countReceivedForUser.get(key)));
+                    JedisData.getInstance().setKey(dateString + "_" + key + USER_RECEIVED_PREFIX, String.valueOf(countReceivedForUser.get(key)));
                 }
                 clearVariable();
             }
