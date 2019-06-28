@@ -150,7 +150,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
             } else if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_COUNT_OF_WORD ||
                     telegramParser.getUsers().get(chatId).getStatus() == UserStatus.TESTING){
-                telegramParser.parseText(update);
+                if (update.hasCallbackQuery()) {
+                    telegramParser.parsCallback(update);
+                } else {
+                    telegramParser.parseText(update);
+                }
             } else {
                 if (update.hasCallbackQuery()){
                   telegramParser.parsCallback(update);

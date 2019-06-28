@@ -236,6 +236,7 @@ public class TelegramParser {
             } else if (user.getStatus() == UserStatus.WAIT_KEY) {
 
             } else {
+                telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
                 var builder = InlineKeyboardBuilder.
                         create(chatId).
                         setText(resource.getStringByKey("STR_9")).
