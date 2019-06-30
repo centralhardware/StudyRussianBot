@@ -25,6 +25,7 @@ public class TelegramParser {
     private final Resource resource = new Resource();
     private final RSA rsa = new RSA();
     private final InlineKeyboard inlineKeyboard;
+    private final Chart chart = new Chart();
 
     public HashMap<Long, User> getUsers() {
         return users;
@@ -90,15 +91,21 @@ public class TelegramParser {
                         telegramBot.send("access denied", update.getMessage().getChatId());
                     }
                 }
-                if (message.equals("/stat")) {
+                if (message.startsWith("/stat")) {
                     if (Config.getInstance().getAdminsId().contains(chatId)) {
-                        StringBuilder builder = new StringBuilder();
-                        builder.append("bot statistic:").append("\n");
-                        for (String str : JedisData.getInstance().getAllKeys("*")) {
-                            builder.append(str).append("=")
-                                    .append(JedisData.getInstance().getValue(str)).append("\n");
+                        var userStatistic = Statistic.getInstance().getStatistic();
+                        String statString = "статистика бота" + "\n" +
+                                "всего отправлено: " + userStatistic.getTotalCountOfSend() + "\n" +
+                                "всего принято: " + userStatistic.getTotalCountReceived() + "\n" +
+                                "всего пользователей: " + userStatistic.getUserReceived().size() + "\n";
+                        telegramBot.send(statString, chatId);
+                        try {
+                            telegramBot.send(chart.genineLinerGraf("Принято по всем пользователям", "принято", userStatistic.listToArray(userStatistic.getTotalReceived()), userStatistic.getXdata(userStatistic.getTotalReceived().size())), chatId);
+                            telegramBot.send(chart.genineLinerGraf("Отправлено всем пользователям", "отправлено", userStatistic.listToArray(userStatistic.getTotalSend()), userStatistic.getXdata(userStatistic.getTotalSend().size())), chatId);
+                        } catch (Exception e) {
+                            logger.warn("error while generate graf", e);
+                            telegramBot.send("ошибка при генерации графика", chatId);
                         }
-                        telegramBot.send(builder.toString(), chatId);
                     } else {
                         telegramBot.send("access denied", chatId);
                     }
@@ -215,7 +222,7 @@ public class TelegramParser {
                 inlineKeyboard.sendBookInlineKeyBoard(update, Integer.parseInt(callback.replace("book_to_", "")));
             }
             if (callback.startsWith("book" ) && !callback.startsWith("book_to_")){
-                telegramBot.send(Data.getInstance().wordManager.getRuleDescriptionById(Integer.parseInt(callback.replace("book",""))).getDescription(),chatId);
+                telegramBot.send(Data.getInstance().getWordManager().getRuleDescriptionById(Integer.parseInt(callback.replace("book", ""))).getDescription(), chatId);
                 var builder = InlineKeyboardBuilder.
                         create(chatId).setText(resource.getStringByKey("STR_18")).
                         row().

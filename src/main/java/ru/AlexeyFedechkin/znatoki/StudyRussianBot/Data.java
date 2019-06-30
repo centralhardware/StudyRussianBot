@@ -33,8 +33,7 @@ public class Data {
         }
     }
 
-    public final WordManager wordManager;
-
+    private final WordManager wordManager;
 
     public WordManager getWordManager() {
         return wordManager;

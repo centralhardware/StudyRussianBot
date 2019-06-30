@@ -12,6 +12,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -20,6 +21,7 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.*;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 
+import java.io.File;
 import java.net.Authenticator;
 import java.net.InetAddress;
 import java.net.PasswordAuthentication;
@@ -202,6 +204,25 @@ public class TelegramBot extends TelegramLongPollingBot {
             Statistic.getInstance().checkSent(Long.parseLong(sendMessage.getChatId()));
         } catch (TelegramApiException e) {
             logger.warn("fail to send message", e);
+        }
+    }
+
+    public void send(File file, long chatId) {
+        SendPhoto sendPhoto = new SendPhoto();
+        sendPhoto.setChatId(chatId);
+        sendPhoto.setPhoto(file);
+        try {
+            execute(sendPhoto);
+            logger.info("send photo " + file.getName());
+            JedisData.getInstance().sent(chatId);
+            Statistic.getInstance().checkSent(chatId);
+            if (file.delete()) {
+                logger.info("file " + file.getName() + " deleted successfully");
+            } else {
+                logger.warn("file " + file.getName() + " deleted fail");
+            }
+        } catch (TelegramApiException e) {
+            logger.info("send photo fail", e);
         }
     }
 

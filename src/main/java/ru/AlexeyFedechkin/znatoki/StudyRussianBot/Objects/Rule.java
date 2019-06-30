@@ -67,7 +67,7 @@ public class Rule {
      */
     public static int getMaxPage(){
         int max = 0;
-        for (var rule : Data.getInstance().wordManager.getRules()){
+        for (var rule : Data.getInstance().getWordManager().getRules()) {
             if (rule.getPageNumber() > max){
                 max = rule.getPageNumber();
             }

@@ -8,6 +8,7 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,9 +19,7 @@ public class JedisData {
     private static final JedisData ourInstance = new JedisData();
     private final Logger logger = Logger.getLogger(Jedis.class);
 
-    public static JedisData getInstance() {
-        return ourInstance;
-    }
+    public final String COUNT_OF_RECEIVED_MESSAGE_POSTFIX = "_count_of_received_message";
 
     private final Jedis jedis;
 
@@ -29,10 +28,13 @@ public class JedisData {
         jedis =  new Jedis(Config.getInstance().getRedisHost(), Config.getInstance().getRedisPort());
     }
 
-    private final String COUNT_OF_RECEIVED_MESSAGE_POSTFIX = "_count_of_received_message";
-    private final String COUNT_OF_RECEIVED_MESSAGE_KEY = "count_of_received_message";
-    private final String COUNT_OF_SENT_MESSAGE_POSTFIX = "_count_of_sent_message";
-    private final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";
+    public final String COUNT_OF_RECEIVED_MESSAGE_KEY = "count_of_received_message";
+    public final String COUNT_OF_SENT_MESSAGE_POSTFIX = "_count_of_sent_message";
+    public final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";
+
+    public synchronized static JedisData getInstance() {
+        return ourInstance;
+    }
     private final String CHECKED_WORD_POSTFIX = "_checked_word";
     private final String CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word";
     private final String CHECKED_RULE_POSTFIX = "_checked_rule";
@@ -88,7 +90,7 @@ public class JedisData {
         var checkWordKey = user.getChatId() + CHECKED_WORD_POSTFIX;
         var checkRuleKey = user.getChatId() + CHECKED_RULE_POSTFIX;
         int checkedCount = 0;
-        for (Word word : Data.getInstance().wordManager.getRule(user.getCurrRule().getName()).getWords()){
+        for (Word word : Data.getInstance().getWordManager().getRule(user.getCurrRule().getName()).getWords()) {
             if (jedis.sismember(checkWordKey, word.getName())){
                 checkedCount++;
             }
@@ -144,7 +146,7 @@ public class JedisData {
     public int getCountOfCheckedWord(long chatId){
         var checkWordKey = chatId + CHECKED_WORD_POSTFIX;
         int count = 0;
-        for (Rule rule : Data.getInstance().wordManager.getRules()){
+        for (Rule rule : Data.getInstance().getWordManager().getRules()) {
             for (Word word : rule.getWords()){
                 if (jedis.sismember(checkWordKey, word.getName())){
                     count++;
@@ -164,7 +166,7 @@ public class JedisData {
         HashMap<String, Integer> res = new HashMap<>();
         var checkWordKey = chatId + CHECKED_WRONG_WORD_POSTFIX;
         int count = 0;
-        for (Rule rule : Data.getInstance().wordManager.getRules()) {
+        for (Rule rule : Data.getInstance().getWordManager().getRules()) {
             for (Word word : rule.getWords()) {
                 if (jedis.sismember(checkWordKey, word.getName())) {
                     count++;
@@ -261,5 +263,13 @@ public class JedisData {
             }
         }
         return keys;
+    }
+
+    public synchronized void addToList(String key, String value) {
+        jedis.lpush(key, String.valueOf(value));
+    }
+
+    public List<String> getList(String key) {
+        return jedis.lrange(key, 0, jedis.llen(key));
     }
 }

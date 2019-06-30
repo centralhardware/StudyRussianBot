@@ -51,7 +51,7 @@ public class InlineKeyboard {
         }
         if (!(JedisData.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))){
             for (var i = 0; i < 3; i++) {
-                var ruleDescription = Data.getInstance().wordManager.getRuleDescriptions().get(i);
+                var ruleDescription = Data.getInstance().getWordManager().getRuleDescriptions().get(i);
                 builder.row().
                         button(ruleDescription.getName(), "book"+ruleDescription.getId()).
                         endRow();
@@ -121,7 +121,7 @@ public class InlineKeyboard {
         }
         if (!(JedisData.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))){
             for (var i = 1; i < 4; i++) {
-                var rule = Data.getInstance().wordManager.getRules().get(i);
+                var rule = Data.getInstance().getWordManager().getRules().get(i);
                 builder.row();
                 if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
                     builder.button("✅" + rule.getName(), rule.getSection());
