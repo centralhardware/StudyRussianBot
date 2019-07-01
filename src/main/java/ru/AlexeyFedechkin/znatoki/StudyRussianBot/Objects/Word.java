@@ -9,9 +9,12 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 import org.apache.log4j.Logger;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.SchoolStage;
 
+import java.util.Objects;
+
 /**
  *Data about word
  */
+@SuppressWarnings("HardCodedStringLiteral")
 public class Word {
     private static final Logger logger = Logger.getLogger(Word.class);
 
@@ -78,5 +81,33 @@ public class Word {
 
     public SchoolStage getSchoolStage() {
         return schoolStage;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Word word = (Word) o;
+        return wrightName.equals(word.wrightName) &&
+                name.equals(word.name) &&
+                section.equals(word.section) &&
+                answer.equals(word.answer) &&
+                schoolStage == word.schoolStage;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(wrightName, name, section, answer, schoolStage);
+    }
+
+    @Override
+    public String toString() {
+        return "Word{" +
+                "wrightName='" + wrightName + '\'' +
+                ", name='" + name + '\'' +
+                ", section='" + section + '\'' +
+                ", answer='" + answer + '\'' +
+                ", schoolStage=" + schoolStage +
+                '}';
     }
 }

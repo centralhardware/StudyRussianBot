@@ -8,12 +8,13 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  *Data about user
@@ -109,31 +110,56 @@ public class User {
      */
     public String getProfile(){
         float rightPercent;
-        if (JedisData.getInstance().getCountOfWrongCheckedWord(chatId) != 0) {
-            rightPercent = JedisData.getInstance().getCountOfCheckedWord(chatId) / JedisData.getInstance().getCountOfWrongCheckedWord(chatId) * 100;
+        if (Redis.getInstance().getCountOfWrongCheckedWord(chatId) != 0) {
+            rightPercent = Redis.getInstance().getCountOfCheckedWord(chatId) / Redis.getInstance().getCountOfWrongCheckedWord(chatId) * 100;
         } else {
             rightPercent = 100;
         }
         var builder = new StringBuilder();
         builder.append(resource.getStringByKey("STR_12")).append("\n").
-                append(resource.getStringByKey("STR_13")).append(JedisData.getInstance().getCountOfSentMessage(chatId)).append("\n")
-                .append(resource.getStringByKey("STR_14")).append(JedisData.getInstance().getCountOfReceivedMessage(chatId)).append("\n").
-                append(resource.getStringByKey("STR_15")).append(JedisData.getInstance().getCountOfCheckedWord(chatId)).append("\n").
-                append(resource.getStringByKey("STR_45")).append(JedisData.getInstance().getCountOfWrongCheckedWord(chatId)).append("\n").
+                append(resource.getStringByKey("STR_13")).append(Redis.getInstance().getCountOfSentMessage(chatId)).append("\n")
+                .append(resource.getStringByKey("STR_14")).append(Redis.getInstance().getCountOfReceivedMessage(chatId)).append("\n").
+                append(resource.getStringByKey("STR_15")).append(Redis.getInstance().getCountOfCheckedWord(chatId)).append("\n").
+                append(resource.getStringByKey("STR_45")).append(Redis.getInstance().getCountOfWrongCheckedWord(chatId)).append("\n").
                 append(resource.getStringByKey("STR_46")).append(rightPercent).append("%").append("\n").
                 append(resource.getStringByKey("STR_16")).append("\n");
         for (var rule : Data.getInstance().getWordManager().getRules()){
-            if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
+            if (Redis.getInstance().isCheckRule(chatId, rule.getName())) {
                 builder.append(" - ").append("\"").append(rule.getName()).append("\"").append("\n");
             }
         }
         if (Config.getInstance().getAdminsId().contains(chatId)){
             builder.append(resource.getStringByKey("STR_35")).append(resource.getStringByKey("STR_37"));
-        } else if  (JedisData.getInstance().checkRight(chatId)){
+        } else if (Redis.getInstance().checkRight(chatId)) {
             builder.append(resource.getStringByKey("STR_35")).append(resource.getStringByKey("STR_38"));
         } else {
             builder.append(resource.getStringByKey("STR_35")).append(resource.getStringByKey("STR_39"));
         }
         return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return chatId == user.chatId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(chatId);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "chatId=" + chatId +
+                ", currRule=" + currRule +
+                ", status=" + status +
+                ", words=" + words +
+                ", wrongWords=" + wrongWords +
+                ", count=" + count +
+                '}';
     }
 }

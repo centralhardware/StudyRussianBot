@@ -2,19 +2,25 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
 import org.apache.log4j.Logger;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.UserStatistic;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
 
 import java.util.*;
 
+@SuppressWarnings("HardCodedStringLiteral")
 public class Statistic {
-    private static Statistic ourInstance = new Statistic();
+    private static final Statistic ourInstance = new Statistic();
     private final Logger logger = Logger.getLogger(Statistic.class);
     private final String TOTAL_SENT_KEY = "total_sent";
     private final String TOTAL_RECEIVED_KEY = "total_received";
+    private final String USER_SEND_KEY = "_send";
+    private final String USER_RECEIVED_KEY = "_received";
     private int PERIOD;
     private volatile int totalSent = 0;
     private volatile int totalReceived = 0;
-    private Map<Long, Integer> countReceivedForUser = Collections.synchronizedMap(new HashMap<>());
-    private Map<Long, Integer> countSentForUser = Collections.synchronizedMap(new HashMap<>());
+    private final Map<Long, Integer> countReceivedForUser = Collections.synchronizedMap(new HashMap<>());
+    private final Map<Long, Integer> countSentForUser = Collections.synchronizedMap(new HashMap<>());
+    private final int MILLISECONDS_IN_SECOND = 1000;
+    private final int SECOND_IN_MINUTE = 60;
 
     private Statistic() {
     }
@@ -38,17 +44,17 @@ public class Statistic {
             @Override
             public void run() {
                 logger.info("save statistic");
-                JedisData.getInstance().addToList(TOTAL_SENT_KEY, String.valueOf(totalSent));
-                JedisData.getInstance().addToList(TOTAL_RECEIVED_KEY, String.valueOf(totalReceived));
+                Redis.getInstance().addToList(TOTAL_SENT_KEY, String.valueOf(totalSent));
+                Redis.getInstance().addToList(TOTAL_RECEIVED_KEY, String.valueOf(totalReceived));
                 for (long key : countSentForUser.keySet()) {
-                    JedisData.getInstance().addToList(key + "_send", String.valueOf(countSentForUser.get(key)));
+                    Redis.getInstance().addToList(key + USER_SEND_KEY, String.valueOf(countSentForUser.get(key)));
                 }
                 for (long key : countReceivedForUser.keySet()) {
-                    JedisData.getInstance().addToList(key + "_received", String.valueOf(countReceivedForUser.get(key)));
+                    Redis.getInstance().addToList(key + USER_RECEIVED_KEY, String.valueOf(countReceivedForUser.get(key)));
                 }
                 clearVariable();
             }
-        }, 0, 1000 * 60 * PERIOD);
+        }, 0, MILLISECONDS_IN_SECOND * SECOND_IN_MINUTE * PERIOD);
     }
 
     /**
@@ -90,15 +96,14 @@ public class Statistic {
 
     /**
      * get statistic
-     *
      * @return object with all statistic
      */
     public UserStatistic getStatistic() {
         var res = new UserStatistic();
-        List<String> totalSent = JedisData.getInstance().getList(TOTAL_SENT_KEY);
-        List<String> totalReceived = JedisData.getInstance().getList(TOTAL_RECEIVED_KEY);
-        Set<String> userSent = JedisData.getInstance().getAllKeys("*_send");
-        Set<String> userReceived = JedisData.getInstance().getAllKeys("*_received");
+        List<String> totalSent = Redis.getInstance().getList(TOTAL_SENT_KEY);
+        List<String> totalReceived = Redis.getInstance().getList(TOTAL_RECEIVED_KEY);
+        Set<String> userSent = Redis.getInstance().getAllKeys("*" + USER_SEND_KEY);
+        Set<String> userReceived = Redis.getInstance().getAllKeys("*" + USER_RECEIVED_KEY);
 
         HashMap<Long, ArrayList<Integer>> userSentRes = new HashMap<>();
         HashMap<Long, ArrayList<Integer>> userReceivedRes = new HashMap<>();
@@ -111,44 +116,44 @@ public class Statistic {
         }
 
         for (String str : userSent) {
-            List<String> listString = JedisData.getInstance().getList(str);
+            List<String> listString = Redis.getInstance().getList(str);
             ArrayList<Integer> list = new ArrayList<>();
             for (String s : listString) {
                 list.add(Integer.valueOf(s));
             }
             if (!str.equals("total_send")) {
-                userSentRes.put(Long.parseLong(str.replace("_send", "")), list);
+                userSentRes.put(Long.parseLong(str.replace(USER_SEND_KEY, "")), list);
             }
         }
         for (String str : userReceived) {
-            List<String> listString = JedisData.getInstance().getList(str);
+            List<String> listString = Redis.getInstance().getList(str);
             ArrayList<Integer> list = new ArrayList<>();
             for (String s : listString) {
                 list.add(Integer.valueOf(s));
             }
             if (!str.equals("total_received")) {
-                userReceivedRes.put(Long.parseLong(str.replace("_received", "")), list);
+                userReceivedRes.put(Long.parseLong(str.replace(USER_RECEIVED_KEY, "")), list);
             }
         }
 
         res.setUserReceived(userReceivedRes);
         res.setUserSend(userSentRes);
 
-        res.setTotalCountOfSend(Integer.parseInt(JedisData.getInstance().getValue(JedisData.getInstance().COUNT_OF_SENT_MESSAGE_KEY)));
-        res.setTotalCountReceived(Integer.parseInt(JedisData.getInstance().getValue(JedisData.getInstance().COUNT_OF_RECEIVED_MESSAGE_KEY)));
+        res.setTotalCountOfSend(Integer.parseInt(Redis.getInstance().getValue(Redis.getInstance().COUNT_OF_SENT_MESSAGE_KEY)));
+        res.setTotalCountReceived(Integer.parseInt(Redis.getInstance().getValue(Redis.getInstance().COUNT_OF_RECEIVED_MESSAGE_KEY)));
 
-        Set<String> usersSent = JedisData.getInstance().getAllKeys("*" + JedisData.getInstance().COUNT_OF_SENT_MESSAGE_POSTFIX);
-        Set<String> usersReceived = JedisData.getInstance().getAllKeys("*" + JedisData.getInstance().COUNT_OF_RECEIVED_MESSAGE_POSTFIX);
+        Set<String> usersSent = Redis.getInstance().getAllKeys("*" + Redis.getInstance().COUNT_OF_SENT_MESSAGE_POSTFIX);
+        Set<String> usersReceived = Redis.getInstance().getAllKeys("*" + Redis.getInstance().COUNT_OF_RECEIVED_MESSAGE_POSTFIX);
 
         for (String str : usersSent) {
-            res.getUserCountSent().put(Long.valueOf(str.replace(JedisData.getInstance().COUNT_OF_SENT_MESSAGE_POSTFIX, "")),
-                    Integer.parseInt(JedisData.getInstance().getValue(str)));
+            res.getUserCountSent().put(Long.valueOf(str.replace(Redis.getInstance().COUNT_OF_SENT_MESSAGE_POSTFIX, "")),
+                    Integer.parseInt(Redis.getInstance().getValue(str)));
 
         }
 
         for (String str : usersReceived) {
-            res.getUserCountSent().put(Long.valueOf(str.replace(JedisData.getInstance().COUNT_OF_RECEIVED_MESSAGE_POSTFIX, "")),
-                    Integer.parseInt(JedisData.getInstance().getValue(str)));
+            res.getUserCountSent().put(Long.valueOf(str.replace(Redis.getInstance().COUNT_OF_RECEIVED_MESSAGE_POSTFIX, "")),
+                    Integer.parseInt(Redis.getInstance().getValue(str)));
         }
         return res;
     }

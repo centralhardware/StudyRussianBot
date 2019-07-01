@@ -1,7 +1,8 @@
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils;
 
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.internal.util.Base64;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -13,9 +14,10 @@ import java.security.spec.X509EncodedKeySpec;
  * class for working with asymmetric encryption
  * used to generate activation codes and checking them
  */
+@SuppressWarnings("HardCodedStringLiteral")
 public class RSA {
     private final Logger logger = Logger.getLogger(RSA.class);
-    private final String SOLID = "asdfsdd";
+    private final String SOLID = "aYbWZRqZgBWkxQL2z8Z4kWPBz";
     private Signature signature = null;
     private final org.apache.commons.codec.binary.Base64 base64 = new org.apache.commons.codec.binary.Base64();
 

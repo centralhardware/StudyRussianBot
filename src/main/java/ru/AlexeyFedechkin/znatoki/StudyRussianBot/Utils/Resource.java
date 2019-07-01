@@ -4,7 +4,7 @@
  * Copyright (c) 2019
  */
 
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils;
 
 import org.apache.log4j.Logger;
 

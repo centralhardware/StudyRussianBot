@@ -12,6 +12,7 @@ import java.util.Objects;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+@SuppressWarnings("HardCodedStringLiteral")
 public class WordTest {
 
     @Test

@@ -4,9 +4,9 @@ import org.apache.log4j.Logger;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.JedisData;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 
 /**
  * methods to send InlineKeyboardMarkup
@@ -14,7 +14,7 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Resource;
 public class InlineKeyboard {
     private final Resource resource = new Resource();
     private final Logger logger = Logger.getLogger(InlineKeyboardBuilder.class);
-    private TelegramBot telegramBot;
+    private final TelegramBot telegramBot;
 
     /**
      * set telegramBot
@@ -49,7 +49,7 @@ public class InlineKeyboard {
         } else {
             userId = update.getMessage().getFrom().getId();
         }
-        if (!(JedisData.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))){
+        if (!(Redis.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))) {
             for (var i = 0; i < 3; i++) {
                 var ruleDescription = Data.getInstance().getWordManager().getRuleDescriptions().get(i);
                 builder.row().
@@ -119,11 +119,11 @@ public class InlineKeyboard {
         } else {
             userId = update.getMessage().getFrom().getId();
         }
-        if (!(JedisData.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))){
+        if (!(Redis.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))) {
             for (var i = 1; i < 4; i++) {
                 var rule = Data.getInstance().getWordManager().getRules().get(i);
                 builder.row();
-                if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
+                if (Redis.getInstance().isCheckRule(chatId, rule.getName())) {
                     builder.button("✅" + rule.getName(), rule.getSection());
                 } else {
                     builder.button(rule.getName(), rule.getSection());
@@ -134,7 +134,7 @@ public class InlineKeyboard {
             for (var rule : Data.getInstance().getWordManager().getRules()) {
                 if (rule.getPageNumber() == pageNumber){
                     builder.row();
-                    if (JedisData.getInstance().isCheckRule(chatId, rule.getName())){
+                    if (Redis.getInstance().isCheckRule(chatId, rule.getName())) {
                         builder.button("✅" + rule.getName(), rule.getSection());
                     } else {
                         builder.button(rule.getName(), rule.getSection());
@@ -178,7 +178,7 @@ public class InlineKeyboard {
      * @param chatId id of user
      */
     public void sendLoginInfo(long chatId) {
-        if (JedisData.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId)) {
+        if (Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId)) {
             telegramBot.send(resource.getStringByKey("STR_44"), chatId);
         } else {
             var builder = InlineKeyboardBuilder.create(chatId).
@@ -217,9 +217,15 @@ public class InlineKeyboard {
                 row().
                 button(resource.getStringByKey("STR_34"), "book").
                 endRow();
-        if (!JedisData.getInstance().checkRight(chatId) &&  !Config.getInstance().getAdminsId().contains(chatId)){
+        if (!Redis.getInstance().checkRight(chatId) && !Config.getInstance().getAdminsId().contains(chatId)) {
             builder.row().
                     button(resource.getStringByKey("STR_36"), "login").
+                    endRow();
+        }
+        if (!Config.getInstance().getAdminsId().contains(chatId)) {
+            builder.
+                    row().
+                    button("Написать нам", "report").
                     endRow();
         }
         telegramBot.send(builder.build());

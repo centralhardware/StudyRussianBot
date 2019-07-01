@@ -1,7 +1,9 @@
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils;
 
 import org.apache.log4j.Logger;
 import redis.clients.jedis.Jedis;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
@@ -15,30 +17,29 @@ import java.util.Set;
  * wrapper for work with redis server
  */
 @SuppressWarnings("HardCodedStringLiteral")
-public class JedisData {
-    private static final JedisData ourInstance = new JedisData();
+public class Redis {
+    private static final Redis ourInstance = new Redis();
     private final Logger logger = Logger.getLogger(Jedis.class);
-
-    public final String COUNT_OF_RECEIVED_MESSAGE_POSTFIX = "_count_of_received_message";
-
     private final Jedis jedis;
+    public final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";
 
-    private JedisData() {
+    public final String COUNT_OF_RECEIVED_MESSAGE_KEY = "count_of_received_message";
+    public final String COUNT_OF_RECEIVED_MESSAGE_POSTFIX = "_count_of_received_message";
+    private final String KEY_POSTFIX = "_key";
+    private final String CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word";
+
+    private Redis() {
         logger.info("redis configure");
         jedis =  new Jedis(Config.getInstance().getRedisHost(), Config.getInstance().getRedisPort());
     }
-
-    public final String COUNT_OF_RECEIVED_MESSAGE_KEY = "count_of_received_message";
     public final String COUNT_OF_SENT_MESSAGE_POSTFIX = "_count_of_sent_message";
-    public final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";
+    private final String CHECKED_WORD_POSTFIX = "_checked_word";
+    private final String CHECKED_RULE_POSTFIX = "_checked_rule";
 
-    public synchronized static JedisData getInstance() {
+    public synchronized static Redis getInstance() {
         return ourInstance;
     }
-    private final String CHECKED_WORD_POSTFIX = "_checked_word";
-    private final String CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word";
-    private final String CHECKED_RULE_POSTFIX = "_checked_rule";
-    private final String KEY_POSTFIX = "_key";
+
 
     /**
      * store data in redis about count of received messages
@@ -51,14 +52,14 @@ public class JedisData {
         } else {
             jedis.set(count_of_received_message_key, String.valueOf(Integer.parseInt(jedis.get(count_of_received_message_key)) + 1));
         }
-        logger.info("set key " + count_of_received_message_key + " value " + jedis.get(count_of_received_message_key));
+        logger.info("set key \"" + count_of_received_message_key + "\" value \"" + jedis.get(count_of_received_message_key + "\""));
 
         if (jedis.get(COUNT_OF_RECEIVED_MESSAGE_KEY) == null){
             jedis.set(COUNT_OF_RECEIVED_MESSAGE_KEY, "1");
         } else {
             jedis.set(COUNT_OF_RECEIVED_MESSAGE_KEY, String.valueOf(Integer.parseInt(jedis.get(COUNT_OF_RECEIVED_MESSAGE_KEY)) + 1));
         }
-        logger.info("set key " + COUNT_OF_RECEIVED_MESSAGE_KEY + " value " + jedis.get(COUNT_OF_RECEIVED_MESSAGE_KEY));
+        logger.info("set key \"" + COUNT_OF_RECEIVED_MESSAGE_KEY + "\" value \"" + jedis.get(COUNT_OF_RECEIVED_MESSAGE_KEY) + "\"");
     }
 
     /**
@@ -72,14 +73,14 @@ public class JedisData {
         } else {
             jedis.set(count_of_sent_message_key, String.valueOf(Integer.parseInt(jedis.get(count_of_sent_message_key)) + 1));
         }
-        logger.info("set key " + count_of_sent_message_key + " value " + jedis.get(count_of_sent_message_key));
+        logger.info("set key \"" + count_of_sent_message_key + "\" value \"" + jedis.get(count_of_sent_message_key) + "\"");
 
         if (jedis.get(COUNT_OF_SENT_MESSAGE_KEY) == null){
             jedis.set(COUNT_OF_SENT_MESSAGE_KEY, "1");
         } else {
             jedis.set(COUNT_OF_SENT_MESSAGE_KEY, String.valueOf(Integer.parseInt(jedis.get(COUNT_OF_SENT_MESSAGE_KEY)) + 1));
         }
-        logger.info("set key " + COUNT_OF_SENT_MESSAGE_KEY + " value " + jedis.get(COUNT_OF_SENT_MESSAGE_KEY));
+        logger.info("set key \"" + COUNT_OF_SENT_MESSAGE_KEY + "\" value \"" + jedis.get(COUNT_OF_SENT_MESSAGE_KEY) + "\"");
     }
 
     /**
@@ -98,7 +99,7 @@ public class JedisData {
         if (Config.getInstance().isTesting()){
             if (checkedCount > 2){
                 jedis.sadd(checkRuleKey, user.getCurrRule().getName());
-                logger.info("add value " + user.getCurrRule().getName() + " to set by key " + checkRuleKey);
+                logger.info("add value \"" + user.getCurrRule().getName() + "\" to set by key \"" + checkRuleKey + "\"");
             }
         } else {
             if (checkedCount >= user.getCurrRule().getWords().size()){
@@ -183,7 +184,7 @@ public class JedisData {
     public void checkWord(User user){
         var checkWordKey = user.getChatId() + CHECKED_WORD_POSTFIX;
         jedis.sadd(checkWordKey, user.getWords().get(0).getName());
-        logger.info("add value " + user.getWords().get(0).getName() + " to set by key " + checkWordKey);
+        logger.info("add value \"" + user.getWords().get(0).getName() + "\" to set by key \"" + checkWordKey + "\"");
     }
 
     /**
@@ -194,7 +195,7 @@ public class JedisData {
     public void checkWrongWord(User user) {
         var checkWordKey = user.getChatId() + CHECKED_WRONG_WORD_POSTFIX;
         jedis.sadd(checkWordKey, user.getWords().get(0).getName());
-        logger.info("add value " + user.getWords().get(0).getName() + " to set by key " + checkWordKey);
+        logger.info("add value \"" + user.getWords().get(0).getName() + "\" to set by key \"" + checkWordKey + "\"");
     }
 
     /**

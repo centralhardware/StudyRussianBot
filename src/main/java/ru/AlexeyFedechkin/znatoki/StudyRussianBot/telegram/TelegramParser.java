@@ -8,10 +8,16 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
 
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.*;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Statistic;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Chart;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.RSA;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 
 import java.util.HashMap;
 
@@ -48,7 +54,7 @@ public class TelegramParser {
         var message = update.getMessage().getText();
         var chatId = update.getMessage().getChatId();
         var user = users.get(chatId);
-        JedisData.getInstance().received(chatId);
+        Redis.getInstance().received(chatId);
         switch (message) {
             case "/start":
                 user.reset();
@@ -78,7 +84,7 @@ public class TelegramParser {
                         telegramBot.send(rsa.generateKey(message.replace("/gen ", "")), chatId);
 
                     } else {
-                        telegramBot.send("access denied", update.getMessage().getChatId());
+                        telegramBot.send(resource.getStringByKey("STR_47"), update.getMessage().getChatId());
                     }
                 }
                 if (message.startsWith("/ver ")) {
@@ -88,26 +94,32 @@ public class TelegramParser {
                     if (Config.getInstance().getAdminsId().contains(chatId)) {
                         telegramBot.send(String.valueOf(rsa.validateKey(msg, key)), chatId);
                     } else {
-                        telegramBot.send("access denied", update.getMessage().getChatId());
+                        telegramBot.send(resource.getStringByKey("STR_47"), update.getMessage().getChatId());
                     }
                 }
                 if (message.startsWith("/stat")) {
                     if (Config.getInstance().getAdminsId().contains(chatId)) {
                         var userStatistic = Statistic.getInstance().getStatistic();
-                        String statString = "статистика бота" + "\n" +
-                                "всего отправлено: " + userStatistic.getTotalCountOfSend() + "\n" +
-                                "всего принято: " + userStatistic.getTotalCountReceived() + "\n" +
-                                "всего пользователей: " + userStatistic.getUserReceived().size() + "\n";
+                        String statString = resource.getStringByKey("STR_48") + "\n" +
+                                resource.getStringByKey("STR_49") + userStatistic.getTotalCountOfSend() + "\n" +
+                                resource.getStringByKey("STR_50") + userStatistic.getTotalCountReceived() + "\n" +
+                                resource.getStringByKey("STR_51") + userStatistic.getUserReceived().size() + "\n";
                         telegramBot.send(statString, chatId);
                         try {
-                            telegramBot.send(chart.genineLinerGraf("Принято по всем пользователям", "принято", userStatistic.listToArray(userStatistic.getTotalReceived()), userStatistic.getXdata(userStatistic.getTotalReceived().size())), chatId);
-                            telegramBot.send(chart.genineLinerGraf("Отправлено всем пользователям", "отправлено", userStatistic.listToArray(userStatistic.getTotalSend()), userStatistic.getXdata(userStatistic.getTotalSend().size())), chatId);
+                            telegramBot.send(chart.genineLinerGraf(resource.getStringByKey("STR_52"),
+                                    resource.getStringByKey("STR_53"),
+                                    userStatistic.listToArray(userStatistic.getTotalReceived()),
+                                    userStatistic.getXdata(userStatistic.getTotalReceived().size())), chatId);
+                            telegramBot.send(chart.genineLinerGraf(resource.getStringByKey("STR_55"),
+                                    resource.getStringByKey("STR_56"),
+                                    userStatistic.listToArray(userStatistic.getTotalSend()),
+                                    userStatistic.getXdata(userStatistic.getTotalSend().size())), chatId);
                         } catch (Exception e) {
                             logger.warn("error while generate graf", e);
-                            telegramBot.send("ошибка при генерации графика", chatId);
+                            telegramBot.send(resource.getStringByKey("STR_57"), chatId);
                         }
                     } else {
-                        telegramBot.send("access denied", chatId);
+                        telegramBot.send(resource.getStringByKey("STR_47"), chatId);
                     }
                 }
                 if (user.getStatus() == UserStatus.WAIT_COUNT_OF_WORD) {
@@ -139,16 +151,16 @@ public class TelegramParser {
                         if (user.getWords().size() == 0){
                             telegramBot.send(resource.getStringByKey("STR_4"), chatId);
                             telegramBot.send(user.getTestingResult(), chatId);
-                            JedisData.getInstance().checkRule(user);
+                            Redis.getInstance().checkRule(user);
                             inlineKeyboard.sendMenu(chatId);
                             user.reset();
                             return;
                         }
                         telegramBot.send(user.getWords().get(0).getName(), chatId);
-                        JedisData.getInstance().checkWord(user);
+                        Redis.getInstance().checkWord(user);
                     } else{
                         telegramBot.send(resource.getStringByKey("STR_5"), chatId);
-                        JedisData.getInstance().checkWrongWord(user);
+                        Redis.getInstance().checkWrongWord(user);
                         Word temp = user.getWords().get(0);
                         user.getWords().remove(0);
                         user.getWords().add(temp);
@@ -167,7 +179,7 @@ public class TelegramParser {
             var callback = update.getCallbackQuery().getData();
             var chatId = update.getCallbackQuery().getMessage().getChatId();
             var user = users.get(chatId);
-            JedisData.getInstance().received(chatId);
+            Redis.getInstance().received(chatId);
             switch (callback){
                 case "reset_testing":
                     telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
@@ -185,7 +197,7 @@ public class TelegramParser {
                     telegramBot.send(user.getProfile(),chatId);
                     break;
                 case "help":
-                    if (!(JedisData.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
+                    if (!(Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
                         telegramBot.send(resource.getStringByKey("STR_32"), chatId);
                     } else {
                         telegramBot.send(resource.getStringByKey("HELP_MESSAGE"), chatId);
@@ -211,6 +223,10 @@ public class TelegramParser {
                 case "book":
                     telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
                     inlineKeyboard.sendBookInlineKeyBoard(update, 0);
+                    return;
+                case "report":
+                    user.setStatus(UserStatus.WAIT_REPORT);
+                    telegramBot.send("Введите сообщение", chatId);
                     return;
             }
             if (callback.startsWith("to_")){

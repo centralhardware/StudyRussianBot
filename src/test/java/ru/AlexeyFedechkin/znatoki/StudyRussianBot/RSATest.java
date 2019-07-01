@@ -1,10 +1,12 @@
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
 import org.junit.Test;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.RSA;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings("HardCodedStringLiteral")
 public class RSATest {
 
     private final String KEY = "WVgDoh6bCJZ3F78/lvGEFS5WJcFX3qHdKw1yYRrYykiwiapXSrejnpebzpPv5wjNArJD/leMjh39gtfajNHN1" +

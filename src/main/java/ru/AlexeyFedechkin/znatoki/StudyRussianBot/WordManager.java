@@ -23,11 +23,12 @@ import java.util.Random;
 /**
  * class that parse json file and generate object collections, provide collection to other classes
  */
+@SuppressWarnings("HardCodedStringLiteral")
 public class WordManager {
     private final Logger logger = Logger.getLogger(WordManager.class);
-    private ArrayList<String> wrongMessages = new ArrayList<>();
-    private ArrayList<Rule> rules = new ArrayList<>();
-    private ArrayList<RuleDescription> ruleDescriptions = new ArrayList<>();
+    private final ArrayList<String> wrongMessages = new ArrayList<>();
+    private final ArrayList<Rule> rules = new ArrayList<>();
+    private final ArrayList<RuleDescription> ruleDescriptions = new ArrayList<>();
 
     /**
      * parseText all data file and generate collections of object
@@ -108,6 +109,7 @@ public class WordManager {
             ruleDesc.setPageNumber((byte) (count/ Rule.pageCountRule));
             count++;
         }
+        System.gc();
     }
 
     /**

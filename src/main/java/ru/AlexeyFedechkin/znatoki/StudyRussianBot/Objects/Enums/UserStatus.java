@@ -13,5 +13,6 @@ public enum UserStatus {
     NONE,
     TESTING, // passing the rules
     WAIT_COUNT_OF_WORD, // input count of word for testing
-    WAIT_KEY // input activated key
+    WAIT_KEY, // input activated key
+    WAIT_REPORT
 }

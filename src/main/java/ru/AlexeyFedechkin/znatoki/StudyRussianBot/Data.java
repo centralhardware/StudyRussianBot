@@ -28,6 +28,7 @@ public class Data {
         wordManager = new WordManager();
         try {
             wordManager.init();
+            logger.info("data load");
         } catch (IOException e) {
             logger.fatal("load data fail", e);
         }

@@ -1,4 +1,4 @@
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils;
 
 import org.apache.log4j.Logger;
 import org.knowm.xchart.BitmapEncoder;
@@ -22,16 +22,15 @@ public class Chart {
      * @param yData    vertical data
      * @param xData    horizontal data
      * @return File with saved graf
-     * @throws Exception error while generate or saving picture
      */
-    public File genineLinerGraf(String name, String lineName, double[] yData, double[] xData) throws Exception {
+    public File genineLinerGraf(String name, String lineName, double[] yData, double[] xData) {
         XYChart chart = new XYChart(1920, 1080);
         chart.setTitle(name);
         chart.setXAxisTitle("X");
         chart.setXAxisTitle("Y");
         XYSeries series = chart.addSeries(lineName, null, yData);
         series.setMarker(SeriesMarkers.NONE);
-        logger.info("generate chart " + name);
+        logger.info("generate chart: " + name);
         var fileName = "./" + "chart_" + random.nextInt(1000) + ".jpg";
         File file;
         try {

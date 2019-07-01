@@ -8,10 +8,7 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 /**
  *Data about rule
@@ -24,7 +21,7 @@ public class Rule {
     private final String name;
     private Rule parent;
     private final String section;
-    private ArrayList<Word> words;
+    private final ArrayList<Word> words;
     private byte pageNumber;
     public static final int pageCountRule = 10;
 
@@ -87,5 +84,34 @@ public class Rule {
             wordSet.add(words.get(random.nextInt(words.size())));
         }
         return new ArrayList<>(wordSet);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rule rule = (Rule) o;
+        return pageNumber == rule.pageNumber &&
+                name.equals(rule.name) &&
+                Objects.equals(parent, rule.parent) &&
+                section.equals(rule.section) &&
+                words.equals(rule.words);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, parent, section, words, pageNumber);
+    }
+
+    @SuppressWarnings("HardCodedStringLiteral")
+    @Override
+    public String toString() {
+        return "Rule{" +
+                "name='" + name + '\'' +
+                ", parent=" + parent +
+                ", section='" + section + '\'' +
+                ", words=" + words +
+                ", pageNumber=" + pageNumber +
+                '}';
     }
 }
