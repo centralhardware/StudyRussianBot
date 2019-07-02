@@ -106,11 +106,11 @@ public class TelegramParser {
                                 resource.getStringByKey("STR_51") + userStatistic.getUserReceived().size() + "\n";
                         telegramBot.send(statString, chatId);
                         try {
-                            telegramBot.send(chart.genineLinerGraf(resource.getStringByKey("STR_52"),
+                            telegramBot.send(chart.genOneLineGraf(resource.getStringByKey("STR_52"),
                                     resource.getStringByKey("STR_53"),
                                     userStatistic.listToArray(userStatistic.getTotalReceived()),
                                     userStatistic.getXdata(userStatistic.getTotalReceived().size())), chatId);
-                            telegramBot.send(chart.genineLinerGraf(resource.getStringByKey("STR_55"),
+                            telegramBot.send(chart.genOneLineGraf(resource.getStringByKey("STR_55"),
                                     resource.getStringByKey("STR_56"),
                                     userStatistic.listToArray(userStatistic.getTotalSend()),
                                     userStatistic.getXdata(userStatistic.getTotalSend().size())), chatId);

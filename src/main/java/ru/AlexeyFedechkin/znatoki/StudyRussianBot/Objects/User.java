@@ -109,9 +109,11 @@ public class User {
      * @return string with profile data
      */
     public String getProfile(){
-        float rightPercent;
-        if (Redis.getInstance().getCountOfWrongCheckedWord(chatId) != 0) {
-            rightPercent = Redis.getInstance().getCountOfCheckedWord(chatId) / Redis.getInstance().getCountOfWrongCheckedWord(chatId) * 100;
+        int rightPercent;
+        double wright = Redis.getInstance().getCountOfCheckedWord(chatId);
+        double wrong = Redis.getInstance().getCountOfWrongCheckedWord(chatId);
+        if (wrong != 0 && wright < wrong) {
+            rightPercent = (int) ((wright / wrong) * 100);
         } else {
             rightPercent = 100;
         }

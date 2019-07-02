@@ -21,8 +21,7 @@ public class Main {
         logger.info("program start");
         ApiContextInitializer.init();
         logger.info("api context init");
-        var telegramBot = new TelegramBot();
-        telegramBot.init();
+        new TelegramBot().init();
         logger.info("telegram bot run");
         Statistic.getInstance().init();
         logger.info("init statistic");

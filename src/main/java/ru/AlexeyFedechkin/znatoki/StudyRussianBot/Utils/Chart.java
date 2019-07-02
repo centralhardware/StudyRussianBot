@@ -23,12 +23,12 @@ public class Chart {
      * @param xData    horizontal data
      * @return File with saved graf
      */
-    public File genineLinerGraf(String name, String lineName, double[] yData, double[] xData) {
+    public File genOneLineGraf(String name, String lineName, double[] yData, double[] xData) {
         XYChart chart = new XYChart(1920, 1080);
         chart.setTitle(name);
         chart.setXAxisTitle("X");
         chart.setXAxisTitle("Y");
-        XYSeries series = chart.addSeries(lineName, null, yData);
+        XYSeries series = chart.addSeries(lineName, xData, yData);
         series.setMarker(SeriesMarkers.NONE);
         logger.info("generate chart: " + name);
         var fileName = "./" + "chart_" + random.nextInt(1000) + ".jpg";
@@ -40,6 +40,7 @@ public class Chart {
             logger.warn("", e);
         }
         file = new File(fileName);
+        System.gc();
         return file;
     }
 }
