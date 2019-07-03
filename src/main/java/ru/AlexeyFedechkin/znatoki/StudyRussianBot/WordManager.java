@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * class that parse json file and generate object collections, provide collection to other classes
@@ -26,7 +25,6 @@ import java.util.Random;
 @SuppressWarnings("HardCodedStringLiteral")
 public class WordManager {
     private final Logger logger = Logger.getLogger(WordManager.class);
-    private final ArrayList<String> wrongMessages = new ArrayList<>();
     private final ArrayList<Rule> rules = new ArrayList<>();
     private final ArrayList<RuleDescription> ruleDescriptions = new ArrayList<>();
 
@@ -38,14 +36,7 @@ public class WordManager {
         // get Strings from files
         var wordString = getStringFromResources("word.json");
         var ruleString = getStringFromResources("rule.json");
-        var wrongMessageString = getStringFromResources("wrongMessage.json");
         var ruleDescriptionString = getStringFromResources("ruleDesc.json");
-        // parse wrongMessage.json
-        var wrongMessageObject = new JSONObject(wrongMessageString);
-        var wrongMessageArray = wrongMessageObject.getJSONArray("data");
-        for (int i = 0; i < wrongMessageArray.length(); i++) {
-            wrongMessages.add(wrongMessageArray.getString(i));
-        }
         // parse rule.json
         var ruleObject = new JSONObject(ruleString);
         var ruleData = ruleObject.getJSONObject("data");
@@ -125,16 +116,6 @@ public class WordManager {
         return writer.toString();
     }
 
-    private final Random random = new Random();
-
-    /**
-     * get random wrong message
-     * @return random string with remark about error
-     */
-    public String getRandomWrongMessage(){
-        return (String) wrongMessages.toArray()[random.nextInt(wrongMessages.size())];
-    }
-
     public ArrayList<Rule> getRules(){
         return rules;
     }
@@ -145,7 +126,6 @@ public class WordManager {
 
     /**
      * get RuleDescription by id
-     *
      * @param id id of needed rule description
      * @return RuleDescription find by giving id
      */

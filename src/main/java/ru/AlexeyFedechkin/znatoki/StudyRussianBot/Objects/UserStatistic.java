@@ -38,7 +38,7 @@ public class UserStatistic {
      * @param count count of element in graf
      * @return horizontal data
      */
-    public double[] getXdata(int count) {
+    public double[] getXData(int count) {
         var res = new double[count];
         for (int i = 0; i < count; i++) {
             res[i] = i;

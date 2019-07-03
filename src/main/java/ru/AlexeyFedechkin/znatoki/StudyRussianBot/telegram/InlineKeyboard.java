@@ -225,7 +225,7 @@ public class InlineKeyboard {
         if (!Config.getInstance().getAdminsId().contains(chatId)) {
             builder.
                     row().
-                    button("Написать нам", "report").
+                    button(resource.getStringByKey("STR_58"), "report").
                     endRow();
         }
         telegramBot.send(builder.build());

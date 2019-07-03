@@ -8,7 +8,6 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -164,7 +163,6 @@ public class Redis {
      * @return count of checked word
      */
     public int getCountOfWrongCheckedWord(long chatId) {
-        HashMap<String, Integer> res = new HashMap<>();
         var checkWordKey = chatId + CHECKED_WRONG_WORD_POSTFIX;
         int count = 0;
         for (Rule rule : Data.getInstance().getWordManager().getRules()) {

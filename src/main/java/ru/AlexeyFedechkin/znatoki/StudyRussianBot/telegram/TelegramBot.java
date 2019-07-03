@@ -102,88 +102,89 @@ public class TelegramBot extends TelegramLongPollingBot {
      * @param update received message
      */
     public void onUpdateReceived(Update update) {
+        if (telegramParser == null) {
+            telegramParser = new TelegramParser(this);
+        }
+        long chatId;
         if (update.hasCallbackQuery()){
             logger.info("receive callback \"" + update.getCallbackQuery().getData() + "\" " +
                     update.getCallbackQuery().getFrom().getFirstName() + "\" " +
                     update.getCallbackQuery().getFrom().getLastName() + "\" " +
                     update.getCallbackQuery().getFrom().getUserName() + "\"");
+            if (!telegramParser.getUsers().containsKey(update.getCallbackQuery().getMessage().getChatId())) {
+                telegramParser.getUsers().put(update.getCallbackQuery().getMessage().getChatId(), new User(update.getCallbackQuery().getMessage().getChatId()));
+            }
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+            Statistic.getInstance().checkReceived(chatId);
         } else {
             logger.info("receive message \"" + update.getMessage().getText() +
                     "\" from \"" + update.getMessage().getFrom().getFirstName() + "\" " +
                     update.getMessage().getFrom().getLastName() + "\" " +
                     update.getMessage().getFrom().getUserName() + "\" " +
                     update.getMessage().getFrom().getId().toString() + "\"");
+            if (!telegramParser.getUsers().containsKey(update.getMessage().getChatId())) {
+                telegramParser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
+            }
+            chatId = update.getMessage().getChatId();
+            Statistic.getInstance().checkReceived(chatId);
+
             if (update.getMessage().getText().toLowerCase().equals("ping")) {
                 send("pong",update.getMessage().getChatId());
             } else if (update.getMessage().getText().toLowerCase().equals("pong")) {
                 send("ping", update.getMessage().getChatId());
             }
         }
-        if (telegramParser == null){
-            telegramParser = new TelegramParser(this);
-        }
-        long chatId;
-        if (update.hasCallbackQuery()){
-            if (!telegramParser.getUsers().containsKey(update.getCallbackQuery().getMessage().getChatId())){
-                telegramParser.getUsers().put(update.getCallbackQuery().getMessage().getChatId(), new User(update.getCallbackQuery().getMessage().getChatId()));
-            }
-            chatId = update.getCallbackQuery().getMessage().getChatId();
-            Statistic.getInstance().checkReceived(chatId);
-        } else {
-            if (!telegramParser.getUsers().containsKey(update.getMessage().getChatId())){
-                telegramParser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
-            }
-            chatId = update.getMessage().getChatId();
-            Statistic.getInstance().checkReceived(chatId);
-        }
+
         if (!(Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
-            if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_KEY){
-                if (!update.hasCallbackQuery()){
-                    if (rsa.validateKey(update.getMessage().getFrom().getUserName(), update.getMessage().getText())){
-                        telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
-                        Redis.getInstance().setRight(chatId, update.getMessage().getText());
-                        send(resource.getStringByKey("STR_19"), chatId);
-                        inlineKeyboard.sendMenu(chatId);
-                    } else {
-                        if (update.hasCallbackQuery()){
-                            telegramParser.parsCallback(update);
-                            return;
+            switch (telegramParser.getUsers().get(chatId).getStatus()) {
+                case WAIT_KEY:
+                    if (!update.hasCallbackQuery()) {
+                        if (rsa.validateKey(update.getMessage().getFrom().getUserName(), update.getMessage().getText())) {
+                            telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
+                            Redis.getInstance().setRight(chatId, update.getMessage().getText());
+                            send(resource.getStringByKey("STR_19"), chatId);
+                            inlineKeyboard.sendMenu(chatId);
+                        } else {
+                            if (update.hasCallbackQuery()) {
+                                telegramParser.parsCallback(update);
+                                return;
+                            }
+                            send(resource.getStringByKey("STR_21"), chatId);
                         }
-                        send(resource.getStringByKey("STR_21"), chatId);
-                    }
-                } else {
-                    telegramParser.parsCallback(update);
-                }
-            } else if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_COUNT_OF_WORD ||
-                    telegramParser.getUsers().get(chatId).getStatus() == UserStatus.TESTING){
-                if (update.hasCallbackQuery()) {
-                    telegramParser.parsCallback(update);
-                } else {
-                    telegramParser.parseText(update);
-                }
-            } else if (telegramParser.getUsers().get(chatId).getStatus() == UserStatus.WAIT_REPORT) {
-                for (var id : Config.getInstance().getAdminsId()) {
-                    if (update.getMessage().getFrom().getUserName() == null) {
-                        send("Сообщение от " + update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName() + " \n" + update.getMessage().getText(), id);
                     } else {
-                        send("Сообщение от @" + update.getMessage().getFrom().getUserName() + " " + update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName() + " \n" + update.getMessage().getText(), id);
+                        telegramParser.parsCallback(update);
                     }
-                }
-                send("Сообщение отправлено", chatId);
-                telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
-            } else {
-                if (update.hasCallbackQuery()){
-                    telegramParser.parsCallback(update);
-                } else {
-                    inlineKeyboard.sendLoginInfo(chatId);
-                }
+                    return;
+                case WAIT_COUNT_OF_WORD:
+                case TESTING:
+                    if (update.hasCallbackQuery()) {
+                        telegramParser.parsCallback(update);
+                    } else {
+                        telegramParser.parseText(update);
+                    }
+                    return;
+                case WAIT_REPORT:
+                    if (update.hasCallbackQuery()) {
+                        telegramParser.parsCallback(update);
+                    } else {
+                        for (var id : Config.getInstance().getAdminsId()) {
+                            if (update.getMessage().getFrom().getUserName() == null) {
+                                send(resource.getStringByKey("STR_59") + update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName() + " \n" + update.getMessage().getText(), id);
+                            } else {
+                                send(resource.getStringByKey("STR_60") + update.getMessage().getFrom().getUserName() + " " + update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName() + " \n" + update.getMessage().getText(), id);
+                            }
+                        }
+                        send(resource.getStringByKey("STR_61"), chatId);
+                        telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
+                    }
+                    return;
+
             }
+        }
+        if (update.hasCallbackQuery()) {
+            telegramParser.parsCallback(update);
         } else {
-            if (update.hasCallbackQuery()){
-                telegramParser.parsCallback(update);
-            } else {
-                telegramParser.parseText(update);
-            }
+            telegramParser.parseText(update);
         }
     }
 
@@ -222,11 +223,11 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     public void send(File file, long chatId) {
-        SendPhoto sendPhoto = new SendPhoto();
+        var sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         sendPhoto.setPhoto(file);
         try {
-            var res = execute(sendPhoto);
+            execute(sendPhoto);
             logger.info("send photo: " + file.getName());
             Redis.getInstance().sent(chatId);
             Statistic.getInstance().checkSent(chatId);
@@ -256,6 +257,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             logger.info("delete fail " + chatId + " - " + messageId);
         }
     }
+
 
     /**
      * get bot user name

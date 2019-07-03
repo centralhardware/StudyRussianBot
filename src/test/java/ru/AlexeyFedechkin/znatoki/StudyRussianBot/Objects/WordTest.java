@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Objects;
 
 import static org.junit.Assert.assertNotNull;
@@ -22,7 +21,6 @@ public class WordTest {
         var wordString = getStringFromResources();
         var wordObject = new JSONObject(wordString);
         var wordArray = wordObject.getJSONArray("word");
-        var words = new ArrayList<Word>();
         for (int i = 0; i < wordArray.length(); i++) {
             assertNotNull(Word.parse((String) wordArray.get(i)));
         }

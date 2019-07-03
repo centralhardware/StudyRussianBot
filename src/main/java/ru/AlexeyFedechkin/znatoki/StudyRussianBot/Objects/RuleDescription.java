@@ -7,7 +7,7 @@ import java.util.Objects;
  */
 public class RuleDescription {
     private final String name;
-    private String description;
+    private final String description;
     private int pageNumber;
     private final int id;
 
@@ -19,10 +19,6 @@ public class RuleDescription {
 
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public int getPageNumber() {

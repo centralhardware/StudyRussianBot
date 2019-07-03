@@ -14,13 +14,10 @@ public class Statistic {
     private final String TOTAL_RECEIVED_KEY = "total_received";
     private final String USER_SEND_KEY = "_send";
     private final String USER_RECEIVED_KEY = "_received";
-    private int PERIOD;
     private volatile int totalSent = 0;
     private volatile int totalReceived = 0;
     private final Map<Long, Integer> countReceivedForUser = Collections.synchronizedMap(new HashMap<>());
     private final Map<Long, Integer> countSentForUser = Collections.synchronizedMap(new HashMap<>());
-    private final int MILLISECONDS_IN_SECOND = 1000;
-    private final int SECOND_IN_MINUTE = 60;
 
     private Statistic() {
     }
@@ -34,12 +31,15 @@ public class Statistic {
      * start timer schedule
      */
     public void init() {
+        int period;
         if (Config.getInstance().isTesting()) {
-            PERIOD = 1;
+            period = 1;
         } else {
-            PERIOD = 60;
+            period = 60;
         }
         Timer timer = new Timer();
+        final int MILLISECONDS_IN_SECOND = 1000;
+        final int SECOND_IN_MINUTE = 60;
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -54,7 +54,7 @@ public class Statistic {
                 }
                 clearVariable();
             }
-        }, 0, MILLISECONDS_IN_SECOND * SECOND_IN_MINUTE * PERIOD);
+        }, 0, MILLISECONDS_IN_SECOND * SECOND_IN_MINUTE * period);
     }
 
     /**
@@ -73,7 +73,7 @@ public class Statistic {
      * @param chatId id of user
      */
     public void checkReceived(long chatId) {
-        totalReceived++;
+        totalReceived = totalReceived + 1;
         if (countReceivedForUser.containsKey(chatId)) {
             countReceivedForUser.put(chatId, countReceivedForUser.get(chatId) + 1);
         } else {
@@ -86,7 +86,7 @@ public class Statistic {
      * @param chatId id of user
      */
     public void checkSent(long chatId) {
-        totalSent++;
+        totalSent = totalSent + 1;
         if (countSentForUser.containsKey(chatId)) {
             countSentForUser.put(chatId, countSentForUser.get(chatId) + 1);
         } else {
@@ -115,10 +115,10 @@ public class Statistic {
             res.getTotalReceived().add(Integer.valueOf(str));
         }
 
-        for (String str : userSent) {
+        for (var str : userSent) {
             List<String> listString = Redis.getInstance().getList(str);
             ArrayList<Integer> list = new ArrayList<>();
-            for (String s : listString) {
+            for (var s : listString) {
                 list.add(Integer.valueOf(s));
             }
             if (!str.equals("total_send")) {
@@ -128,7 +128,7 @@ public class Statistic {
         for (String str : userReceived) {
             List<String> listString = Redis.getInstance().getList(str);
             ArrayList<Integer> list = new ArrayList<>();
-            for (String s : listString) {
+            for (var s : listString) {
                 list.add(Integer.valueOf(s));
             }
             if (!str.equals("total_received")) {

@@ -10,9 +10,9 @@ public class ChartTest {
 
     @Test
     public void genOneLineGraf() {
-        double[] xData = new double[]{01, 10};
-        double[] yData = new double[]{01, 10};
-        File file = new Chart().genOneLineGraf("test", "line", xData, yData);
+        double[] xData = new double[]{1, 10};
+        double[] yData = new double[]{1, 10};
+        File file = new Chart().genOneLineGraf("test", "line", yData, xData);
         assertTrue(file.isFile());
         file.delete();
     }
