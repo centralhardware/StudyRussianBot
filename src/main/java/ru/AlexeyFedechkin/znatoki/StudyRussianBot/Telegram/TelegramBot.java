@@ -4,7 +4,7 @@
  * Copyright (c) 2019
  */
 
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram;
 
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -51,7 +51,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     /**
-     * need to create class from main class
+     * need to create instance from main class
      */
     public TelegramBot(){
     }
@@ -99,6 +99,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     /**
      * method by which the library telegram sends
      * the received messages for processing by the server part
+     * logging input message.
      * @param update received message
      */
     public void onUpdateReceived(Update update) {
@@ -226,6 +227,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    /**
+     * send file as image.
+     * after sending file will be delete.
+     *
+     * @param file   file with image
+     * @param chatId id of user
+     */
     public void send(File file, long chatId) {
         var sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
@@ -246,7 +254,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     /**
-     * delete message
+     * delete message. using for delete previously message with inline keyboard
      * @param chatId id of chat with user
      * @param messageId id of deleting message
      */

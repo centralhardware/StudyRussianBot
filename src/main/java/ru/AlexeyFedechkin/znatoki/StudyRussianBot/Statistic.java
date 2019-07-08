@@ -34,7 +34,7 @@ public class Statistic {
 
     /**
      * save statistic to redis
-     * start timer schedule
+     * start timer schedule.
      */
     public void init() {
         int period;
@@ -105,20 +105,16 @@ public class Statistic {
      */
     public UserStatistic getStatistic() {
         var res = new UserStatistic();
+        //get row data from redis
         List<String> totalSent = Redis.getInstance().getListByKey(TOTAL_SENT_KEY);
         List<String> totalReceived = Redis.getInstance().getListByKey(TOTAL_RECEIVED_KEY);
         Set<String> userSent = Redis.getInstance().getAllKeys("*" + USER_SEND_KEY);
         Set<String> userReceived = Redis.getInstance().getAllKeys("*" + USER_RECEIVED_KEY);
+        Set<String> usersSent = Redis.getInstance().getAllKeys("*" + Redis.getInstance().COUNT_OF_SENT_MESSAGE_POSTFIX);
+        Set<String> usersReceived = Redis.getInstance().getAllKeys("*" + Redis.getInstance().COUNT_OF_RECEIVED_MESSAGE_POSTFIX);
 
         HashMap<Long, ArrayList<Integer>> userSentRes = new HashMap<>();
         HashMap<Long, ArrayList<Integer>> userReceivedRes = new HashMap<>();
-
-        for (String str : totalSent) {
-            res.getTotalSend().add(Integer.valueOf(str));
-        }
-        for (String str : totalReceived) {
-            res.getTotalReceived().add(Integer.valueOf(str));
-        }
 
         for (var str : userSent) {
             List<String> listString = Redis.getInstance().getListByKey(str);
@@ -140,15 +136,13 @@ public class Statistic {
                 userReceivedRes.put(Long.parseLong(str.replace(USER_RECEIVED_KEY, "")), list);
             }
         }
-
-        res.setUserReceived(userReceivedRes);
-        res.setUserSend(userSentRes);
-
-        res.setTotalCountOfSend(Integer.parseInt(Redis.getInstance().getValue(Redis.getInstance().COUNT_OF_SENT_MESSAGE_KEY)));
-        res.setTotalCountReceived(Integer.parseInt(Redis.getInstance().getValue(Redis.getInstance().COUNT_OF_RECEIVED_MESSAGE_KEY)));
-
-        Set<String> usersSent = Redis.getInstance().getAllKeys("*" + Redis.getInstance().COUNT_OF_SENT_MESSAGE_POSTFIX);
-        Set<String> usersReceived = Redis.getInstance().getAllKeys("*" + Redis.getInstance().COUNT_OF_RECEIVED_MESSAGE_POSTFIX);
+        //set data to userStatistic object
+        for (String str : totalSent) {
+            res.getTotalSend().add(Integer.valueOf(str));
+        }
+        for (String str : totalReceived) {
+            res.getTotalReceived().add(Integer.valueOf(str));
+        }
 
         for (String str : usersSent) {
             res.getUserCountSent().put(Long.valueOf(str.replace(Redis.getInstance().COUNT_OF_SENT_MESSAGE_POSTFIX, "")),
@@ -160,6 +154,12 @@ public class Statistic {
             res.getUserCountSent().put(Long.valueOf(str.replace(Redis.getInstance().COUNT_OF_RECEIVED_MESSAGE_POSTFIX, "")),
                     Integer.parseInt(Redis.getInstance().getValue(str)));
         }
+
+        res.setUserReceived(userReceivedRes);
+        res.setUserSend(userSentRes);
+
+        res.setTotalCountOfSend(Integer.parseInt(Redis.getInstance().getValue(Redis.getInstance().COUNT_OF_SENT_MESSAGE_KEY)));
+        res.setTotalCountReceived(Integer.parseInt(Redis.getInstance().getValue(Redis.getInstance().COUNT_OF_RECEIVED_MESSAGE_KEY)));
         return res;
     }
 }

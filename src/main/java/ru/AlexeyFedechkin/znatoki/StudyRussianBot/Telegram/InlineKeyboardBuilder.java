@@ -1,4 +1,4 @@
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -18,6 +18,9 @@ public class InlineKeyboardBuilder {
     private List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
     private List<InlineKeyboardButton> row = null;
 
+    /**
+     * need to ban creation of instance of class without create method
+     */
     private InlineKeyboardBuilder() {}
 
     /**

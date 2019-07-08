@@ -23,6 +23,7 @@ public class Data {
 
     /**
      * init wordManager
+     * throw runtimeException if load data fail
      */
     private Data() {
         wordManager = new WordManager();
@@ -31,6 +32,7 @@ public class Data {
             logger.info("data load");
         } catch (IOException e) {
             logger.fatal("load data fail", e);
+            throw new RuntimeException();
         }
     }
 

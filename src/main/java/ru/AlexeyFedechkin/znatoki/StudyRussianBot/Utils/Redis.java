@@ -20,17 +20,12 @@ public class Redis {
     private static final Redis ourInstance = new Redis();
     private final Logger logger = Logger.getLogger(Jedis.class);
     private final Jedis jedis;
-    public final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";
 
+    public final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";
     public final String COUNT_OF_RECEIVED_MESSAGE_KEY = "count_of_received_message";
     public final String COUNT_OF_RECEIVED_MESSAGE_POSTFIX = "_count_of_received_message";
     private final String KEY_POSTFIX = "_key";
     private final String CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word";
-
-    private Redis() {
-        logger.info("redis configure");
-        jedis =  new Jedis(Config.getInstance().getRedisHost(), Config.getInstance().getRedisPort());
-    }
     public final String COUNT_OF_SENT_MESSAGE_POSTFIX = "_count_of_sent_message";
     private final String CHECKED_WORD_POSTFIX = "_checked_word";
     private final String CHECKED_RULE_POSTFIX = "_checked_rule";
@@ -39,6 +34,13 @@ public class Redis {
         return ourInstance;
     }
 
+    /**
+     * connect with redis server
+     */
+    private Redis() {
+        logger.info("redis configure");
+        jedis = new Jedis(Config.getInstance().getRedisHost(), Config.getInstance().getRedisPort());
+    }
 
     /**
      * store data in redis about count of received messages

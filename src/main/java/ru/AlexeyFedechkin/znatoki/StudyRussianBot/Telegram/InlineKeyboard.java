@@ -1,4 +1,4 @@
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram;
 
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -66,6 +66,7 @@ public class InlineKeyboard {
                 }
             }
         }
+        // add buttons to go to other page
         if (pageNumber == 0){
             builder.row().
                     button(resource.getStringByKey("STR_17"), "book_to_1").
@@ -143,6 +144,7 @@ public class InlineKeyboard {
                 }
             }
         }
+        // add buttons to got to other pages
         if (pageNumber == 0){
             builder.row().
                     button(resource.getStringByKey("STR_17"), "to_1").

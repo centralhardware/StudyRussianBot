@@ -8,7 +8,7 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.ApiContextInitializer;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram.TelegramBot;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram.TelegramBot;
 
 @SuppressWarnings("HardCodedStringLiteral")
 public class Main {

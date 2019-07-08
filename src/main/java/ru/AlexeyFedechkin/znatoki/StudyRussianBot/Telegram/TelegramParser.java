@@ -4,7 +4,7 @@
  * Copyright (c) 2019
  */
 
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram;
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram;
 
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -48,6 +48,18 @@ public class TelegramParser {
 
     /**
      * parse text message
+     * support command
+     * - /start: start command. also reset current testing.
+     * - /help: show help message.
+     * - /rules: show choose rule inline menu
+     * - /profile: show profile data
+     * - /gen: generate activated code. Param: userName. only for admin
+     * - /ver: verify activated code. Param: key userName. only for admin
+     * - /stat: show bot statistic. only for admin
+     * if message have not command: depending on status
+     * - WAIT_COUNT_OF_WORD: start testing with giving count of word
+     * - TESTING: message is answer on word with missing later. if answer is wright - send next word or result
+     * if answer is wrong send "неправильно" and send next word. current word moves to the end of the word queue
      * @param update received message
      */
     public void parseText(Update update) {
@@ -152,6 +164,21 @@ public class TelegramParser {
 
     /**
      * parse callback
+     * support action:
+     * - reset_testing - change status to NONE
+     * - noreset_testing - rejection cancellation. delete message and send current word again
+     * - testing - start testing. for demo access aviable only tree rule.
+     * - profile - show profile data
+     * - help - show help message.
+     * - menu - show menu
+     * - enter_key - set status to wait_key and waiting input of activated code. only for demo access
+     * - login - send login inline menu. only for demo access.
+     * - buy_key - send message with data about buy access. only for demo access.
+     * - book - show rule help. for demo aviable only tree rule description
+     * - report - send message to admins. only for demo or full access
+     * - statistic - show statistic. only for admin
+     * - to_$pageNumber - show page of rule
+     * - book_to_#pageNumber - show page of rule description
      * @param update received message
      */
         public void parsCallback (Update update){
