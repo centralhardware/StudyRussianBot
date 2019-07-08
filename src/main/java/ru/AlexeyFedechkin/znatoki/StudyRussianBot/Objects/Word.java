@@ -24,7 +24,7 @@ public class Word {
     private final String answer;
     private final SchoolStage schoolStage;
 
-    public Word(String wrightName, String name, String section, String answer, SchoolStage schoolStage) {
+    private Word(String wrightName, String name, String section, String answer, SchoolStage schoolStage) {
         this.wrightName = wrightName;
         this.name = name;
         this.answer = answer;

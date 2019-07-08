@@ -18,7 +18,7 @@ import java.util.Set;
 @SuppressWarnings("HardCodedStringLiteral")
 public class Redis {
     private static final Redis ourInstance = new Redis();
-    private final Logger logger = Logger.getLogger(Jedis.class);
+    private static final Logger logger = Logger.getLogger(Redis.class);
     private final Jedis jedis;
 
     public final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";

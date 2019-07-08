@@ -2,7 +2,7 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ChartUtil {
     /**
@@ -11,7 +11,7 @@ public class ChartUtil {
      * @param data integer's list
      * @return array of int
      */
-    public static double[] listToArray(ArrayList<Integer> data) {
+    public static double[] listToArray(List<Integer> data) {
         var res = new double[data.size()];
         for (var i = 0; i < data.size(); i++) {
             res[i] = data.get(i);

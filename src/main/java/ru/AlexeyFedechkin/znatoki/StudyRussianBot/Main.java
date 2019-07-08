@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.telegram.telegrambots.ApiContextInitializer;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram.TelegramBot;
 
-@SuppressWarnings("HardCodedStringLiteral")
+@SuppressWarnings({"HardCodedStringLiteral", "WeakerAccess"})
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class);
     /**

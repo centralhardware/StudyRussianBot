@@ -14,7 +14,7 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
  */
 public class InlineKeyboard implements InlineKeyboardInt {
     private final Resource resource = new Resource();
-    private final Logger logger = Logger.getLogger(InlineKeyboardBuilder.class);
+    private static final Logger logger = Logger.getLogger(InlineKeyboard.class);
     private final TelegramBot telegramBot;
 
     /**
@@ -43,7 +43,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
         }
         logger.info("send book keyboard rules");
         var builder = InlineKeyboardBuilder.
-                create(chatId).setText(resource.getStringByKey("STR_42"));
+                create(Long.valueOf(chatId)).setText(resource.getStringByKey("STR_42"));
         long userId;
         if (update.hasCallbackQuery()){
             userId = update.getCallbackQuery().getFrom().getId();
@@ -54,7 +54,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
             for (var i = 0; i < 3; i++) {
                 var ruleDescription = Data.getInstance().getWordManager().getRuleDescriptions().get(i);
                 builder.row().
-                        button(ruleDescription.getName(), "book"+ruleDescription.getId()).
+                        button(ruleDescription.getName(), "book" + ruleDescription.getId()).
                         endRow();
             }
         } else {
@@ -62,7 +62,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
                 if (ruleDescription.getPageNumber() == pageNumber){
                     builder.
                             row().
-                            button(ruleDescription.getName(), "book"+ruleDescription.getId()).
+                            button(ruleDescription.getName(), "book" + ruleDescription.getId()).
                             endRow();
                 }
             }
@@ -233,7 +233,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
         } else {
             builder.
                     row().
-                    button("статиситка", "statistic").
+                    button(resource.getStringByKey("STR_100"), "statistic").
                     endRow();
         }
         telegramBot.send(builder.build());

@@ -52,7 +52,7 @@ public class Rule {
         this.parent = parent;
     }
 
-    public ArrayList<Word> getWords() {
+    public List<Word> getWords() {
         return words;
     }
 

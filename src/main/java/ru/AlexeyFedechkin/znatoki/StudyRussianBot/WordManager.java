@@ -16,13 +16,15 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * class that parse json file and generate object collections, provide collection to other classes
  */
 @SuppressWarnings("HardCodedStringLiteral")
 public class WordManager {
-    private final Logger logger = Logger.getLogger(WordManager.class);
+    private static final Logger logger = Logger.getLogger(WordManager.class);
     private final ArrayList<Rule> rules = new ArrayList<>(1600);
     private final ArrayList<RuleDescription> ruleDescriptions = new ArrayList<>();
     private final Resource resource = new Resource();
@@ -117,7 +119,6 @@ public class WordManager {
             ruleDesc.setPageNumber((byte) (count/ Rule.pageCountRule));
             count++;
         }
-        System.gc();
     }
 
     /**
@@ -148,11 +149,11 @@ public class WordManager {
         return null;
     }
 
-    public ArrayList<Rule> getRules() {
-        return rules;
+    public List<Rule> getRules() {
+        return Collections.unmodifiableList(rules);
     }
 
-    public ArrayList<RuleDescription> getRuleDescriptions() {
-        return ruleDescriptions;
+    public List<RuleDescription> getRuleDescriptions() {
+        return Collections.unmodifiableList(ruleDescriptions);
     }
 }

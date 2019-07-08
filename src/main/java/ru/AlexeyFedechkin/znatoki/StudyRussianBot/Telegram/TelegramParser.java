@@ -17,13 +17,15 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Statistic;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram.Interfaces.TelegramParserInt;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.*;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * parse message from telegram
  */
 public class TelegramParser implements TelegramParserInt {
-    private final Logger logger = Logger.getLogger(TelegramParser.class);
+    private static final Logger logger = Logger.getLogger(TelegramParser.class);
     private final TelegramBot telegramBot;
     private final HashMap<Long, User> users = new HashMap<>();
     private final Resource resource = new Resource();
@@ -31,8 +33,8 @@ public class TelegramParser implements TelegramParserInt {
     private final InlineKeyboard inlineKeyboard;
     private final Chart chart = new Chart();
 
-    public HashMap<Long, User> getUsers() {
-        return users;
+    public Map<Long, User> getUsers() {
+        return Collections.unmodifiableMap(users);
     }
 
     /**
@@ -136,7 +138,7 @@ public class TelegramParser implements TelegramParserInt {
                         if (user.getWords().get(0).getAnswer().toLowerCase().equals(message.toLowerCase())) {
                             telegramBot.send(resource.getStringByKey("STR_3"), chatId);
                             user.getWords().remove(0);
-                            if (user.getWords().size() == 0) {
+                            if (user.getWords().isEmpty()) {
                                 telegramBot.send(resource.getStringByKey("STR_4"), chatId);
                                 telegramBot.send(user.getTestingResult(), chatId);
                                 Redis.getInstance().checkRule(user);
@@ -201,10 +203,10 @@ public class TelegramParser implements TelegramParserInt {
                     telegramBot.send(user.getProfile(),chatId);
                     break;
                 case "help":
-                    if (!(Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
-                        telegramBot.send(resource.getStringByKey("STR_32"), chatId);
-                    } else {
+                    if ((Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
                         telegramBot.send(resource.getStringByKey("HELP_MESSAGE"), chatId);
+                    } else {
+                        telegramBot.send(resource.getStringByKey("STR_32"), chatId);
                     }
                     break;
                 case "menu":

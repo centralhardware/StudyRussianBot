@@ -13,7 +13,7 @@ import java.util.Random;
  * generate graf
  */
 public class Chart {
-    private final Logger logger = Logger.getLogger(Chart.class);
+    private static final Logger logger = Logger.getLogger(Chart.class);
     private final Random random = new Random();
 
     /**
@@ -40,7 +40,6 @@ public class Chart {
         } catch (IOException e) {
             logger.warn("chart generated error", e);
         }
-        System.gc();
         return new File(fileName);
     }
 }

@@ -1,8 +1,6 @@
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * store all metrics of bot
@@ -17,15 +15,15 @@ public class UserStatistic {
     private final HashMap<Long, Integer> userCountSent = new HashMap<>();
     private final HashMap<Long, Integer> userReceivedSent = new HashMap<>();
 
-    public ArrayList<Integer> getTotalSend() {
+    public List<Integer> getTotalSend() {
         return totalSend;
     }
 
-    public ArrayList<Integer> getTotalReceived() {
+    public List<Integer> getTotalReceived() {
         return totalReceived;
     }
 
-    public HashMap<Long, ArrayList<Integer>> getUserSend() {
+    public Map<Long, ArrayList<Integer>> getUserSend() {
         return userSend;
     }
 
@@ -33,7 +31,7 @@ public class UserStatistic {
         this.userSend = userSend;
     }
 
-    public HashMap<Long, ArrayList<Integer>> getUserReceived() {
+    public Map<Long, ArrayList<Integer>> getUserReceived() {
         return userReceived;
     }
 
@@ -41,11 +39,11 @@ public class UserStatistic {
         this.userReceived = userReceived;
     }
 
-    public HashMap<Long, Integer> getUserCountSent() {
+    public Map<Long, Integer> getUserCountSent() {
         return userCountSent;
     }
 
-    public HashMap<Long, Integer> getUserReceivedSent() {
+    public Map<Long, Integer> getUserReceivedSent() {
         return userReceivedSent;
     }
 

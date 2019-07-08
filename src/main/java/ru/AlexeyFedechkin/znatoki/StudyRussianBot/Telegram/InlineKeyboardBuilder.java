@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * builder for inlineKeyboardMarkup
  */
-@SuppressWarnings("CanBeFinal")
+@SuppressWarnings({"CanBeFinal", "unused"})
 public class InlineKeyboardBuilder implements InlineKeyboardBuilderInt {
     private Long chatId;
     private String text;

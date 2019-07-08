@@ -36,7 +36,7 @@ import java.net.URL;
  */
 public class TelegramBot extends TelegramLongPollingBot {
 
-    private final Logger logger = Logger.getLogger(TelegramBot.class);
+    private static final Logger logger = Logger.getLogger(TelegramBot.class);
     private TelegramParser telegramParser;
     private final RSA rsa = new RSA();
     private final Resource resource = new Resource();
@@ -61,16 +61,7 @@ public class TelegramBot extends TelegramLongPollingBot {
      */
     public void init(){
         if (Config.getInstance().isUseProxy()){
-            Authenticator.setDefault(new Authenticator() {
-                @Override
-                public PasswordAuthentication requestPasswordAuthenticationInstance(String host, InetAddress addr,
-                                                                                    int port, String protocol,
-                                                                                    String prompt, String scheme, URL url,
-                                                                                    RequestorType reqType) {
-                    return new PasswordAuthentication(Config.getInstance().getProxyUser(),
-                            Config.getInstance().getProxyPassword().toCharArray());
-                }
-            });
+            Authenticator.setDefault(new MyAuthenticator());
             var botsApi = new TelegramBotsApi();
             var botOptions = ApiContext.getInstance(DefaultBotOptions.class);
             botOptions.setProxyHost(Config.getInstance().getProxyHost());
@@ -122,7 +113,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     "\" from \"" + update.getMessage().getFrom().getFirstName() + "\" " +
                     update.getMessage().getFrom().getLastName() + "\" " +
                     update.getMessage().getFrom().getUserName() + "\" " +
-                    update.getMessage().getFrom().getId().toString() + "\"");
+                    update.getMessage().getFrom().getId() + "\"");
             if (!telegramParser.getUsers().containsKey(update.getMessage().getChatId())) {
                 telegramParser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
             }
@@ -296,6 +287,17 @@ public class TelegramBot extends TelegramLongPollingBot {
         } else {
             logger.info("getting production bot token");
             return Config.getInstance().getBotToken();
+        }
+    }
+
+    private static class MyAuthenticator extends Authenticator {
+        @Override
+        public PasswordAuthentication requestPasswordAuthenticationInstance(String host, InetAddress addr,
+                                                                            int port, String protocol,
+                                                                            String prompt, String scheme, URL url,
+                                                                            RequestorType reqType) {
+            return new PasswordAuthentication(Config.getInstance().getProxyUser(),
+                    Config.getInstance().getProxyPassword().toCharArray());
         }
     }
 }

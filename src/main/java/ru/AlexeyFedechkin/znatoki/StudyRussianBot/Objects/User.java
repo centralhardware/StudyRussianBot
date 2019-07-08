@@ -12,9 +12,7 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 /**
  *Data about user
@@ -42,8 +40,8 @@ public class User {
     }
 
 
-    public ArrayList<Word> getWords() {
-        return words;
+    public List<Word> getWords() {
+        return Collections.unmodifiableList(words);
     }
 
     public UserStatus getStatus() {
@@ -66,8 +64,8 @@ public class User {
         this.currRule = currRule;
     }
 
-    public ArrayList<Word> getWrongWords() {
-        return wrongWords;
+    public List<Word> getWrongWords() {
+        return Collections.unmodifiableList(wrongWords);
     }
 
     public void setCount(int count) {

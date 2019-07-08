@@ -17,7 +17,7 @@ import java.security.spec.X509EncodedKeySpec;
  */
 @SuppressWarnings("HardCodedStringLiteral")
 public class RSA implements RSAInt {
-    private final Logger logger = Logger.getLogger(RSA.class);
+    private static final Logger logger = Logger.getLogger(RSA.class);
     private final String SOLID = "aYbWZRqZgBWkxQL2z8Z4kWPBz";
     private Signature signature = null;
     private final org.apache.commons.codec.binary.Base64 base64 = new org.apache.commons.codec.binary.Base64();

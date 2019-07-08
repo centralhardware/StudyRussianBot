@@ -15,7 +15,7 @@ import java.util.*;
 @SuppressWarnings("HardCodedStringLiteral")
 public class Statistic {
     private static final Statistic ourInstance = new Statistic();
-    private final Logger logger = Logger.getLogger(Statistic.class);
+    private static final Logger logger = Logger.getLogger(Statistic.class);
     private final String TOTAL_SENT_KEY = "total_sent";
     private final String TOTAL_RECEIVED_KEY = "total_received";
     private final String USER_SEND_KEY = "_send";
@@ -38,14 +38,10 @@ public class Statistic {
      */
     public void init() {
         int period;
-        if (Config.getInstance().isTesting()) {
-            period = 1;
-        } else {
-            period = 60;
-        }
+        period = Config.getInstance().isTesting() ? 1 : 60;
         Timer timer = new Timer();
-        final int MILLISECONDS_IN_SECOND = 1000;
-        final int SECOND_IN_MINUTE = 60;
+        int MILLISECONDS_IN_SECOND = 1000;
+        int SECOND_IN_MINUTE = 60;
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
