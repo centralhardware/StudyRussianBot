@@ -6,6 +6,12 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
 
 import java.util.*;
 
+/**
+ * collect statistic to redis
+ * period of collect is one hour for production mode
+ * and one minute for testing mode
+ * all modified variable are thread safe
+ */
 @SuppressWarnings("HardCodedStringLiteral")
 public class Statistic {
     private static final Statistic ourInstance = new Statistic();
@@ -16,8 +22,8 @@ public class Statistic {
     private final String USER_RECEIVED_KEY = "_received";
     private volatile int totalSent = 0;
     private volatile int totalReceived = 0;
-    private final Map<Long, Integer> countReceivedForUser = Collections.synchronizedMap(new HashMap<>());
-    private final Map<Long, Integer> countSentForUser = Collections.synchronizedMap(new HashMap<>());
+    private final Map<Long, Integer> countReceivedForUser = Collections.synchronizedMap(new LinkedHashMap<>());
+    private final Map<Long, Integer> countSentForUser = Collections.synchronizedMap(new LinkedHashMap<>());
 
     private Statistic() {
     }
@@ -58,7 +64,7 @@ public class Statistic {
     }
 
     /**
-     * clear all variable
+     * clear all variable for start new period of statistics collection
      */
     private void clearVariable() {
         totalReceived = 0;
@@ -69,11 +75,10 @@ public class Statistic {
 
     /**
      * store metric about received message
-     *
      * @param chatId id of user
      */
     public void checkReceived(long chatId) {
-        totalReceived = totalReceived + 1;
+        totalReceived++;
         if (countReceivedForUser.containsKey(chatId)) {
             countReceivedForUser.put(chatId, countReceivedForUser.get(chatId) + 1);
         } else {
@@ -86,7 +91,7 @@ public class Statistic {
      * @param chatId id of user
      */
     public void checkSent(long chatId) {
-        totalSent = totalSent + 1;
+        totalSent++;
         if (countSentForUser.containsKey(chatId)) {
             countSentForUser.put(chatId, countSentForUser.get(chatId) + 1);
         } else {
@@ -100,8 +105,8 @@ public class Statistic {
      */
     public UserStatistic getStatistic() {
         var res = new UserStatistic();
-        List<String> totalSent = Redis.getInstance().getList(TOTAL_SENT_KEY);
-        List<String> totalReceived = Redis.getInstance().getList(TOTAL_RECEIVED_KEY);
+        List<String> totalSent = Redis.getInstance().getListByKey(TOTAL_SENT_KEY);
+        List<String> totalReceived = Redis.getInstance().getListByKey(TOTAL_RECEIVED_KEY);
         Set<String> userSent = Redis.getInstance().getAllKeys("*" + USER_SEND_KEY);
         Set<String> userReceived = Redis.getInstance().getAllKeys("*" + USER_RECEIVED_KEY);
 
@@ -116,7 +121,7 @@ public class Statistic {
         }
 
         for (var str : userSent) {
-            List<String> listString = Redis.getInstance().getList(str);
+            List<String> listString = Redis.getInstance().getListByKey(str);
             ArrayList<Integer> list = new ArrayList<>();
             for (var s : listString) {
                 list.add(Integer.valueOf(s));
@@ -126,7 +131,7 @@ public class Statistic {
             }
         }
         for (String str : userReceived) {
-            List<String> listString = Redis.getInstance().getList(str);
+            List<String> listString = Redis.getInstance().getListByKey(str);
             ArrayList<Integer> list = new ArrayList<>();
             for (var s : listString) {
                 list.add(Integer.valueOf(s));

@@ -227,6 +227,11 @@ public class InlineKeyboard {
                     row().
                     button(resource.getStringByKey("STR_58"), "report").
                     endRow();
+        } else {
+            builder.
+                    row().
+                    button("статиситка", "statistic").
+                    endRow();
         }
         telegramBot.send(builder.build());
     }

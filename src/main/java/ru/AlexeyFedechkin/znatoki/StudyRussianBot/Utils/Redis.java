@@ -90,7 +90,7 @@ public class Redis {
         var checkWordKey = user.getChatId() + CHECKED_WORD_POSTFIX;
         var checkRuleKey = user.getChatId() + CHECKED_RULE_POSTFIX;
         int checkedCount = 0;
-        for (Word word : Data.getInstance().getWordManager().getRule(user.getCurrRule().getName()).getWords()) {
+        for (Word word : Data.getInstance().getWordManager().getRuleByName(user.getCurrRule().getName()).getWords()) {
             if (jedis.sismember(checkWordKey, word.getName())){
                 checkedCount++;
             }
@@ -264,11 +264,23 @@ public class Redis {
         return keys;
     }
 
+    /**
+     * add data to list. using for store data about statistic
+     *
+     * @param key   key of list
+     * @param value value too add in list
+     */
     public synchronized void addToList(String key, String value) {
         jedis.lpush(key, String.valueOf(value));
     }
 
-    public List<String> getList(String key) {
+    /**
+     * get list by key
+     *
+     * @param key key of list
+     * @return list data
+     */
+    public List<String> getListByKey(String key) {
         return jedis.lrange(key, 0, jedis.llen(key));
     }
 }

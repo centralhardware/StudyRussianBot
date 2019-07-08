@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
+/**
+ * generate graf
+ */
 public class Chart {
     private final Logger logger = Logger.getLogger(Chart.class);
     private final Random random = new Random();

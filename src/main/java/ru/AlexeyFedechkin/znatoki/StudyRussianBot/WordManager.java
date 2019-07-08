@@ -6,18 +6,16 @@
 
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.RuleDescription;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * class that parse json file and generate object collections, provide collection to other classes
@@ -25,8 +23,9 @@ import java.util.Objects;
 @SuppressWarnings("HardCodedStringLiteral")
 public class WordManager {
     private final Logger logger = Logger.getLogger(WordManager.class);
-    private final ArrayList<Rule> rules = new ArrayList<>();
+    private final ArrayList<Rule> rules = new ArrayList<>(1600);
     private final ArrayList<RuleDescription> ruleDescriptions = new ArrayList<>();
+    private final Resource resource = new Resource();
 
     /**
      * parseText all data file and generate collections of object
@@ -34,9 +33,9 @@ public class WordManager {
      */
     public void init() throws IOException {
         // get Strings from files
-        var wordString = getStringFromResources("word.json");
-        var ruleString = getStringFromResources("rule.json");
-        var ruleDescriptionString = getStringFromResources("ruleDesc.json");
+        var wordString = resource.getStringFromResources("word.json");
+        var ruleString = resource.getStringFromResources("rule.json");
+        var ruleDescriptionString = resource.getStringFromResources("ruleDesc.json");
         // parse rule.json
         var ruleObject = new JSONObject(ruleString);
         var ruleData = ruleObject.getJSONObject("data");
@@ -78,13 +77,12 @@ public class WordManager {
                 r.getParent().getWords().addAll(r.getWords());
             }
         }
-        // set pageNumbers
+        // set pageNumbers for rule
         var count = 1;
         for (var rule : rules) {
             rule.setPageNumber((byte) (count/ Rule.pageCountRule));
             count++;
         }
-
         for (var r : rules){
             logger.info("in rule \"" + r.getName() + "\" added " + r.getWords().size() + "  words");
         }
@@ -94,34 +92,13 @@ public class WordManager {
             var object = (JSONObject) ruleDesc;
             ruleDescriptions.add(new RuleDescription(object.getString("name"), object.getString("description"), object.getInt("id")));
         }
-        // set pageNumbers
+        // set pageNumbers for rule description
         count = 1;
         for (var ruleDesc : ruleDescriptions) {
             ruleDesc.setPageNumber((byte) (count/ Rule.pageCountRule));
             count++;
         }
         System.gc();
-    }
-
-    /**
-     * get string from resource folder file
-     * @param fileName name of file to search
-     * @return string from file that placed in resource folder
-     */
-    private String getStringFromResources(String fileName) throws IOException {
-        var classLoader = ClassLoader.getSystemClassLoader();
-        var inputStream = classLoader.getResourceAsStream(fileName);
-        var writer = new StringWriter();
-        IOUtils.copy(Objects.requireNonNull(inputStream), writer);
-        return writer.toString();
-    }
-
-    public ArrayList<Rule> getRules(){
-        return rules;
-    }
-
-    public ArrayList<RuleDescription> getRuleDescriptions() {
-        return ruleDescriptions;
     }
 
     /**
@@ -143,12 +120,20 @@ public class WordManager {
      * @param rule name of rule
      * @return rule find by giving name
      */
-    public Rule getRule(String rule){
+    public Rule getRuleByName(String rule) {
         for (var r : rules){
             if (r.getName().equals(rule)){
                 return r;
             }
         }
         return null;
+    }
+
+    public ArrayList<Rule> getRules() {
+        return rules;
+    }
+
+    public ArrayList<RuleDescription> getRuleDescriptions() {
+        return ruleDescriptions;
     }
 }

@@ -168,10 +168,14 @@ public class TelegramBot extends TelegramLongPollingBot {
                         telegramParser.parsCallback(update);
                     } else {
                         for (var id : Config.getInstance().getAdminsId()) {
+                            org.telegram.telegrambots.meta.api.objects.User user = update.getMessage().getFrom();
                             if (update.getMessage().getFrom().getUserName() == null) {
-                                send(resource.getStringByKey("STR_59") + update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName() + " \n" + update.getMessage().getText(), id);
+                                send(resource.getStringByKey("STR_59") + user.getFirstName() + " "
+                                        + user.getLastName() + " \n" + update.getMessage().getText(), id);
                             } else {
-                                send(resource.getStringByKey("STR_60") + update.getMessage().getFrom().getUserName() + " " + update.getMessage().getFrom().getFirstName() + " " + update.getMessage().getFrom().getLastName() + " \n" + update.getMessage().getText(), id);
+                                send(resource.getStringByKey("STR_60") + user.getUserName() + " " +
+                                        user.getFirstName() + " " + user.getLastName() + " \n"
+                                        + update.getMessage().getText(), id);
                             }
                         }
                         send(resource.getStringByKey("STR_61"), chatId);

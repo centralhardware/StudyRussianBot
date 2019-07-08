@@ -34,6 +34,13 @@ public class User {
         wrongWords = new ArrayList<>();
     }
 
+    public void reset() {
+        status = UserStatus.NONE;
+        words.clear();
+        wrongWords.clear();
+        count = 0;
+    }
+
 
     public ArrayList<Word> getWords() {
         return words;
@@ -69,13 +76,6 @@ public class User {
 
     public int getCount() {
         return count;
-    }
-
-    public void reset() {
-        status = UserStatus.NONE;
-        words.clear();
-        wrongWords.clear();
-        count = 0;
     }
 
     private final Resource resource = new Resource();

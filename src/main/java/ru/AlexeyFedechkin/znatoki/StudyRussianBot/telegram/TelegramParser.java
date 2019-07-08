@@ -97,29 +97,7 @@ public class TelegramParser {
                     }
                 }
                 if (message.startsWith("/stat")) {
-                    if (Config.getInstance().getAdminsId().contains(chatId)) {
-                        var userStatistic = Statistic.getInstance().getStatistic();
-                        String statString = resource.getStringByKey("STR_48") + "\n" +
-                                resource.getStringByKey("STR_49") + userStatistic.getTotalCountOfSend() + "\n" +
-                                resource.getStringByKey("STR_50") + userStatistic.getTotalCountReceived() + "\n" +
-                                resource.getStringByKey("STR_51") + userStatistic.getUserReceived().size() + "\n";
-                        telegramBot.send(statString, chatId);
-                        try {
-                            telegramBot.send(chart.genOneLineGraf(resource.getStringByKey("STR_52"),
-                                    resource.getStringByKey("STR_53"),
-                                    userStatistic.listToArray(userStatistic.getTotalReceived()),
-                                    userStatistic.getXData(userStatistic.getTotalReceived().size())), chatId);
-                            telegramBot.send(chart.genOneLineGraf(resource.getStringByKey("STR_55"),
-                                    resource.getStringByKey("STR_56"),
-                                    userStatistic.listToArray(userStatistic.getTotalSend()),
-                                    userStatistic.getXData(userStatistic.getTotalSend().size())), chatId);
-                        } catch (Exception e) {
-                            logger.warn("error while generate graf", e);
-                            telegramBot.send(resource.getStringByKey("STR_57"), chatId);
-                        }
-                    } else {
-                        telegramBot.send(resource.getStringByKey("STR_47"), chatId);
-                    }
+                    sendStatistic(chatId);
                 }
                 switch (user.getStatus()) {
                     case WAIT_COUNT_OF_WORD:
@@ -229,6 +207,9 @@ public class TelegramParser {
                     user.setStatus(UserStatus.WAIT_REPORT);
                     telegramBot.send(resource.getStringByKey("STR_62"), chatId);
                     return;
+                case "statistic":
+                    sendStatistic(chatId);
+                    return;
             }
             if (callback.startsWith("to_")){
                 if (user.getStatus() != UserStatus.WAIT_COUNT_OF_WORD && user.getStatus() != UserStatus.TESTING) {
@@ -247,29 +228,57 @@ public class TelegramParser {
                         endRow();
                 telegramBot.send(builder.build());
             }
-            switch (user.getStatus()) {
-                case NONE:
-                    for (var rule : Data.getInstance().getWordManager().getRules()) {
-                        if (rule.getSection().equals(callback)) {
-                            user.setStatus(UserStatus.WAIT_COUNT_OF_WORD);
-                            user.setCurrRule(rule);
-                            telegramBot.send(resource.getStringByKey("STR_6") + rule.getName(), chatId);
-                            telegramBot.send(resource.getStringByKey("STR_7"), chatId);
-                            return;
-                        }
+            if (user.getStatus() == UserStatus.NONE) {
+                for (var rule : Data.getInstance().getWordManager().getRules()) {
+                    if (rule.getSection().equals(callback)) {
+                        user.setStatus(UserStatus.WAIT_COUNT_OF_WORD);
+                        user.setCurrRule(rule);
+                        telegramBot.send(resource.getStringByKey("STR_6") + rule.getName(), chatId);
+                        telegramBot.send(resource.getStringByKey("STR_7"), chatId);
+                        return;
                     }
-                    break;
-                default:
-                    telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
-                    var builder = InlineKeyboardBuilder.
-                            create(chatId).
-                            setText(resource.getStringByKey("STR_9")).
-                            row().
-                            button(resource.getStringByKey("YES"), "reset_testing").
-                            button(resource.getStringByKey("NO"), "noreset_testing").
-                            endRow();
-                    telegramBot.send(builder.build());
-                    break;
+                }
+            } else {
+                telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+                var builder = InlineKeyboardBuilder.
+                        create(chatId).
+                        setText(resource.getStringByKey("STR_9")).
+                        row().
+                        button(resource.getStringByKey("YES"), "reset_testing").
+                        button(resource.getStringByKey("NO"), "noreset_testing").
+                        endRow();
+                telegramBot.send(builder.build());
             }
         }
+
+    /**
+     * send to admin bot statistic
+     *
+     * @param chatId id of admin user
+     */
+    private void sendStatistic(Long chatId) {
+        if (Config.getInstance().getAdminsId().contains(chatId)) {
+            var userStatistic = Statistic.getInstance().getStatistic();
+            String statString = resource.getStringByKey("STR_48") + "\n" +
+                    resource.getStringByKey("STR_49") + userStatistic.getTotalCountOfSend() + "\n" +
+                    resource.getStringByKey("STR_50") + userStatistic.getTotalCountReceived() + "\n" +
+                    resource.getStringByKey("STR_51") + userStatistic.getUserReceived().size() + "\n";
+            telegramBot.send(statString, chatId);
+            try {
+                telegramBot.send(chart.genOneLineGraf(resource.getStringByKey("STR_52"),
+                        resource.getStringByKey("STR_53"),
+                        userStatistic.listToArray(userStatistic.getTotalReceived()),
+                        userStatistic.getXData(userStatistic.getTotalReceived().size())), chatId);
+                telegramBot.send(chart.genOneLineGraf(resource.getStringByKey("STR_55"),
+                        resource.getStringByKey("STR_56"),
+                        userStatistic.listToArray(userStatistic.getTotalSend()),
+                        userStatistic.getXData(userStatistic.getTotalSend().size())), chatId);
+            } catch (Exception e) {
+                logger.warn("error while generate graf", e);
+                telegramBot.send(resource.getStringByKey("STR_57"), chatId);
+            }
+        } else {
+            telegramBot.send(resource.getStringByKey("STR_47"), chatId);
+        }
+    }
 }

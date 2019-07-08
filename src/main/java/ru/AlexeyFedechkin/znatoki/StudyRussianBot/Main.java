@@ -14,7 +14,7 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.telegram.TelegramBot;
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class);
     /**
-     * init telegram ApiContext and telegram bot
+     * init telegram ApiContext and telegram bot, statistic
      * @param args never use
      */
     public static void main(String[] args) {

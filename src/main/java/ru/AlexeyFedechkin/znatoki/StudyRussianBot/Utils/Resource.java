@@ -6,8 +6,12 @@
 
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -26,5 +30,19 @@ public class Resource {
     public String getStringByKey(String key){
         logger.info("get string from resource bundle string.properties. key = " + key);
         return resourceBundle.getString(key);
+    }
+
+    /**
+     * get string from resource folder file
+     *
+     * @param fileName name of file to search
+     * @return string from file that placed in resource folder
+     */
+    public String getStringFromResources(String fileName) throws IOException {
+        var classLoader = ClassLoader.getSystemClassLoader();
+        var inputStream = classLoader.getResourceAsStream(fileName);
+        var writer = new StringWriter();
+        IOUtils.copy(Objects.requireNonNull(inputStream), writer);
+        return writer.toString();
     }
 }
