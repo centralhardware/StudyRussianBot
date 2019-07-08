@@ -22,11 +22,6 @@ public class Word {
     private final String name;
     private final String section;
     private final String answer;
-
-    public String getSection() {
-        return section;
-    }
-
     private final SchoolStage schoolStage;
 
     public Word(String wrightName, String name, String section, String answer, SchoolStage schoolStage) {
@@ -82,6 +77,11 @@ public class Word {
     public SchoolStage getSchoolStage() {
         return schoolStage;
     }
+
+    public String getSection() {
+        return section;
+    }
+
 
     @Override
     public boolean equals(Object o) {

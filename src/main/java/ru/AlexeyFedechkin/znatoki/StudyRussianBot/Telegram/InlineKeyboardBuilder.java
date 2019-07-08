@@ -3,6 +3,7 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram.Interfaces.InlineKeyboardBuilderInt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * builder for inlineKeyboardMarkup
  */
 @SuppressWarnings("CanBeFinal")
-public class InlineKeyboardBuilder {
+public class InlineKeyboardBuilder implements InlineKeyboardBuilderInt {
     private Long chatId;
     private String text;
 

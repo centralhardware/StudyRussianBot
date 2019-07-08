@@ -3,6 +3,7 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.internal.util.Base64;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Interfaces.RSAInt;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -15,7 +16,7 @@ import java.security.spec.X509EncodedKeySpec;
  * used to generate activation codes and checking them
  */
 @SuppressWarnings("HardCodedStringLiteral")
-public class RSA {
+public class RSA implements RSAInt {
     private final Logger logger = Logger.getLogger(RSA.class);
     private final String SOLID = "aYbWZRqZgBWkxQL2z8Z4kWPBz";
     private Signature signature = null;

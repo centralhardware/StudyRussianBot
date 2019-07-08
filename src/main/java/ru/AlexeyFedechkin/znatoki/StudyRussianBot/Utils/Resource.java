@@ -8,6 +8,7 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Interfaces.ResourceInt;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -18,7 +19,7 @@ import java.util.ResourceBundle;
  * wrapper for Resource bundle with string constant
  */
 @SuppressWarnings("HardCodedStringLiteral")
-public class Resource {
+public class Resource implements ResourceInt {
     private static final Logger logger = Logger.getLogger(Resource.class);
     private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("string");
 

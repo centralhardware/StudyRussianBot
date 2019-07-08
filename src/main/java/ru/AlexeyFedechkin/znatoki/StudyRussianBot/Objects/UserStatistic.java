@@ -1,7 +1,5 @@
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -18,33 +16,6 @@ public class UserStatistic {
     private int totalCountReceived;
     private final HashMap<Long, Integer> userCountSent = new HashMap<>();
     private final HashMap<Long, Integer> userReceivedSent = new HashMap<>();
-
-    /**
-     * convert list to array
-     *
-     * @param data integer's list
-     * @return array of int
-     */
-    public double[] listToArray(ArrayList<Integer> data) {
-        var res = new double[data.size()];
-        for (var i = 0; i < data.size(); i++) {
-            res[i] = data.get(i);
-        }
-        ArrayUtils.reverse(res);
-        return res;
-    }
-
-    /**
-     * @param count count of element in graf
-     * @return horizontal data
-     */
-    public double[] getXData(int count) {
-        var res = new double[count];
-        for (int i = 0; i < count; i++) {
-            res[i] = i;
-        }
-        return res;
-    }
 
     public ArrayList<Integer> getTotalSend() {
         return totalSend;

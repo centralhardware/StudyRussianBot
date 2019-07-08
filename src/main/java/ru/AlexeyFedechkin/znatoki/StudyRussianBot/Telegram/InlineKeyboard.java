@@ -5,13 +5,14 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram.Interfaces.InlineKeyboardInt;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 
 /**
  * methods to send InlineKeyboardMarkup
  */
-public class InlineKeyboard {
+public class InlineKeyboard implements InlineKeyboardInt {
     private final Resource resource = new Resource();
     private final Logger logger = Logger.getLogger(InlineKeyboardBuilder.class);
     private final TelegramBot telegramBot;

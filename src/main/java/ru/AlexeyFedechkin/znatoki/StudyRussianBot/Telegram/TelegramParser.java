@@ -14,17 +14,15 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Statistic;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Chart;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.RSA;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram.Interfaces.TelegramParserInt;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.*;
 
 import java.util.HashMap;
 
 /**
  * parse message from telegram
  */
-public class TelegramParser {
+public class TelegramParser implements TelegramParserInt {
     private final Logger logger = Logger.getLogger(TelegramParser.class);
     private final TelegramBot telegramBot;
     private final HashMap<Long, User> users = new HashMap<>();
@@ -294,12 +292,12 @@ public class TelegramParser {
             try {
                 telegramBot.send(chart.genOneLineGraf(resource.getStringByKey("STR_52"),
                         resource.getStringByKey("STR_53"),
-                        userStatistic.listToArray(userStatistic.getTotalReceived()),
-                        userStatistic.getXData(userStatistic.getTotalReceived().size())), chatId);
+                        ChartUtil.listToArray(userStatistic.getTotalReceived()),
+                        ChartUtil.getXData(userStatistic.getTotalReceived().size())), chatId);
                 telegramBot.send(chart.genOneLineGraf(resource.getStringByKey("STR_55"),
                         resource.getStringByKey("STR_56"),
-                        userStatistic.listToArray(userStatistic.getTotalSend()),
-                        userStatistic.getXData(userStatistic.getTotalSend().size())), chatId);
+                        ChartUtil.listToArray(userStatistic.getTotalSend()),
+                        ChartUtil.getXData(userStatistic.getTotalSend().size())), chatId);
             } catch (Exception e) {
                 logger.warn("error while generate graf", e);
                 telegramBot.send(resource.getStringByKey("STR_57"), chatId);
