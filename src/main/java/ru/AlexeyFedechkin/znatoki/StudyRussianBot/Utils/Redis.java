@@ -18,15 +18,14 @@ import java.util.Set;
 @SuppressWarnings("HardCodedStringLiteral")
 public class Redis {
     private static final Redis ourInstance = new Redis();
-    private static final Logger logger = Logger.getLogger(Redis.class);
-    private final Jedis jedis;
-
     public final String COUNT_OF_SENT_MESSAGE_KEY = "count_of_sent_message";
+    private final Jedis jedis;
     public final String COUNT_OF_RECEIVED_MESSAGE_KEY = "count_of_received_message";
     public final String COUNT_OF_RECEIVED_MESSAGE_POSTFIX = "_count_of_received_message";
+    public final String COUNT_OF_SENT_MESSAGE_POSTFIX = "_count_of_sent_message";
     private final String KEY_POSTFIX = "_key";
     private final String CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word";
-    public final String COUNT_OF_SENT_MESSAGE_POSTFIX = "_count_of_sent_message";
+    private final Logger logger = Logger.getLogger(Redis.class);
     private final String CHECKED_WORD_POSTFIX = "_checked_word";
     private final String CHECKED_RULE_POSTFIX = "_checked_rule";
 

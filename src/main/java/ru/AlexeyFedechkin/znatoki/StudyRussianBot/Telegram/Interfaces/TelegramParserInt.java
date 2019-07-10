@@ -6,4 +6,8 @@ public interface TelegramParserInt {
     void parseText(Update update);
 
     void parsCallback(Update update);
+
+    void parseAudio(Update update);
+
+    void parseImage(Update update);
 }

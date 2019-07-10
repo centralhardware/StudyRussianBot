@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -60,30 +61,24 @@ public class TelegramBot extends TelegramLongPollingBot {
      * init telegram bot and configure proxy
      */
     public void init(){
-        if (Config.getInstance().isUseProxy()){
-            Authenticator.setDefault(new MyAuthenticator());
-            var botsApi = new TelegramBotsApi();
-            var botOptions = ApiContext.getInstance(DefaultBotOptions.class);
-            botOptions.setProxyHost(Config.getInstance().getProxyHost());
-            botOptions.setProxyPort(Config.getInstance().getProxyPort());
-            botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
-            logger.info("proxy configure");
-            try {
+        try {
+            if (Config.getInstance().isUseProxy()) {
+                Authenticator.setDefault(new Auth());
+                var botsApi = new TelegramBotsApi();
+                var botOptions = ApiContext.getInstance(DefaultBotOptions.class);
+                botOptions.setProxyHost(Config.getInstance().getProxyHost());
+                botOptions.setProxyPort(Config.getInstance().getProxyPort());
+                botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
+                logger.info("proxy configure");
                 botsApi.registerBot(new TelegramBot(botOptions));
-                logger.info("bot register");
-            } catch (TelegramApiRequestException e) {
-                logger.fatal("bot start fail", e);
-                System.exit(20);
-            }
-        } else {
-            var botsApi = new TelegramBotsApi();
-            try {
+            } else {
+                var botsApi = new TelegramBotsApi();
                 botsApi.registerBot(new TelegramBot());
-                logger.info("bot register");
-            } catch (TelegramApiRequestException e) {
-                logger.fatal("bot start fail", e);
-                System.exit(20);
             }
+            logger.info("bot register");
+        } catch (TelegramApiRequestException e) {
+            logger.fatal("bot start fail", e);
+            System.exit(20);
         }
     }
 
@@ -97,7 +92,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (telegramParser == null) {
             telegramParser = new TelegramParser(this);
         }
-        long chatId;
+        long chatId = 0;
+        if (update.hasCallbackQuery()) {
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+        } else {
+            chatId = update.getMessage().getChatId();
+        }
+        Statistic.getInstance().checkReceived(chatId);
         if (update.hasCallbackQuery()){
             logger.info("receive callback \"" + update.getCallbackQuery().getData() + "\" " +
                     update.getCallbackQuery().getFrom().getFirstName() + "\" " +
@@ -106,9 +107,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (!telegramParser.getUsers().containsKey(update.getCallbackQuery().getMessage().getChatId())) {
                 telegramParser.getUsers().put(update.getCallbackQuery().getMessage().getChatId(), new User(update.getCallbackQuery().getMessage().getChatId()));
             }
-            chatId = update.getCallbackQuery().getMessage().getChatId();
-            Statistic.getInstance().checkReceived(chatId);
-        } else {
+        } else if (update.getMessage().hasText()) {
             logger.info("receive message \"" + update.getMessage().getText() +
                     "\" from \"" + update.getMessage().getFrom().getFirstName() + "\" " +
                     update.getMessage().getFrom().getLastName() + "\" " +
@@ -117,16 +116,16 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (!telegramParser.getUsers().containsKey(update.getMessage().getChatId())) {
                 telegramParser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
             }
-            chatId = update.getMessage().getChatId();
-            Statistic.getInstance().checkReceived(chatId);
-
             if (update.getMessage().getText().toLowerCase().equals("ping")) {
                 send("pong",update.getMessage().getChatId());
             } else if (update.getMessage().getText().toLowerCase().equals("pong")) {
                 send("ping", update.getMessage().getChatId());
             }
+        } else if (update.getMessage().hasVoice() || update.getMessage().hasAudio()) {
+            telegramParser.parseAudio(update);
+        } else if (update.getMessage().hasPhoto()) {
+            telegramParser.parseImage(update);
         }
-
         if (!(Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
             switch (telegramParser.getUsers().get(chatId).getStatus()) {
                 case WAIT_KEY:
@@ -218,6 +217,18 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    public void send(SendVoice sendVoice) {
+        logger.info("send voice");
+        try {
+            execute(sendVoice);
+        } catch (TelegramApiException e) {
+            logger.warn("fail to send voice", e);
+            Redis.getInstance().sent(Long.parseLong(sendVoice.getChatId()));
+            Statistic.getInstance().checkSent(Long.parseLong(sendVoice.getChatId()));
+        }
+    }
+
+
     /**
      * send file as image.
      * after sending file will be delete.
@@ -239,6 +250,17 @@ public class TelegramBot extends TelegramLongPollingBot {
             } else {
                 logger.warn("file \"" + file.getName() + "\" deleted fail");
             }
+        } catch (TelegramApiException e) {
+            logger.info("send photo fail", e);
+        }
+    }
+
+    public void send(SendPhoto sendPhoto) {
+        try {
+            execute(sendPhoto);
+            logger.info("send photos");
+            Redis.getInstance().sent(Long.parseLong(sendPhoto.getChatId()));
+            Statistic.getInstance().checkSent(Long.parseLong(sendPhoto.getChatId()));
         } catch (TelegramApiException e) {
             logger.info("send photo fail", e);
         }
@@ -290,7 +312,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private static class MyAuthenticator extends Authenticator {
+    private static class Auth extends Authenticator {
         @Override
         public PasswordAuthentication requestPasswordAuthenticationInstance(String host, InetAddress addr,
                                                                             int port, String protocol,

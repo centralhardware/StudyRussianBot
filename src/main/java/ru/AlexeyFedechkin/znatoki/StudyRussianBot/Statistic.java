@@ -38,7 +38,11 @@ public class Statistic {
      */
     public void init() {
         int period;
-        period = Config.getInstance().isTesting() ? 1 : 60;
+        if (Config.getInstance().isTesting()) {
+            period = 1;
+        } else {
+            period = 60;
+        }
         Timer timer = new Timer();
         int MILLISECONDS_IN_SECOND = 1000;
         int SECOND_IN_MINUTE = 60;
@@ -56,7 +60,7 @@ public class Statistic {
                 }
                 clearVariable();
             }
-        }, 0, MILLISECONDS_IN_SECOND * SECOND_IN_MINUTE * period);
+        }, 1, MILLISECONDS_IN_SECOND * SECOND_IN_MINUTE * period);
     }
 
     /**

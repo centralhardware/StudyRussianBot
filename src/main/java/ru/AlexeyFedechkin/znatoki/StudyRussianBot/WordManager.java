@@ -25,7 +25,7 @@ import java.util.List;
 @SuppressWarnings("HardCodedStringLiteral")
 public class WordManager {
     private static final Logger logger = Logger.getLogger(WordManager.class);
-    private final ArrayList<Rule> rules = new ArrayList<>(1600);
+    private final ArrayList<Rule> rules = new ArrayList<>();
     private final ArrayList<RuleDescription> ruleDescriptions = new ArrayList<>();
     private final Resource resource = new Resource();
 

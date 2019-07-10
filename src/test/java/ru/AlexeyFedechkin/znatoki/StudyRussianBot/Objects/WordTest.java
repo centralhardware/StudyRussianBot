@@ -17,7 +17,9 @@ public class WordTest {
     @Test
     public void parse() throws IOException {
         String notParse = "деструкц_я деструкцИя и r3 1 10";
+        String parse = "деструкц_я деструкцИя и r3 1 1 0";
         assertNull(Word.parse(notParse));
+        assertNotNull(Word.parse(parse));
         var wordString = resource.getStringFromResources("word.json");
         var wordObject = new JSONObject(wordString);
         var wordArray = wordObject.getJSONArray("word");

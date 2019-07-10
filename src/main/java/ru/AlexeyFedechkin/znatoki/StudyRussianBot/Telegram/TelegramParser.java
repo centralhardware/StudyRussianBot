@@ -7,6 +7,8 @@
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram;
 
 import org.apache.log4j.Logger;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
@@ -17,7 +19,6 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Statistic;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram.Interfaces.TelegramParserInt;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.*;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public class TelegramParser implements TelegramParserInt {
     private final Chart chart = new Chart();
 
     public Map<Long, User> getUsers() {
-        return Collections.unmodifiableMap(users);
+        return users;
     }
 
     /**
@@ -277,6 +278,35 @@ public class TelegramParser implements TelegramParserInt {
                 telegramBot.send(builder.build());
             }
         }
+
+    @Override
+    public void parseAudio(Update update) {
+        if (users.get(update.getMessage().getChatId()).getStatus() == UserStatus.WAIT_REPORT) {
+            for (long chatId : Config.getInstance().getAdminsId()) {
+                SendVoice sendVoice = new SendVoice();
+                sendVoice.setChatId(chatId);
+                sendVoice.setVoice(update.getMessage().getVoice().getFileId());
+                telegramBot.send(sendVoice);
+            }
+        } else {
+            telegramBot.send("Бот не поддерживает голосовые сообщения", update.getMessage().getChatId());
+        }
+    }
+
+    @Override
+    public void parseImage(Update update) {
+        if (users.get(update.getMessage().getChatId()).getStatus() == UserStatus.WAIT_REPORT) {
+            for (long chatId : Config.getInstance().getAdminsId()) {
+                var photo = update.getMessage().getPhoto().get(update.getMessage().getPhoto().size() - 1);
+                var sendPhoto = new SendPhoto();
+                sendPhoto.setChatId(chatId);
+                sendPhoto.setPhoto(photo.getFileId());
+                telegramBot.send(sendPhoto);
+            }
+        } else {
+            telegramBot.send("Бот не поддерживает изображения", update.getMessage().getChatId());
+        }
+    }
 
     /**
      * send to admin bot statistic
