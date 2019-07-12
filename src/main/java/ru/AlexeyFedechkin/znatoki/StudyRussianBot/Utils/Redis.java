@@ -125,6 +125,7 @@ public class Redis {
      * @return count of sen message
      */
     public String getCountOfSentMessage(long chatId){
+        logger.info("get count of message");
         var count_of_received_message_key = chatId + COUNT_OF_RECEIVED_MESSAGE_POSTFIX;
         return jedis.get(count_of_received_message_key);
     }
@@ -135,6 +136,7 @@ public class Redis {
      * @return count of received message
      */
     public String getCountOfReceivedMessage(long chatId){
+        logger.info("get count of received message");
         var count_of_sent_message_key = chatId + COUNT_OF_SENT_MESSAGE_POSTFIX;
         return jedis.get(count_of_sent_message_key);
     }
@@ -145,6 +147,7 @@ public class Redis {
      * @return count of checked word
      */
     public int getCountOfCheckedWord(long chatId){
+        logger.info("get count of checked word");
         var checkWordKey = chatId + CHECKED_WORD_POSTFIX;
         int count = 0;
         for (Rule rule : Data.getInstance().getWordManager().getRules()) {
@@ -164,6 +167,7 @@ public class Redis {
      * @return count of checked word
      */
     public int getCountOfWrongCheckedWord(long chatId) {
+        logger.info("get count of wrong checked word");
         var checkWordKey = chatId + CHECKED_WRONG_WORD_POSTFIX;
         int count = 0;
         for (Rule rule : Data.getInstance().getWordManager().getRules()) {
