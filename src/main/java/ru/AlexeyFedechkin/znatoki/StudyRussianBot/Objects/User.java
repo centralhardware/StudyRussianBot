@@ -41,7 +41,7 @@ public class User {
 
 
     public List<Word> getWords() {
-        return Collections.unmodifiableList(words);
+        return words;
     }
 
     public UserStatus getStatus() {
@@ -65,7 +65,7 @@ public class User {
     }
 
     public List<Word> getWrongWords() {
-        return Collections.unmodifiableList(wrongWords);
+        return wrongWords;
     }
 
     public void setCount(int count) {
