@@ -52,7 +52,7 @@ public class Redis {
         } else {
             jedis.set(count_of_received_message_key, String.valueOf(Integer.parseInt(jedis.get(count_of_received_message_key)) + 1));
         }
-        logger.info("set key \"" + count_of_received_message_key + "\" value \"" + jedis.get(count_of_received_message_key + "\""));
+        logger.info("set key \"" + count_of_received_message_key + "\" value \"" + jedis.get(count_of_received_message_key)+ "\"");
 
         if (jedis.get(COUNT_OF_RECEIVED_MESSAGE_KEY) == null){
             jedis.set(COUNT_OF_RECEIVED_MESSAGE_KEY, "1");
