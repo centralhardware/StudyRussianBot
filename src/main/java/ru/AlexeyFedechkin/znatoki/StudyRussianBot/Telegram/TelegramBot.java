@@ -92,7 +92,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (telegramParser == null) {
             telegramParser = new TelegramParser(this);
         }
-        long chatId = 0;
+        long chatId;
         if (update.hasCallbackQuery()) {
             chatId = update.getCallbackQuery().getMessage().getChatId();
         } else {

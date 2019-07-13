@@ -43,7 +43,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
         }
         logger.info("send book keyboard rules");
         var builder = InlineKeyboardBuilder.
-                create(Long.valueOf(chatId)).setText(resource.getStringByKey("STR_42"));
+                create(chatId).setText(resource.getStringByKey("STR_42"));
         long userId;
         if (update.hasCallbackQuery()){
             userId = update.getCallbackQuery().getFrom().getId();

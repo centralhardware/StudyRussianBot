@@ -13,7 +13,6 @@ import java.io.IOException;
 /**
  * provides access to instance WordManager
  */
-@SuppressWarnings("FieldCanBeLocal")
 public class Data {
     private static final Logger logger = Logger.getLogger(Data.class);
     private static final Data ourInstance = new Data();

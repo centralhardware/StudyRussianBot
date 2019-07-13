@@ -54,6 +54,7 @@ public class TelegramParser implements TelegramParserInt {
      * - /help: show help message.
      * - /rules: show choose rule inline menu
      * - /profile: show profile data
+     * - /menu: show menu
      * - /gen: generate activated code. Param: userName. only for admin
      * - /ver: verify activated code. Param: key userName. only for admin
      * - /stat: show bot statistic. only for admin
@@ -87,6 +88,8 @@ public class TelegramParser implements TelegramParserInt {
             case "/profile":
                 telegramBot.send(user.getProfile(), chatId);
                 break;
+            case "/menu":
+                inlineKeyboard.sendMenu(chatId);
             default:
                 if (message.startsWith("/gen ")) {
                     if (Config.getInstance().getAdminsId().contains(chatId)) {
@@ -110,7 +113,7 @@ public class TelegramParser implements TelegramParserInt {
                 } else if (message.startsWith("/stat")) {
                     sendStatistic(chatId);
                 } else if(message.startsWith("/")) {
-                    telegramBot.send("команда не распознана", chatId);
+                    telegramBot.send(resource.getStringByKey("STR_101"), chatId);
                 }
                 switch (user.getStatus()) {
                     case WAIT_COUNT_OF_WORD:
@@ -289,7 +292,7 @@ public class TelegramParser implements TelegramParserInt {
                 telegramBot.send(sendVoice);
             }
         } else {
-            telegramBot.send("Бот не поддерживает голосовые сообщения", update.getMessage().getChatId());
+            telegramBot.send(resource.getStringByKey("STR_102"), update.getMessage().getChatId());
         }
     }
 
@@ -304,7 +307,7 @@ public class TelegramParser implements TelegramParserInt {
                 telegramBot.send(sendPhoto);
             }
         } else {
-            telegramBot.send("Бот не поддерживает изображения", update.getMessage().getChatId());
+            telegramBot.send(resource.getStringByKey("STR_103"), update.getMessage().getChatId());
         }
     }
 

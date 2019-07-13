@@ -6,6 +6,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings("HardCodedStringLiteral")
 public class ChartTest {
 
     @Test

@@ -12,6 +12,7 @@ import java.util.Random;
 /**
  * generate graf
  */
+@SuppressWarnings("HardCodedStringLiteral")
 public class Chart {
     private static final Logger logger = Logger.getLogger(Chart.class);
     private final Random random = new Random();
