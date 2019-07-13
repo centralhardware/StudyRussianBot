@@ -146,18 +146,10 @@ public class Redis {
      * @param chatId id of user
      * @return count of checked word
      */
-    public int getCountOfCheckedWord(long chatId){
+    public long getCountOfCheckedWord(long chatId){
         logger.info("get count of checked word");
         var checkWordKey = chatId + CHECKED_WORD_POSTFIX;
-        int count = 0;
-        for (Rule rule : Data.getInstance().getWordManager().getRules()) {
-            for (Word word : rule.getWords()){
-                if (jedis.sismember(checkWordKey, word.getName())){
-                    count++;
-                }
-            }
-        }
-        return count;
+        return jedis.scard(checkWordKey);
     }
 
     /**
@@ -166,18 +158,10 @@ public class Redis {
      * @param chatId id of user
      * @return count of checked word
      */
-    public int getCountOfWrongCheckedWord(long chatId) {
+    public long getCountOfWrongCheckedWord(long chatId) {
         logger.info("get count of wrong checked word");
         var checkWordKey = chatId + CHECKED_WRONG_WORD_POSTFIX;
-        int count = 0;
-        for (Rule rule : Data.getInstance().getWordManager().getRules()) {
-            for (Word word : rule.getWords()) {
-                if (jedis.sismember(checkWordKey, word.getName())) {
-                    count++;
-                }
-            }
-        }
-        return count;
+        return jedis.scard(checkWordKey);
     }
 
     /**

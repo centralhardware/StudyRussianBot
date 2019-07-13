@@ -98,8 +98,7 @@ public class TelegramParser implements TelegramParserInt {
                     } else {
                         telegramBot.send(resource.getStringByKey("STR_47"), update.getMessage().getChatId());
                     }
-                }
-                if (message.startsWith("/ver ")) {
+                } else if (message.startsWith("/ver ")) {
                     var args = message.replace("/ver ", "").split(" ");
                     String key = args[0];
                     String msg = args[1];
@@ -108,9 +107,10 @@ public class TelegramParser implements TelegramParserInt {
                     } else {
                         telegramBot.send(resource.getStringByKey("STR_47"), update.getMessage().getChatId());
                     }
-                }
-                if (message.startsWith("/stat")) {
+                } else if (message.startsWith("/stat")) {
                     sendStatistic(chatId);
+                } else if(message.startsWith("/")) {
+                    telegramBot.send("команда не распознана", chatId);
                 }
                 switch (user.getStatus()) {
                     case WAIT_COUNT_OF_WORD:
