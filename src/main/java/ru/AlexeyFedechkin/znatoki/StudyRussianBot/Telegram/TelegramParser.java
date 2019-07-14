@@ -6,7 +6,6 @@
 
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram;
 
-import org.apache.log4j.Logger;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,9 +14,10 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Data;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Statistic;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram.Interfaces.TelegramParserInt;
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.*;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.RSA;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 
 import java.util.HashMap;
 import java.util.Map;
