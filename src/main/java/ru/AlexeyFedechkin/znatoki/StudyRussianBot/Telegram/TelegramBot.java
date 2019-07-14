@@ -11,26 +11,18 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Statistic;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Auth;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.RSA;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 
-import java.io.File;
 import java.net.Authenticator;
-import java.net.InetAddress;
-import java.net.PasswordAuthentication;
-import java.net.URL;
 
 /**
  * telegram bot class
@@ -41,7 +33,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     private TelegramParser telegramParser;
     private final RSA rsa = new RSA();
     private final Resource resource = new Resource();
-    private final InlineKeyboard inlineKeyboard = new InlineKeyboard(this);
+    private final InlineKeyboard inlineKeyboard;
+    private final Sender sender;
 
     /**
      * set proxy setting
@@ -49,12 +42,16 @@ public class TelegramBot extends TelegramLongPollingBot {
      */
     private TelegramBot(DefaultBotOptions botOptions) {
         super(botOptions);
+        sender = new Sender(this);
+        inlineKeyboard = new InlineKeyboard(sender);
     }
 
     /**
      * need to create instance from main class
      */
     public TelegramBot(){
+        sender = new Sender(this);
+        inlineKeyboard = new InlineKeyboard(sender);
     }
 
     /**
@@ -90,7 +87,7 @@ public class TelegramBot extends TelegramLongPollingBot {
      */
     public void onUpdateReceived(Update update) {
         if (telegramParser == null) {
-            telegramParser = new TelegramParser(this);
+            telegramParser = new TelegramParser(sender);
         }
         long chatId;
         if (update.hasCallbackQuery()) {
@@ -117,13 +114,23 @@ public class TelegramBot extends TelegramLongPollingBot {
                 telegramParser.getUsers().put(update.getMessage().getChatId(), new User(update.getMessage().getChatId()));
             }
             if (update.getMessage().getText().toLowerCase().equals("ping")) {
-                send("pong",update.getMessage().getChatId());
+                sender.send("pong",update.getMessage().getChatId());
             } else if (update.getMessage().getText().toLowerCase().equals("pong")) {
-                send("ping", update.getMessage().getChatId());
+                sender.send("ping", update.getMessage().getChatId());
             }
         } else if (update.getMessage().hasVoice() || update.getMessage().hasAudio()) {
+            logger.info("receive voice \"" + update.getMessage().getText() +
+                    "\" from \"" + update.getMessage().getFrom().getFirstName() + "\" " +
+                    update.getMessage().getFrom().getLastName() + "\" " +
+                    update.getMessage().getFrom().getUserName() + "\" " +
+                    update.getMessage().getFrom().getId() + "\"");
             telegramParser.parseAudio(update);
         } else if (update.getMessage().hasPhoto()) {
+            logger.info("receive photo \"" + update.getMessage().getText() +
+                    "\" from \"" + update.getMessage().getFrom().getFirstName() + "\" " +
+                    update.getMessage().getFrom().getLastName() + "\" " +
+                    update.getMessage().getFrom().getUserName() + "\" " +
+                    update.getMessage().getFrom().getId() + "\"");
             telegramParser.parseImage(update);
         }
         if (!(Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
@@ -133,14 +140,14 @@ public class TelegramBot extends TelegramLongPollingBot {
                         if (rsa.validateKey(update.getMessage().getFrom().getUserName(), update.getMessage().getText())) {
                             telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
                             Redis.getInstance().setRight(chatId, update.getMessage().getText());
-                            send(resource.getStringByKey("STR_19"), chatId);
+                            sender.send(resource.getStringByKey("STR_19"), chatId);
                             inlineKeyboard.sendMenu(chatId);
                         } else {
                             if (update.hasCallbackQuery()) {
                                 telegramParser.parsCallback(update);
                                 return;
                             }
-                            send(resource.getStringByKey("STR_21"), chatId);
+                            sender.send(resource.getStringByKey("STR_21"), chatId);
                         }
                     } else {
                         telegramParser.parsCallback(update);
@@ -161,15 +168,15 @@ public class TelegramBot extends TelegramLongPollingBot {
                         for (var id : Config.getInstance().getAdminsId()) {
                             org.telegram.telegrambots.meta.api.objects.User user = update.getMessage().getFrom();
                             if (update.getMessage().getFrom().getUserName() == null) {
-                                send(resource.getStringByKey("STR_59") + user.getFirstName() + " "
+                                sender.send(resource.getStringByKey("STR_59") + user.getFirstName() + " "
                                         + user.getLastName() + " \n" + update.getMessage().getText(), id);
                             } else {
-                                send(resource.getStringByKey("STR_60") + user.getUserName() + " " +
+                                sender.send(resource.getStringByKey("STR_60") + user.getUserName() + " " +
                                         user.getFirstName() + " " + user.getLastName() + " \n"
                                         + update.getMessage().getText(), id);
                             }
                         }
-                        send(resource.getStringByKey("STR_61"), chatId);
+                        sender.send(resource.getStringByKey("STR_61"), chatId);
                         telegramParser.getUsers().get(chatId).setStatus(UserStatus.NONE);
                     }
                     return;
@@ -182,107 +189,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             telegramParser.parseText(update);
         }
     }
-
-    /**
-     * send message to telegram user
-     * @param message string with message to user
-     * @param chatId id of chat where to send message
-     */
-    public void send(String message, long chatId){
-        logger.info("send message: " + message);
-        var msg = new SendMessage().
-                setChatId(chatId).
-                setText(message);
-        try{
-            execute(msg);
-            Redis.getInstance().sent(chatId);
-            Statistic.getInstance().checkSent(chatId);
-        } catch (TelegramApiException e) {
-            logger.warn("fail to send message", e);
-        }
-    }
-
-    /**
-     * send SendMessage to telegram user
-     * @param sendMessage object that contain data for send message to telegram
-     */
-    public void send(SendMessage sendMessage){
-        logger.info("send message: " + sendMessage.getText());
-        try{
-            execute(sendMessage);
-            Redis.getInstance().sent(Long.parseLong(sendMessage.getChatId()));
-            Statistic.getInstance().checkSent(Long.parseLong(sendMessage.getChatId()));
-        } catch (TelegramApiException e) {
-            logger.warn("fail to send message", e);
-        }
-    }
-
-    public void send(SendVoice sendVoice) {
-        logger.info("send voice");
-        try {
-            execute(sendVoice);
-        } catch (TelegramApiException e) {
-            logger.warn("fail to send voice", e);
-            Redis.getInstance().sent(Long.parseLong(sendVoice.getChatId()));
-            Statistic.getInstance().checkSent(Long.parseLong(sendVoice.getChatId()));
-        }
-    }
-
-
-    /**
-     * send file as image.
-     * after sending file will be delete.
-     *
-     * @param file   file with image
-     * @param chatId id of user
-     */
-    public void send(File file, long chatId) {
-        var sendPhoto = new SendPhoto();
-        sendPhoto.setChatId(chatId);
-        sendPhoto.setPhoto(file);
-        try {
-            execute(sendPhoto);
-            logger.info("send photo: " + file.getName());
-            Redis.getInstance().sent(chatId);
-            Statistic.getInstance().checkSent(chatId);
-            if (file.delete()) {
-                logger.info("file \"" + file.getName() + "\" deleted successfully");
-            } else {
-                logger.warn("file \"" + file.getName() + "\" deleted fail");
-            }
-        } catch (TelegramApiException e) {
-            logger.info("send photo fail", e);
-        }
-    }
-
-    public void send(SendPhoto sendPhoto) {
-        try {
-            execute(sendPhoto);
-            logger.info("send photos");
-            Redis.getInstance().sent(Long.parseLong(sendPhoto.getChatId()));
-            Statistic.getInstance().checkSent(Long.parseLong(sendPhoto.getChatId()));
-        } catch (TelegramApiException e) {
-            logger.info("send photo fail", e);
-        }
-    }
-
-    /**
-     * delete message. using for delete previously message with inline keyboard
-     * @param chatId id of chat with user
-     * @param messageId id of deleting message
-     */
-    public void delete(Long chatId, Integer messageId){
-        logger.info("delete message " + chatId + " - " + messageId + "");
-        var deleteMessage = new DeleteMessage();
-        deleteMessage.setChatId(chatId);
-        deleteMessage.setMessageId(messageId);
-        try{
-            execute(deleteMessage);
-        } catch (TelegramApiException e) {
-            logger.info("delete fail " + chatId + " - " + messageId);
-        }
-    }
-
 
     /**
      * get bot user name
@@ -309,17 +215,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         } else {
             logger.info("getting production bot token");
             return Config.getInstance().getBotToken();
-        }
-    }
-
-    private static class Auth extends Authenticator {
-        @Override
-        public PasswordAuthentication requestPasswordAuthenticationInstance(String host, InetAddress addr,
-                                                                            int port, String protocol,
-                                                                            String prompt, String scheme, URL url,
-                                                                            RequestorType reqType) {
-            return new PasswordAuthentication(Config.getInstance().getProxyUser(),
-                    Config.getInstance().getProxyPassword().toCharArray());
         }
     }
 }

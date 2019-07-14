@@ -15,15 +15,15 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource;
 public class InlineKeyboard implements InlineKeyboardInt {
     private final Resource resource = new Resource();
     private static final Logger logger = Logger.getLogger(InlineKeyboard.class);
-    private final TelegramBot telegramBot;
+    private final Sender sender;
 
     /**
      * set telegramBot
      *
-     * @param telegramBot instance of telegram bot
+     * @param sender instance of telegram bot
      */
-    public InlineKeyboard(TelegramBot telegramBot){
-        this.telegramBot = telegramBot;
+    public InlineKeyboard(Sender sender){
+        this.sender = sender;
     }
 
     /**
@@ -74,7 +74,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
                     button(resource.getStringByKey("STR_24"), "menu").
                     endRow();
             if (!message.equals("/book")){
-                telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+                sender.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
             }
         } else if (pageNumber < Rule.getMaxPage()){
             builder.row().
@@ -82,19 +82,19 @@ public class InlineKeyboard implements InlineKeyboardInt {
                     button(resource.getStringByKey("STR_17") + (pageNumber + 1), "book_to_" + (pageNumber + 1)).
                     button(resource.getStringByKey("STR_24"), "menu").
                     endRow();
-            telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
-            telegramBot.send(builder.build());
+            sender.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            sender.send(builder.build());
             return;
         } else if (pageNumber == Rule.getMaxPage()){
             builder.row().
                     button(resource.getStringByKey("STR_18"), "book_to_" + (pageNumber - 1)).
                     button(resource.getStringByKey("STR_24"), "menu").
                     endRow();
-            telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
-            telegramBot.send(builder.build());
+            sender.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            sender.send(builder.build());
             return;
         }
-        telegramBot.send(builder.build());
+        sender.send(builder.build());
     }
 
     /**
@@ -152,7 +152,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
                     button(resource.getStringByKey("STR_24"), "menu").
                     endRow();
             if (!message.equals("/rules")){
-                telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+                sender.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
             }
         } else if (pageNumber < Rule.getMaxPage()){
             builder.row().
@@ -160,19 +160,19 @@ public class InlineKeyboard implements InlineKeyboardInt {
                     button(resource.getStringByKey("STR_17") + (pageNumber + 1), "to_" + (pageNumber + 1)).
                     button(resource.getStringByKey("STR_24"), "menu").
                     endRow();
-            telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
-            telegramBot.send(builder.build());
+            sender.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            sender.send(builder.build());
             return;
         } else if (pageNumber == Rule.getMaxPage()){
             builder.row().
                     button(resource.getStringByKey("STR_18"), "to_" + (pageNumber - 1)).
                     button(resource.getStringByKey("STR_24"), "menu").
                     endRow();
-            telegramBot.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
-            telegramBot.send(builder.build());
+            sender.delete(chatId, update.getCallbackQuery().getMessage().getMessageId());
+            sender.send(builder.build());
             return;
         }
-        telegramBot.send(builder.build());
+        sender.send(builder.build());
     }
 
     /**
@@ -182,7 +182,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
      */
     public void sendLoginInfo(long chatId) {
         if (Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId)) {
-            telegramBot.send(resource.getStringByKey("STR_44"), chatId);
+            sender.send(resource.getStringByKey("STR_44"), chatId);
         } else {
             var builder = InlineKeyboardBuilder.create(chatId).
                     setText(resource.getStringByKey("STR_28")).
@@ -198,7 +198,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
                     row().
                     button(resource.getStringByKey("STR_26"), "help").
                     endRow();
-            telegramBot.send(builder.build());
+            sender.send(builder.build());
         }
     }
 
@@ -236,6 +236,6 @@ public class InlineKeyboard implements InlineKeyboardInt {
                     button(resource.getStringByKey("STR_100"), "statistic").
                     endRow();
         }
-        telegramBot.send(builder.build());
+        sender.send(builder.build());
     }
 }
