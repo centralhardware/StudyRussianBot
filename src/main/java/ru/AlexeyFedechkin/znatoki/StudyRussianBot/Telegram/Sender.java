@@ -54,6 +54,9 @@ public class Sender {
         }
     }
 
+    /**
+     * @param sendVoice
+     */
     public void send(SendVoice sendVoice) {
         logger.info("send voice");
         try {
