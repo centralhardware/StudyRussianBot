@@ -92,6 +92,9 @@ public class Sender {
         }
     }
 
+    /**
+     * @param sendPhoto
+     */
     public void send(SendPhoto sendPhoto) {
         try {
             telegramBot.execute(sendPhoto);
