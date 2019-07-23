@@ -101,7 +101,7 @@ public class Sender {
     public void send(SendPhoto sendPhoto) {
         try {
             telegramBot.execute(sendPhoto);
-            logger.info("send photos");
+            logger.info("send photo");
             Redis.getInstance().sent(Long.parseLong(sendPhoto.getChatId()));
             Statistic.getInstance().checkSent(Long.parseLong(sendPhoto.getChatId()));
         } catch (TelegramApiException e) {

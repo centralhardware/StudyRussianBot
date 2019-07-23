@@ -1,0 +1,6 @@
+version: 3
+services:
+  bot:
+    container_name: StudyRussianBot
+    restart: always
+    image: 'bot:2.0'
