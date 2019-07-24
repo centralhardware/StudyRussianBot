@@ -128,7 +128,7 @@ public class User {
                 builder.append(" - ").append("\"").append(rule.getName()).append("\"").append("\n");
             }
         }
-        if (Config.getInstance().getAdminsId().contains(chatId)){
+        if (Config.getAdminsId().contains(chatId)){
             builder.append(resource.getStringByKey("STR_35")).append(resource.getStringByKey("STR_37"));
         } else if (Redis.getInstance().checkRight(chatId)) {
             builder.append(resource.getStringByKey("STR_35")).append(resource.getStringByKey("STR_38"));

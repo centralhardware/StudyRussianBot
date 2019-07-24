@@ -7,6 +7,7 @@
 package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects;
 
 import org.apache.log4j.Logger;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.SchoolStage;
 
 import java.util.Objects;
@@ -42,7 +43,9 @@ public class Word {
      * @return object crated from parsing string
      */
     public static Word parse(String str){
-        logger.info("parsing string " + str);
+        if (Config.isTesting()){
+            logger.info("parsing string " + str);
+        }
         var args = str.split(" ");
         if (args.length != 7){
             logger.warn("error in data file " + str);

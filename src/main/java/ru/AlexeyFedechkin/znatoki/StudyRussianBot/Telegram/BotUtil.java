@@ -22,7 +22,7 @@ public class BotUtil {
      * @param chatId id of admin user
      */
     public void sendStatistic(Long chatId) {
-        if (Config.getInstance().getAdminsId().contains(chatId)) {
+        if (Config.getAdminsId().contains(chatId)) {
             var userStatistic = Statistic.getInstance().getStatistic();
             String statString = resource.getStringByKey("STR_48") + "\n" +
                     resource.getStringByKey("STR_49") + userStatistic.getTotalCountOfSend() + "\n" +

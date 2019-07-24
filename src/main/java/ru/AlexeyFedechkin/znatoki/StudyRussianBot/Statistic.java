@@ -38,7 +38,7 @@ public class Statistic {
      */
     public void init() {
         int period;
-        if (Config.getInstance().isTesting()) {
+        if (Config.isTesting()) {
             period = 1;
         } else {
             period = 60;

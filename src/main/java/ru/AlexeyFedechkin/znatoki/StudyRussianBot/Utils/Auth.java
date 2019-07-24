@@ -13,7 +13,7 @@ public class Auth extends Authenticator {
                                                                         int port, String protocol,
                                                                         String prompt, String scheme, URL url,
                                                                         RequestorType reqType) {
-        return new PasswordAuthentication(Config.getInstance().getProxyUser(),
-                Config.getInstance().getProxyPassword().toCharArray());
+        return new PasswordAuthentication(Config.getProxyUser(),
+                Config.getProxyPassword().toCharArray());
     }
 }

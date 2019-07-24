@@ -37,7 +37,7 @@ public class Redis {
      */
     private Redis() {
         logger.info("redis configure");
-        jedis = new Jedis(Config.getInstance().getRedisHost(), Config.getInstance().getRedisPort());
+        jedis = new Jedis(Config.getRedisHost(), Config.getRedisPort());
     }
 
     /**
@@ -95,7 +95,7 @@ public class Redis {
                 checkedCount++;
             }
         }
-        if (Config.getInstance().isTesting()){
+        if (Config.isTesting()){
             if (checkedCount > 2){
                 jedis.sadd(checkRuleKey, user.getCurrRule().getName());
                 logger.info("add value \"" + user.getCurrRule().getName() + "\" to set by key \"" + checkRuleKey + "\"");
@@ -190,7 +190,7 @@ public class Redis {
      * @return true if user don't have demo access
      */
     public boolean checkRight(long user_id) {
-        if (Config.getInstance().getAdminsId().contains(user_id)) {
+        if (Config.getAdminsId().contains(user_id)) {
             logger.info("user \"" + user_id + "\" have admin permission");
             return true;
         }

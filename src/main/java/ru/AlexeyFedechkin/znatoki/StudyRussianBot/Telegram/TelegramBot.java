@@ -59,12 +59,12 @@ public class TelegramBot extends TelegramLongPollingBot {
      */
     public void init(){
         try {
-            if (Config.getInstance().isUseProxy()) {
+            if (Config.isUseProxy()) {
                 Authenticator.setDefault(new Auth());
                 var botsApi = new TelegramBotsApi();
                 var botOptions = ApiContext.getInstance(DefaultBotOptions.class);
-                botOptions.setProxyHost(Config.getInstance().getProxyHost());
-                botOptions.setProxyPort(Config.getInstance().getProxyPort());
+                botOptions.setProxyHost(Config.getProxyHost());
+                botOptions.setProxyPort(Config.getProxyPort());
                 botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
                 logger.info("proxy configure");
                 botsApi.registerBot(new TelegramBot(botOptions));
@@ -133,7 +133,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     update.getMessage().getFrom().getId() + "\"");
             telegramParser.parseImage(update);
         }
-        if (!(Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
+        if (!(Redis.getInstance().checkRight(chatId) || Config.getAdminsId().contains(chatId))) {
             switch (telegramParser.getUsers().get(chatId).getStatus()) {
                 case WAIT_KEY:
                     if (!update.hasCallbackQuery()) {
@@ -165,7 +165,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     if (update.hasCallbackQuery()) {
                         telegramParser.parsCallback(update);
                     } else {
-                        for (var id : Config.getInstance().getAdminsId()) {
+                        for (var id : Config.getAdminsId()) {
                             org.telegram.telegrambots.meta.api.objects.User user = update.getMessage().getFrom();
                             if (update.getMessage().getFrom().getUserName() == null) {
                                 sender.send(resource.getStringByKey("STR_59") + user.getFirstName() + " "
@@ -195,12 +195,12 @@ public class TelegramBot extends TelegramLongPollingBot {
      * @return product or testing bot username
      */
     public String getBotUsername() {
-        if (Config.getInstance().isTesting()){
+        if (Config.isTesting()){
             logger.info("getting testing bot user name");
-            return Config.getInstance().getBotUserTestingName();
+            return Config.getBotUserTestingName();
         } else {
             logger.info("getting production bot user name");
-            return Config.getInstance().getBotUserName();
+            return Config.getBotUserName();
         }
     }
 
@@ -209,12 +209,12 @@ public class TelegramBot extends TelegramLongPollingBot {
      * @return production or testing bot token
      */
     public String getBotToken() {
-        if (Config.getInstance().isTesting()){
+        if (Config.isTesting()){
             logger.info("getting testing bot token");
-            return Config.getInstance().getBotTestingToken();
+            return Config.getBotTestingToken();
         } else {
             logger.info("getting production bot token");
-            return Config.getInstance().getBotToken();
+            return Config.getBotToken();
         }
     }
 }

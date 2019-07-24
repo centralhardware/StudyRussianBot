@@ -72,9 +72,15 @@ public class TelegramParser implements TelegramParserInt {
         switch (message) {
             case "/start":
                 user.reset();
-                sender.send(resource.getStringByKey("START_MESSAGE"),
-                        update.getMessage().getChatId());
-                inlineKeyboard.sendMenu(chatId);
+                if (Redis.getInstance().checkRight(chatId)){
+                    sender.send(resource.getStringByKey("START_MESSAGE"),
+                            update.getMessage().getChatId());
+                    inlineKeyboard.sendMenu(chatId);
+                } else {
+                    sender.send(resource.getStringByKey("START_MESSAGE"),
+                            update.getMessage().getChatId());
+                    inlineKeyboard.sendLoginInfo(chatId);
+                }
                 break;
             case "/help":
                 sender.send(resource.getStringByKey("HELP_MESSAGE"), chatId);
@@ -92,7 +98,7 @@ public class TelegramParser implements TelegramParserInt {
                 inlineKeyboard.sendMenu(chatId);
             default:
                 if (message.startsWith("/gen ")) {
-                    if (Config.getInstance().getAdminsId().contains(chatId)) {
+                    if (Config.getAdminsId().contains(chatId)) {
                         if (message.replace("/gen ", "").isEmpty()) {
                             sender.send(resource.getStringByKey("STR_31"), chatId);
                             return;
@@ -105,7 +111,7 @@ public class TelegramParser implements TelegramParserInt {
                     var args = message.replace("/ver ", "").split(" ");
                     String key = args[0];
                     String msg = args[1];
-                    if (Config.getInstance().getAdminsId().contains(chatId)) {
+                    if (Config.getAdminsId().contains(chatId)) {
                         sender.send(String.valueOf(rsa.validateKey(msg, key)), chatId);
                     } else {
                         sender.send(resource.getStringByKey("STR_47"), update.getMessage().getChatId());
@@ -207,7 +213,7 @@ public class TelegramParser implements TelegramParserInt {
                     sender.send(user.getProfile(),chatId);
                     break;
                 case "help":
-                    if ((Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId))) {
+                    if ((Redis.getInstance().checkRight(chatId) || Config.getAdminsId().contains(chatId))) {
                         sender.send(resource.getStringByKey("HELP_MESSAGE"), chatId);
                     } else {
                         sender.send(resource.getStringByKey("STR_32"), chatId);
@@ -289,7 +295,7 @@ public class TelegramParser implements TelegramParserInt {
     @Override
     public void parseAudio(Update update) {
         if (users.get(update.getMessage().getChatId()).getStatus() == UserStatus.WAIT_REPORT) {
-            for (long chatId : Config.getInstance().getAdminsId()) {
+            for (long chatId : Config.getAdminsId()) {
                 SendVoice sendVoice = new SendVoice();
                 sendVoice.setChatId(chatId);
                 sendVoice.setVoice(update.getMessage().getVoice().getFileId());
@@ -307,7 +313,7 @@ public class TelegramParser implements TelegramParserInt {
     @Override
     public void parseImage(Update update) {
         if (users.get(update.getMessage().getChatId()).getStatus() == UserStatus.WAIT_REPORT) {
-            for (long chatId : Config.getInstance().getAdminsId()) {
+            for (long chatId : Config.getAdminsId()) {
                 var photo = update.getMessage().getPhoto().get(update.getMessage().getPhoto().size() - 1);
                 var sendPhoto = new SendPhoto();
                 sendPhoto.setChatId(chatId);

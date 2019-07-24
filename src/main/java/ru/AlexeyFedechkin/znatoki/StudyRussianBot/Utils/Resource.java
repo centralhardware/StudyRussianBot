@@ -8,6 +8,7 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config;
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Interfaces.ResourceInt;
 
 import java.io.IOException;
@@ -29,7 +30,9 @@ public class Resource implements ResourceInt {
      * @return string by giving constant if value is exist
      */
     public String getStringByKey(String key){
-        logger.info("get string from resource bundle string.properties. key = " + key);
+        if (Config.isTesting()){
+            logger.info("get string from resource bundle string.properties. key = " + key);
+        }
         return resourceBundle.getString(key);
     }
 

@@ -35,7 +35,7 @@ public class RSA implements RSAInt {
         try{
             message += SOLID;
             signature = Signature.getInstance("SHA256withRSA");
-            String pkcs8Pem = Config.getInstance().getRsaPrivateKey();
+            String pkcs8Pem = Config.getRsaPrivateKey();
             pkcs8Pem = pkcs8Pem.replaceAll("\\s+","");
             byte [] pkcs8EncodedBytes = Base64.decode(pkcs8Pem.getBytes(StandardCharsets.UTF_8));
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(pkcs8EncodedBytes);
@@ -63,7 +63,7 @@ public class RSA implements RSAInt {
     public boolean validateKey(String userName, String key) {
         try{
             userName += SOLID;
-            String pkcs8Pem = Config.getInstance().getRsaPublicKey();
+            String pkcs8Pem = Config.getRsaPublicKey();
             pkcs8Pem = pkcs8Pem.replaceAll("\\s+","");
             byte [] pkcs8EncodedBytes = Base64.decode(pkcs8Pem.getBytes(StandardCharsets.UTF_8));
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(pkcs8EncodedBytes);

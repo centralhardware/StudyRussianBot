@@ -50,7 +50,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
         } else {
             userId = update.getMessage().getFrom().getId();
         }
-        if (!(Redis.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))) {
+        if (!(Redis.getInstance().checkRight(userId) || Config.getAdminsId().contains(userId))) {
             for (var i = 0; i < 3; i++) {
                 var ruleDescription = Data.getInstance().getWordManager().getRuleDescriptions().get(i);
                 builder.row().
@@ -121,7 +121,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
         } else {
             userId = update.getMessage().getFrom().getId();
         }
-        if (!(Redis.getInstance().checkRight(userId) || Config.getInstance().getAdminsId().contains(userId))) {
+        if (!(Redis.getInstance().checkRight(userId) || Config.getAdminsId().contains(userId))) {
             for (var i = 1; i < 4; i++) {
                 var rule = Data.getInstance().getWordManager().getRules().get(i);
                 builder.row();
@@ -181,7 +181,7 @@ public class InlineKeyboard implements InlineKeyboardInt {
      * @param chatId id of user
      */
     public void sendLoginInfo(long chatId) {
-        if (Redis.getInstance().checkRight(chatId) || Config.getInstance().getAdminsId().contains(chatId)) {
+        if (Redis.getInstance().checkRight(chatId) || Config.getAdminsId().contains(chatId)) {
             sender.send(resource.getStringByKey("STR_44"), chatId);
         } else {
             var builder = InlineKeyboardBuilder.create(chatId).
@@ -220,12 +220,12 @@ public class InlineKeyboard implements InlineKeyboardInt {
                 row().
                 button(resource.getStringByKey("STR_34"), "book").
                 endRow();
-        if (!Redis.getInstance().checkRight(chatId) && !Config.getInstance().getAdminsId().contains(chatId)) {
+        if (!Redis.getInstance().checkRight(chatId) && !Config.getAdminsId().contains(chatId)) {
             builder.row().
                     button(resource.getStringByKey("STR_36"), "login").
                     endRow();
         }
-        if (!Config.getInstance().getAdminsId().contains(chatId)) {
+        if (!Config.getAdminsId().contains(chatId)) {
             builder.
                     row().
                     button(resource.getStringByKey("STR_58"), "report").

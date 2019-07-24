@@ -13,13 +13,7 @@ import java.util.ResourceBundle;
  * access provides to config file
  */
 public class Config {
-    private static final Config ourInstance = new Config();
-
-    public static Config getInstance() {
-        return ourInstance;
-    }
-
-    private final ResourceBundle config;
+    private static final ResourceBundle config = ResourceBundle.getBundle("config");
     private static final String USER_NAME_KEY = "BOT_USER_NAME";
     private static final String TOKEN_KEY = "BOT_TOKEN";
     private static final String USER_TESTING_NAME_KEY = "BOT_TESTING_USER_NAME";
@@ -36,16 +30,12 @@ public class Config {
     private static final String RSA_PRIVATE_KEY = "RSA_PRIVATE_KEY";
     private static final String RSA_PUBLIC_KEY = "RSA_PUBLIC_KEY";
 
-    private Config() {
-        config = ResourceBundle.getBundle("config");
-    }
-
     /**
      * get list of user that have administration permission
      *
      * @return admin id list
      */
-    public ArrayList<Long> getAdminsId(){
+    public static ArrayList<Long> getAdminsId(){
         var admins = config.getString(ADMIN_ID).split(",");
         var adminsList = new ArrayList<Long>();
         for (String id : admins){
@@ -54,59 +44,59 @@ public class Config {
         return adminsList;
     }
 
-    public String getRsaPrivateKey(){
+    public static String getRsaPrivateKey(){
         return config.getString(RSA_PRIVATE_KEY);
     }
 
-    public String getRsaPublicKey(){
+    public static String getRsaPublicKey(){
         return config.getString(RSA_PUBLIC_KEY);
     }
 
-    public boolean isUseProxy(){
+    public static boolean isUseProxy(){
         return Boolean.parseBoolean(config.getString(IS_USE_PROXY_KEY));
     }
 
-    public String getBotUserName(){
+    public static String getBotUserName(){
         return config.getString(USER_NAME_KEY);
     }
 
-    public String getBotToken(){
+    public static String getBotToken(){
         return config.getString(TOKEN_KEY);
     }
 
-    public String getBotUserTestingName(){
+    public static String getBotUserTestingName(){
         return config.getString(USER_TESTING_NAME_KEY);
     }
 
-    public String getBotTestingToken(){
+    public static String getBotTestingToken(){
         return config.getString(TOKEN_TESTING_KEY);
     }
 
-    public String getProxyHost(){
+    public static String getProxyHost(){
         return config.getString(PROXY_HOST_KEY);
     }
 
-    public int getProxyPort(){
+    public static int getProxyPort(){
         return Integer.parseInt(config.getString(PROXY_PORT_KEY));
     }
 
-    public String getProxyUser(){
+    public static String getProxyUser(){
         return config.getString(PROXY_USER_KEY);
     }
 
-    public String getProxyPassword(){
+    public static String getProxyPassword(){
         return config.getString(PROXY_PASSWORD_KEY);
     }
 
-    public String getRedisHost(){
+    public static String getRedisHost(){
         return config.getString(REDIS_HOST_KEY);
     }
 
-    public int getRedisPort(){
+    public static int getRedisPort(){
         return Integer.parseInt(config.getString(REDIS_PORT_KEY));
     }
 
-    public boolean isTesting(){
+    public static boolean isTesting(){
         return Boolean.parseBoolean(config.getString(IS_TESTING_KEY));
     }
 }
