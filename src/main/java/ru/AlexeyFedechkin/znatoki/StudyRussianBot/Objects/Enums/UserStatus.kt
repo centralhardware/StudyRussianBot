@@ -1,15 +1,6 @@
-/*
- * Author: Fedechkin Alexey Borisovich
- * last modified: 22.06.19 12:55
- * Copyright (c) 2019
- */
+package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums
 
-package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums;
-
-/**
- *enumeration describe user status.
- */
-public enum UserStatus {
+enum class UserStatus {
     NONE,
     /**
      * passing the rules
