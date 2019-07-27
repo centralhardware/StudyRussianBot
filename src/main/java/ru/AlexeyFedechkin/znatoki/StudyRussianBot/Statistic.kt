@@ -23,11 +23,10 @@ object Statistic {
      * start timer schedule.
      */
     fun init() {
-        val period: Int
-        if (Config.isTesting) {
-            period = 1
+        val period: Int = if (Config.isTesting) {
+            1
         } else {
-            period = 60
+            60
         }
         val timer = Timer()
         val MILLISECONDS_IN_SECOND = 1000
@@ -130,13 +129,11 @@ object Statistic {
         }
 
         for (str in usersSent) {
-            res.userCountSent.put(java.lang.Long.valueOf(str.replace(Redis.COUNT_OF_SENT_MESSAGE_POSTFIX, "")),
-                    Integer.parseInt(Redis.getValue(str)))
+            res.userCountSent[java.lang.Long.valueOf(str.replace(Redis.COUNT_OF_SENT_MESSAGE_POSTFIX, ""))] = Integer.parseInt(Redis.getValue(str))
         }
 
         for (str in usersReceived) {
-            res.userCountSent.put(java.lang.Long.valueOf(str.replace(Redis.COUNT_OF_RECEIVED_MESSAGE_POSTFIX, "")),
-                    Integer.parseInt(Redis.getValue(str)))
+            res.userCountSent[java.lang.Long.valueOf(str.replace(Redis.COUNT_OF_RECEIVED_MESSAGE_POSTFIX, ""))] = Integer.parseInt(Redis.getValue(str))
         }
 
         res.userReceived = userReceivedRes

@@ -70,11 +70,11 @@ object WordManager {
         }
         // parse rule.json
         for (r in rules) {
-            if (r.section.equals("all")) {
+            if (r.section == "all") {
                 r.words.addAll(words)
             }
             for (w in words) {
-                if (r.section.equals(w.section)) {
+                if (r.section == w.section) {
                     r.words.add(w)
                 }
             }
@@ -88,7 +88,7 @@ object WordManager {
         // set pageNumbers for rule
         var count = 1
         for (rule in rules) {
-            rule.pageNumber = (count / Rule.pageCountRule) as Byte
+            rule.pageNumber = (count / Rule.pageCountRule)
             count++
         }
         for (r in rules) {
@@ -103,7 +103,7 @@ object WordManager {
         // set pageNumbers for rule description
         count = 1
         for (ruleDesc in ruleDescriptions) {
-            ruleDesc.pageNumber = ((count / Rule.pageCountRule).toByte())
+            ruleDesc.pageNumber = ((count / Rule.pageCountRule))
             count++
         }
     }
@@ -115,7 +115,7 @@ object WordManager {
      */
     fun getRuleDescriptionById(id: Int): RuleDescription? {
         for (ruleDescription in ruleDescriptions) {
-            if (ruleDescription.id === id) {
+            if (ruleDescription.id == id) {
                 return ruleDescription
             }
         }
@@ -129,7 +129,7 @@ object WordManager {
      */
     fun getRuleByName(rule: String): Rule? {
         for (r in rules) {
-            if (r.name.equals(rule)) {
+            if (r.name == rule) {
                 return r
             }
         }

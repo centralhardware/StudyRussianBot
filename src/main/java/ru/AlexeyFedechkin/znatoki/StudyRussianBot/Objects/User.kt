@@ -8,16 +8,14 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.WordManager
 import java.util.ArrayList
 import java.util.HashMap
 
-class User {
-    val chatId: Long
+class User(val chatId: Long) {
     var currRule: Rule? = null
     var status: UserStatus? = null
     var words: ArrayList<Word>
     var wrongWords: ArrayList<Word>
     var count = 0
 
-    constructor(chatId: Long){
-        this.chatId = chatId
+    init {
         this.status = UserStatus.NONE
         words = ArrayList()
         wrongWords = ArrayList()
@@ -62,10 +60,10 @@ class User {
         val rightPercent: Int
         val wright = Redis.getCountOfCheckedWord(chatId).toDouble()
         val wrong = Redis.getCountOfWrongCheckedWord(chatId).toDouble()
-        if (wrong != 0.0 && wright < wrong) {
-            rightPercent = (wright / wrong * 100).toInt()
+        rightPercent = if (wrong != 0.0 && wright < wrong) {
+            (wright / wrong * 100).toInt()
         } else {
-            rightPercent = 100
+            100
         }
         val builder = StringBuilder()
         builder.append(Resource.getStringByKey("STR_12")).append("\n").append(Resource.getStringByKey("STR_13")).append(Redis.getCountOfSentMessage(chatId)).append("\n")
@@ -75,12 +73,10 @@ class User {
                 builder.append(" - ").append("\"").append(rule.name).append("\"").append("\n")
             }
         }
-        if (Config.admins.contains(chatId)) {
-            builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_37"))
-        } else if (Redis.checkRight(chatId)) {
-            builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_38"))
-        } else {
-            builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_39"))
+        when {
+            Config.admins.contains(chatId) -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_37"))
+            Redis.checkRight(chatId) -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_38"))
+            else -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_39"))
         }
         return builder.toString()
     }

@@ -48,7 +48,7 @@ class TelegramParser {
     fun parseText(update: Update) {
         val message = update.message.text
         val chatId = update.message.chatId
-        val user = users.get(chatId)
+        val user = users[chatId]
         Redis.received(chatId)
         when (message) {
             "/start" -> {
@@ -110,14 +110,14 @@ class TelegramParser {
                             } else {
                                 user.status = UserStatus.TESTING
                                 user.words.addAll(user.currRule!!.getWord(count))
-                                sender.send(user.words.get(0).name, chatId)
+                                sender.send(user.words[0].name, chatId)
                             }
                         } catch (e: NumberFormatException) {
                             sender.send(Resource.getStringByKey("STR_2"), chatId)
                         }
 
                     }
-                    UserStatus.TESTING -> if (user.words.get(0).answer.toLowerCase().equals(message.toLowerCase())) {
+                    UserStatus.TESTING -> if (user.words[0].answer.toLowerCase() == message.toLowerCase()) {
                         sender.send(Resource.getStringByKey("STR_3"), chatId)
                         user.words.removeAt(0)
                         if (user.words.isEmpty()) {
@@ -128,16 +128,16 @@ class TelegramParser {
                             user.reset()
                             return
                         }
-                        sender.send(user.words.get(0).name, chatId)
+                        sender.send(user.words[0].name, chatId)
                         Redis.checkWord(user)
                     } else {
                         sender.send(Resource.getStringByKey("STR_5"), chatId)
                         Redis.checkWrongWord(user)
-                        val temp = user.words.get(0)
+                        val temp = user.words[0]
                         user.words.removeAt(0)
                         user.words.add(temp)
                         user.wrongWords.add(temp)
-                        sender.send(user.words.get(0).name, chatId)
+                        sender.send(user.words[0].name, chatId)
                     }
                 }
             }
@@ -176,41 +176,41 @@ class TelegramParser {
                                 return
                             }
                             user.count = count
-                            if (count > user!!.currRule!!.words.size) {
+                            if (count > user.currRule!!.words.size) {
                                 sender.send(Resource.getStringByKey("STR_1"), chatId)
                                 user.status = UserStatus.NONE
                                 user.words.clear()
                             } else {
                                 user.status = UserStatus.TESTING
-                                user.words.addAll(user!!.currRule!!.getWord(count))
-                                sender.send(user!!.words.get(0).name, chatId)
+                                user.words.addAll(user.currRule!!.getWord(count))
+                                sender.send(user.words[0].name, chatId)
                             }
                         } catch (e: NumberFormatException) {
                             sender.send(Resource.getStringByKey("STR_2"), chatId)
                         }
 
                     }
-                    UserStatus.TESTING -> if (user.words.get(0).answer.toLowerCase().equals(message.toLowerCase())) {
+                    UserStatus.TESTING -> if (user.words[0].answer.toLowerCase() == message.toLowerCase()) {
                         sender.send(Resource.getStringByKey("STR_3"), chatId)
-                        user!!.words.removeAt(0)
+                        user.words.removeAt(0)
                         if (user.words.isEmpty()) {
                             sender.send(Resource.getStringByKey("STR_4"), chatId)
-                            sender.send(user!!.getTestingResult(), chatId)
+                            sender.send(user.getTestingResult(), chatId)
                             Redis.checkRule(user)
                             inlineKeyboard.sendMenu(chatId!!)
                             user.reset()
                             return
                         }
-                        sender.send(user!!.words.get(0).name, chatId)
+                        sender.send(user.words[0].name, chatId)
                         Redis.checkWord(user)
                     } else {
                         sender.send(Resource.getStringByKey("STR_5"), chatId)
                         Redis.checkWrongWord(user)
-                        val temp = user!!.words.get(0)
+                        val temp = user.words[0]
                         user.words.removeAt(0)
                         user.words.add(temp)
                         user.wrongWords.add(temp)
-                        sender.send(user!!.words.get(0).name, chatId)
+                        sender.send(user.words[0].name, chatId)
                     }
                 }
             }
@@ -249,7 +249,7 @@ class TelegramParser {
             }
             "noreset_testing" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
-                sender.send(user!!.words.get(0).name, chatId)
+                sender.send(user!!.words[0].name, chatId)
                 return
             }
             "testing" -> inlineKeyboard.sendRuleInlineKeyboard(update, 0)
@@ -293,11 +293,11 @@ class TelegramParser {
         }
         if (callback.startsWith("to_")) {
             if (user!!.status !== UserStatus.WAIT_COUNT_OF_WORD && user!!.status !== UserStatus.TESTING) {
-                inlineKeyboard.sendRuleInlineKeyboard(update, callback.replace("to_", "").toByte())
+                inlineKeyboard.sendRuleInlineKeyboard(update, callback.replace("to_", "").toInt())
             }
         }
         if (callback.startsWith("book_to_")) {
-            inlineKeyboard.sendBookInlineKeyBoard(update, callback.replace("book_to_", "").toByte())
+            inlineKeyboard.sendBookInlineKeyBoard(update, callback.replace("book_to_", "").toInt())
         }
         if (callback.startsWith("book") && !callback.startsWith("book_to_")) {
             sender.send(WordManager.getRuleDescriptionById(Integer.parseInt(callback.replace("book", "")))!!.description, chatId)
@@ -326,7 +326,7 @@ class TelegramParser {
      * @param update
      */
     fun parseAudio(update: Update) {
-        if (users.get(update.message.chatId)!!.status === UserStatus.WAIT_REPORT) {
+        if (users[update.message.chatId]!!.status === UserStatus.WAIT_REPORT) {
             for (chatId in Config.admins) {
                 val sendVoice = SendVoice()
                 sendVoice.chatId = chatId.toString()
@@ -343,7 +343,7 @@ class TelegramParser {
      * @param update
      */
     fun parseImage(update: Update) {
-        if (users.get(update.message.chatId)!!.status === UserStatus.WAIT_REPORT) {
+        if (users[update.message.chatId]!!.status === UserStatus.WAIT_REPORT) {
             for (chatId in Config.admins) {
                 val photo = update.message.photo[update.message.photo.size - 1]
                 val sendPhoto = SendPhoto()

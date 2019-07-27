@@ -24,13 +24,13 @@ object Redis {
          * @param chatId id of user
          */
         fun received(chatId: Long) {
-            val count_of_received_message_key = chatId.toString() + COUNT_OF_RECEIVED_MESSAGE_POSTFIX
-            if (jedis.get(count_of_received_message_key) == null) {
-                jedis.set(count_of_received_message_key, "1")
+            val countOfReceivedMessageKey = chatId.toString() + COUNT_OF_RECEIVED_MESSAGE_POSTFIX
+            if (jedis.get(countOfReceivedMessageKey) == null) {
+                jedis.set(countOfReceivedMessageKey, "1")
             } else {
-                jedis.set(count_of_received_message_key, (Integer.parseInt(jedis.get(count_of_received_message_key)) + 1).toString())
+                jedis.set(countOfReceivedMessageKey, (Integer.parseInt(jedis.get(countOfReceivedMessageKey)) + 1).toString())
             }
-            logger.info("set key \"" + count_of_received_message_key + "\" value \"" + jedis.get(count_of_received_message_key) + "\"")
+            logger.info("set key \"" + countOfReceivedMessageKey + "\" value \"" + jedis.get(countOfReceivedMessageKey) + "\"")
 
             if (jedis.get(COUNT_OF_RECEIVED_MESSAGE_KEY) == null) {
                 jedis.set(COUNT_OF_RECEIVED_MESSAGE_KEY, "1")
@@ -45,13 +45,13 @@ object Redis {
          * @param chatId id of user
          */
         fun sent(chatId: Long) {
-            val count_of_sent_message_key = chatId.toString() + COUNT_OF_SENT_MESSAGE_POSTFIX
-            if (jedis.get(count_of_sent_message_key) == null) {
-                jedis.set(count_of_sent_message_key, "1")
+            val countOfSentMessageKey = chatId.toString() + COUNT_OF_SENT_MESSAGE_POSTFIX
+            if (jedis.get(countOfSentMessageKey) == null) {
+                jedis.set(countOfSentMessageKey, "1")
             } else {
-                jedis.set(count_of_sent_message_key, (Integer.parseInt(jedis.get(count_of_sent_message_key)) + 1).toString())
+                jedis.set(countOfSentMessageKey, (Integer.parseInt(jedis.get(countOfSentMessageKey)) + 1).toString())
             }
-            logger.info("set key \"" + count_of_sent_message_key + "\" value \"" + jedis.get(count_of_sent_message_key) + "\"")
+            logger.info("set key \"" + countOfSentMessageKey + "\" value \"" + jedis.get(countOfSentMessageKey) + "\"")
 
             if (jedis.get(COUNT_OF_SENT_MESSAGE_KEY) == null) {
                 jedis.set(COUNT_OF_SENT_MESSAGE_KEY, "1")
@@ -104,8 +104,8 @@ object Redis {
          */
         fun getCountOfSentMessage(chatId: Long): String {
             logger.info("get count of message")
-            val count_of_received_message_key = chatId.toString() + COUNT_OF_RECEIVED_MESSAGE_POSTFIX
-            return jedis.get(count_of_received_message_key)
+            val countOfReceivedMessageKey = chatId.toString() + COUNT_OF_RECEIVED_MESSAGE_POSTFIX
+            return jedis.get(countOfReceivedMessageKey)
         }
 
         /**
@@ -115,8 +115,8 @@ object Redis {
          */
         fun getCountOfReceivedMessage(chatId: Long): String {
             logger.info("get count of received message")
-            val count_of_sent_message_key = chatId.toString() + COUNT_OF_SENT_MESSAGE_POSTFIX
-            return jedis.get(count_of_sent_message_key)
+            val countOfSentMessageKey = chatId.toString() + COUNT_OF_SENT_MESSAGE_POSTFIX
+            return jedis.get(countOfSentMessageKey)
         }
 
         /**
@@ -148,8 +148,8 @@ object Redis {
          */
         fun checkWord(user: User) {
             val checkWordKey = user.chatId.toString() + CHECKED_WORD_POSTFIX
-            jedis.sadd(checkWordKey, user.words.get(0).name)
-            logger.info("add value \"" + user.words.get(0).name + "\" to set by key \"" + checkWordKey + "\"")
+            jedis.sadd(checkWordKey, user.words[0].name)
+            logger.info("add value \"" + user.words[0].name + "\" to set by key \"" + checkWordKey + "\"")
         }
 
         /**
@@ -159,8 +159,8 @@ object Redis {
          */
         fun checkWrongWord(user: User) {
             val checkWordKey = user.chatId.toString() + CHECKED_WRONG_WORD_POSTFIX
-            jedis.sadd(checkWordKey, user.words.get(0).name)
-            logger.info("add value \"" + user.words.get(0).name + "\" to set by key \"" + checkWordKey + "\"")
+            jedis.sadd(checkWordKey, user.words[0].name)
+            logger.info("add value \"" + user.words[0].name + "\" to set by key \"" + checkWordKey + "\"")
         }
 
         /**
@@ -175,12 +175,12 @@ object Redis {
             }
             val checkRightKey = user_id.toString() + KEY_POSTFIX
             val key = jedis.get(checkRightKey)
-            if (key != null) {
+            return if (key != null) {
                 logger.info("right for user = \"$user_id\" valid")
-                return true
+                true
             } else {
                 logger.info("right for user = \"$user_id\" don't valid")
-                return false
+                false
             }
         }
 

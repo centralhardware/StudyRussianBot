@@ -73,11 +73,10 @@ class TelegramBot : TelegramLongPollingBot{
         if (telegramParser == null) {
             telegramParser = TelegramParser(sender)
         }
-        val chatId: Long
-        if (update.hasCallbackQuery()) {
-            chatId = update.callbackQuery.message.chatId!!
+        val chatId: Long = if (update.hasCallbackQuery()) {
+            update.callbackQuery.message.chatId!!
         } else {
-            chatId = update.message.chatId!!
+            update.message.chatId!!
         }
         Statistic.checkReceived(chatId)
         if (update.hasCallbackQuery()) {

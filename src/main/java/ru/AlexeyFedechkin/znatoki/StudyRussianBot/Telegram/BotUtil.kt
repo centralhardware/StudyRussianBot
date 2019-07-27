@@ -22,7 +22,7 @@ class BotUtil(private val sender: Sender) {
                     Resource.getStringByKey("STR_49") + userStatistic.totalCountOfSend + "\n" +
                     Resource.getStringByKey("STR_50") + userStatistic.totalCountReceived + "\n" +
                     Resource.getStringByKey("STR_51") + userStatistic.userReceived.size + "\n"
-            sender.send(statString, chatId!!)
+            sender.send(statString, chatId)
             try {
                 sender.send(Chart.genOneLineGraf(Resource.getStringByKey("STR_52"),
                         Resource.getStringByKey("STR_53"),

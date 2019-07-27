@@ -11,14 +11,8 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Statistic
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis
 import java.io.File
 
-class Sender {
+class Sender(private val telegramBot: TelegramBot) {
     private val logger = KotlinLogging.logger {  }
-
-    private val telegramBot: TelegramBot
-
-    constructor(telegramBot: TelegramBot){
-        this.telegramBot = telegramBot
-    }
 
     /**
      * send message to telegram user

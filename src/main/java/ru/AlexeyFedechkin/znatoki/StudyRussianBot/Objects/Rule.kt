@@ -3,32 +3,21 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.WordManager
 import java.util.*
 
-class Rule {
-    val name: String
-    var parent: Rule? = null
-    val section: String
-    val words: ArrayList<Word>
-    var pageNumber: Byte = 0
+class Rule(val name: String, var parent: Rule?, val section: String, val words: ArrayList<Word>) {
+    var pageNumber: Int = 0
 
-
-    constructor(name: String, parent: Rule?, section: String, words: ArrayList<Word>){
-        this.name = name
-        this.parent = parent
-        this.words = words
-        this.section = section
-    }
 
     companion object{
         const val pageCountRule = 10
-        val maxRulePage : Byte
-            public get() {
+        val maxRulePage : Int
+            get() {
                 var max = 0
                 for (rule in WordManager.rules) {
                     if (rule.pageNumber > max) {
                         max = rule.pageNumber.toInt()
                     }
                 }
-                return max.toByte()
+                return max
             }
     }
 

@@ -7,7 +7,6 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram.TelegramBot
 private val logger = KotlinLogging.logger {  }
 /**
  * init telegram ApiContext and telegram bot, statistic
- * @param args never use
  */
 fun main(){
     WordManager.init()

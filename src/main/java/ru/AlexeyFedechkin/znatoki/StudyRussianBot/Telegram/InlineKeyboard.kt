@@ -8,18 +8,13 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.WordManager
 
-class InlineKeyboard {
+class InlineKeyboard
+/**
+ * set telegramBot
+ *
+ * @param sender instance of telegram bot
+ */(private val sender: Sender) {
     private val logger = KotlinLogging.logger {  }
-    private val sender: Sender
-
-    /**
-     * set telegramBot
-     *
-     * @param sender instance of telegram bot
-     */
-    constructor(sender: Sender){
-        this.sender = sender
-    }
 
     /**
      * send the user a message from the language selection help menu
@@ -27,7 +22,7 @@ class InlineKeyboard {
      * @param update object with received message
      * @param pageNumber number of page to select
      */
-    fun sendBookInlineKeyBoard(update: Update, pageNumber: Byte) {
+    fun sendBookInlineKeyBoard(update: Update, pageNumber: Int) {
         val chatId: Long
         var message = ""
         if (update.hasCallbackQuery()) {
@@ -38,15 +33,14 @@ class InlineKeyboard {
         }
         logger.info("send book keyboard rules")
         val builder = InlineKeyboardBuilder.create(chatId).setText(Resource.getStringByKey("STR_42"))
-        val userId: Long
-        if (update.hasCallbackQuery()) {
-            userId = update.callbackQuery.from.id!!.toLong()
+        val userId: Long = if (update.hasCallbackQuery()) {
+            update.callbackQuery.from.id!!.toLong()
         } else {
-            userId = update.message.from.id!!.toLong()
+            update.message.from.id!!.toLong()
         }
         if (!(Redis.checkRight(userId) || Config.admins.contains(userId))) {
             for (i in 0..2) {
-                val ruleDescription = WordManager.ruleDescriptions.get(i)
+                val ruleDescription = WordManager.ruleDescriptions[i]
                 builder.row().button(ruleDescription.name, "book" + ruleDescription.id).endRow()
             }
         } else {
@@ -57,7 +51,7 @@ class InlineKeyboard {
             }
         }
         // add buttons to go to other page
-        if (pageNumber == 0.toByte()) {
+        if (pageNumber == 0) {
             builder.row().button(Resource.getStringByKey("STR_17"), "book_to_1").button(Resource.getStringByKey("STR_24"), "menu").endRow()
             if (message != "/book") {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
@@ -82,7 +76,7 @@ class InlineKeyboard {
      * @param update object with received message
      * @param pageNumber number of page to select
      */
-    fun sendRuleInlineKeyboard(update: Update, pageNumber: Byte) {
+    fun sendRuleInlineKeyboard(update: Update, pageNumber: Int) {
         val chatId: Long
         var message = ""
         if (update.hasCallbackQuery()) {
@@ -93,15 +87,14 @@ class InlineKeyboard {
         }
         logger.info("send inline keyboard rules")
         val builder = InlineKeyboardBuilder.create(chatId).setText(Resource.getStringByKey("STR_8"))
-        val userId: Long
-        if (update.hasCallbackQuery()) {
-            userId = update.callbackQuery.from.id!!.toLong()
+        val userId: Long = if (update.hasCallbackQuery()) {
+            update.callbackQuery.from.id!!.toLong()
         } else {
-            userId = update.message.from.id!!.toLong()
+            update.message.from.id!!.toLong()
         }
         if (!(Redis.checkRight(userId) || Config.admins.contains(userId))) {
             for (i in 1..3) {
-                val rule = WordManager.rules.get(i)
+                val rule = WordManager.rules[i]
                 builder.row()
                 if (Redis.isCheckRule(chatId, rule.name)) {
                     builder.button("✅" + rule.name, rule.section)
@@ -124,7 +117,7 @@ class InlineKeyboard {
             }
         }
         // add buttons to got to other pages
-        if (pageNumber == 0.toByte()) {
+        if (pageNumber == 0) {
             builder.row().button(Resource.getStringByKey("STR_17"), "to_1").button(Resource.getStringByKey("STR_24"), "menu").endRow()
             if (message != "/rules") {
                 sender.delete(chatId, update.callbackQuery.message.messageId)

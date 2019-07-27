@@ -5,17 +5,15 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton
 import java.util.ArrayList
 
-class InlineKeyboardBuilder {
+class InlineKeyboardBuilder
+/**
+ * need to ban creation of instance of class without create method
+ */ private constructor() {
     private var chatId: Long? = null
     private var text: String? = null
 
     private val keyboard = ArrayList<List<InlineKeyboardButton>>()
     private var row: MutableList<InlineKeyboardButton>? = null
-
-    /**
-     * need to ban creation of instance of class without create method
-     */
-    private constructor(){}
 
     companion object{
         /**

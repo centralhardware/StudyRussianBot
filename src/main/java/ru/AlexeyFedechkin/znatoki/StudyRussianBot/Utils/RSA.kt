@@ -12,8 +12,8 @@ import java.security.spec.X509EncodedKeySpec
 object RSA {
     private val logger = KotlinLogging.logger {  }
     private const val SOLID = "aYbWZRqZgBWkxQL2z8Z4kWPBz"
-    var signature : Signature = Signature.getInstance("SHA256withRSA")
-    val base64 = org.apache.commons.codec.binary.Base64()
+    private var signature : Signature = Signature.getInstance("SHA256withRSA")
+    private val base64 = org.apache.commons.codec.binary.Base64()
     /**
      * generate activated code.
      * sign signature with giving message (userName of telegram user).
