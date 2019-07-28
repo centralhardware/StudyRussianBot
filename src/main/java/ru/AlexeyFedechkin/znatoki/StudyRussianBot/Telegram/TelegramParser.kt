@@ -12,18 +12,16 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.WordManager
 import java.util.HashMap
 
-class TelegramParser {
-    private val sender: Sender
+class TelegramParser
+/**
+ * set telegramBot and create InlineKeyboard
+ * @param sender object for sending message
+ */(private val sender: Sender) {
     private var inlineKeyboard: InlineKeyboard
     private var botUtil: BotUtil
     val users = HashMap<Long, User>()
 
-    /**
-     * set telegramBot and create InlineKeyboard
-     * @param sender object for sending message
-     */
-    constructor(sender: Sender){
-        this.sender = sender
+    init {
         inlineKeyboard = InlineKeyboard(sender)
         botUtil = BotUtil(sender)
     }

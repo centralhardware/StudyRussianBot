@@ -7,8 +7,7 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Rule
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.RuleDescription
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Word
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource
-import java.io.IOException
-import java.util.ArrayList
+import java.util.*
 
 object WordManager {
     private val logger = Logger.getLogger(WordManager::class.java)
@@ -36,7 +35,6 @@ object WordManager {
      * "name":"",
      * "description": "",
      * }
-     * @throws IOException file not find or other IO problem
      */
      init {
         // get Strings from files

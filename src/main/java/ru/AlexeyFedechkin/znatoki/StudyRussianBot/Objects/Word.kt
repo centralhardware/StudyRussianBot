@@ -4,20 +4,11 @@ import mu.KotlinLogging
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.SchoolStage
 
-class Word {
-    val wrightName: String
-    val name: String
-    val section: String
-    val answer: String
-    private val schoolStage: SchoolStage
-
-    constructor(wrightName: String, name: String, section: String, answer: String, schoolStage: SchoolStage){
-        this.wrightName = wrightName
-        this.name = name
-        this.answer = answer
-        this.schoolStage = schoolStage
-        this.section = section
-    }
+class Word(val wrightName: String,
+           val name: String,
+           val section: String,
+           val answer: String,
+           private val schoolStage: SchoolStage) {
 
     companion object{
         private val logger = KotlinLogging.logger {  }
