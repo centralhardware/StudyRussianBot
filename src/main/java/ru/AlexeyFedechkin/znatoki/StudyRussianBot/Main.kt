@@ -9,8 +9,6 @@ private val logger = KotlinLogging.logger {  }
  * init telegram ApiContext and telegram bot, statistic
  */
 fun main(){
-    WordManager.init()
-    logger.info("init data")
     logger.info("program start")
     ApiContextInitializer.init()
     logger.info("api context init")

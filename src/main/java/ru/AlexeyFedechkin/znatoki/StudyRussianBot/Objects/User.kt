@@ -34,8 +34,13 @@ class User(val chatId: Long) {
      */
     fun getTestingResult(): String {
         val builder = StringBuilder()
-        builder.append(Resource.getStringByKey("STR_10")).append(count).append("\n")
-        builder.append(Resource.getStringByKey("STR_11")).append("\n")
+        builder.
+                append(Resource.getStringByKey("STR_10")).
+                append(count).
+                append("\n")
+        builder.
+                append(Resource.getStringByKey("STR_11")).
+                append("\n")
         val result = HashMap<String, Int>()
         for (word in wrongWords) {
             if (!result.containsKey(word.wrightName)) {
@@ -45,9 +50,17 @@ class User(val chatId: Long) {
             }
         }
         for (key in result.keys) {
-            builder.append(key).append(" - ").append(result[key]).append("\n")
+            builder.
+                    append(key).
+                    append(" - ").
+                    append(result[key]).
+                    append("\n")
         }
-        builder.append("всего ").append(result.size).append(" слов").append("\n")
+        builder.
+                append("всего ").
+                append(result.size).
+                append(" слов").
+                append("\n")
         return builder.toString()
     }
 
@@ -59,24 +72,54 @@ class User(val chatId: Long) {
     fun getProfile(): String {
         val rightPercent: Int
         val wright = Redis.getCountOfCheckedWord(chatId).toDouble()
-        val wrong = Redis.getCountOfWrongCheckedWord(chatId).toDouble()
-        rightPercent = if (wrong != 0.0 && wright < wrong) {
-            (wright / wrong * 100).toInt()
+        val all = Redis.getCountOfWrongCheckedWord(chatId).toDouble() + Redis.getCountOfCheckedWord(chatId).toDouble()
+        rightPercent = if (all != 0.0 && wright < all) {
+            (wright / all * 100).toInt()
         } else {
             100
         }
         val builder = StringBuilder()
-        builder.append(Resource.getStringByKey("STR_12")).append("\n").append(Resource.getStringByKey("STR_13")).append(Redis.getCountOfSentMessage(chatId)).append("\n")
-                .append(Resource.getStringByKey("STR_14")).append(Redis.getCountOfReceivedMessage(chatId)).append("\n").append(Resource.getStringByKey("STR_15")).append(Redis.getCountOfCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_45")).append(Redis.getCountOfWrongCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_46")).append(rightPercent).append("%").append("\n").append(Resource.getStringByKey("STR_16")).append("\n")
+        builder.
+                append(Resource.getStringByKey("STR_12")).
+                append("\n").
+                append(Resource.getStringByKey("STR_13")).
+                append(Redis.getCountOfSentMessage(chatId)).
+                append("\n").
+                append(Resource.getStringByKey("STR_14")).
+                append(Redis.getCountOfReceivedMessage(chatId)).
+                append("\n").
+                append(Resource.getStringByKey("STR_15")).
+                append(Redis.getCountOfCheckedWord(chatId)).
+                append("\n").
+                append(Resource.getStringByKey("STR_45")).
+                append(Redis.getCountOfWrongCheckedWord(chatId)).
+                append("\n").
+                append(Resource.getStringByKey("STR_46")).
+                append(rightPercent).
+                append("%").
+                append("\n").
+                append(Resource.getStringByKey("STR_16")).
+                append("\n")
         for (rule in WordManager.rules) {
             if (Redis.isCheckRule(chatId, rule.name)) {
-                builder.append(" - ").append("\"").append(rule.name).append("\"").append("\n")
+                builder.
+                        append(" - ").
+                        append("\"").
+                        append(rule.name).
+                        append("\"").
+                        append("\n")
             }
         }
         when {
-            Config.admins.contains(chatId) -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_37"))
-            Redis.checkRight(chatId) -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_38"))
-            else -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_39"))
+            Config.admins.contains(chatId) -> builder.
+                    append(Resource.getStringByKey("STR_35")).
+                    append(Resource.getStringByKey("STR_37"))
+            Redis.checkRight(chatId) -> builder.
+                    append(Resource.getStringByKey("STR_35")).
+                    append(Resource.getStringByKey("STR_38"))
+            else -> builder.
+                    append(Resource.getStringByKey("STR_35")).
+                    append(Resource.getStringByKey("STR_39"))
         }
         return builder.toString()
     }

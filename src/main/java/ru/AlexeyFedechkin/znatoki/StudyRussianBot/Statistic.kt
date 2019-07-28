@@ -4,6 +4,9 @@ import mu.KotlinLogging
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.UserStatistic
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashMap
 
 object Statistic {
     private val logger =KotlinLogging.logger {  }
@@ -45,6 +48,7 @@ object Statistic {
                 clearVariable()
             }
         }, 1, (MILLISECONDS_IN_SECOND * SECOND_IN_MINUTE * period).toLong())
+
     }
 
     /**

@@ -38,8 +38,7 @@ object WordManager {
      * }
      * @throws IOException file not find or other IO problem
      */
-    @Throws(IOException::class)
-    fun init() {
+     init {
         // get Strings from files
         val wordString = Resource.getStringFromResources("word.json")
         val ruleString = Resource.getStringFromResources("rule.json")
@@ -73,26 +72,26 @@ object WordManager {
             if (r.section == "all") {
                 r.words.addAll(words)
             }
-            for (w in words) {
-                if (r.section == w.section) {
-                    r.words.add(w)
+            for (word in words) {
+                if (r.section == word.section) {
+                    r.words.add(word)
                 }
             }
         }
         // set word to child rule from parent
-        for (r in rules) {
-            if (r.parent != null) {
-                r.parent!!.words.addAll(r.words)
+        for (rule in rules) {
+            if (rule.parent != null) {
+                rule.parent!!.words.addAll(rule.words)
             }
         }
         // set pageNumbers for rule
         var count = 1
         for (rule in rules) {
-            rule.pageNumber = (count / Rule.pageCountRule)
+            rule.pageNumber = count / Rule.pageCountRule
             count++
         }
-        for (r in rules) {
-            logger.info("in rule \"" + r.name + "\" added " + r.words.size + "  words")
+        for (rule in rules) {
+            logger.info("in rule \"" + rule.name + "\" added " + rule.words.size + "  words")
         }
         // parse ruleDesc.json
         val ruleDescriptionArray = JSONArray(ruleDescriptionString)
@@ -102,10 +101,11 @@ object WordManager {
         }
         // set pageNumbers for rule description
         count = 1
-        for (ruleDesc in ruleDescriptions) {
-            ruleDesc.pageNumber = ((count / Rule.pageCountRule))
+        for (ruleDescription in ruleDescriptions) {
+            ruleDescription.pageNumber = ((count / Rule.pageCountRule))
             count++
         }
+        logger.info("init data")
     }
 
     /**

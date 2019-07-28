@@ -8,16 +8,15 @@ class Rule(val name: String, var parent: Rule?, val section: String, val words: 
 
 
     companion object{
-        const val pageCountRule = 10
-        val maxRulePage : Int
-            get() {
+        const val pageCountRule = 5
+        val maxRulePage : Int by lazy  {
                 var max = 0
                 for (rule in WordManager.rules) {
                     if (rule.pageNumber > max) {
-                        max = rule.pageNumber.toInt()
+                        max = rule.pageNumber
                     }
                 }
-                return max
+                max
             }
     }
 
