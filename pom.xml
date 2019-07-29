@@ -100,7 +100,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>ru.AlexeyFedechkin.znatoki.StudyRussianBot.MainKt</mainClass>
+                                    <mainClass>ru.alexeyFedechkin.znatoki.studyRussianBot.MainKt</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
