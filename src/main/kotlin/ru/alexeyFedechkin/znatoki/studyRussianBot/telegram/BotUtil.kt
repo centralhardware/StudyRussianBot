@@ -3,12 +3,15 @@ package ru.alexeyFedechkin.znatoki.studyRussianBot.telegram
 import mu.KotlinLogging
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Statistic
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Chart
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.ChartUtil
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Resource
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Chart
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.ChartUtil
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
 
+/**
+ *Util class for telegram bot
+ */
 class BotUtil(private val sender: Sender) {
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
 
     /**
      * send to admin bot statistic

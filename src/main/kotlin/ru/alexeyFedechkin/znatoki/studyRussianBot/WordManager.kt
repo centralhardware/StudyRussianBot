@@ -3,16 +3,25 @@ package ru.alexeyFedechkin.znatoki.studyRussianBot
 import org.apache.log4j.Logger
 import org.json.JSONArray
 import org.json.JSONObject
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.Rule
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.RuleDescription
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.Word
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Resource
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.Rule
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.RuleDescription
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.Word
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
 import java.util.*
 
+/**
+ *object contains rule and rule description collection
+ */
 object WordManager {
     private val logger = Logger.getLogger(WordManager::class.java)
-    val rules = ArrayList<Rule>()
-    val ruleDescriptions = ArrayList<RuleDescription>()
+    /**
+     * List of rules
+     */
+    val rules: ArrayList<Rule> = ArrayList<Rule>()
+    /**
+     * List of rule description
+     */
+    val ruleDescriptions: ArrayList<RuleDescription> = ArrayList<RuleDescription>()
 
     /**
      * parseText all data file and generate collections of object
@@ -36,7 +45,7 @@ object WordManager {
      * "description": "",
      * }
      */
-     init {
+    init {
         // get Strings from files
         val wordString = Resource.getStringFromResources("word.json")
         val ruleString = Resource.getStringFromResources("rule.json")
@@ -94,8 +103,8 @@ object WordManager {
         // parse ruleDesc.json
         val ruleDescriptionArray = JSONArray(ruleDescriptionString)
         for (ruleDesc in ruleDescriptionArray) {
-            val `object` = ruleDesc as JSONObject
-            ruleDescriptions.add(RuleDescription(`object`.getString("name"), `object`.getString("description"), `object`.getInt("id")))
+            val ruleDescription = ruleDesc as JSONObject
+            ruleDescriptions.add(RuleDescription(ruleDescription.getString("name"), ruleDescription.getString("description"), ruleDescription.getInt("id")))
         }
         // set pageNumbers for rule description
         count = 1

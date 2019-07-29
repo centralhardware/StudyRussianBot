@@ -1,15 +1,20 @@
 package ru.alexeyFedechkin.znatoki.studyRussianBot
 
 import mu.KotlinLogging
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.UserStatistic
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Redis
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.UserStatistic
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
+/**
+ *collect user and bot statistic
+ * save statistic to redis every hour for production and
+ * one minute for testing mode
+ */
 object Statistic {
-    private val logger =KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
     private const val TOTAL_SENT_KEY = "total_sent"
     private const val TOTAL_RECEIVED_KEY = "total_received"
     private const val USER_SEND_KEY = "_send"
@@ -21,14 +26,14 @@ object Statistic {
     private val countReceivedForUser = Collections.synchronizedMap(LinkedHashMap<Long, Int>())
     private val countSentForUser = Collections.synchronizedMap(LinkedHashMap<Long, Int>())
 
-    private const val  MILLISECONDS_IN_SECOND  = 1000
-    private const val  SECOND_IN_MINUTE        = 60
+    private const val MILLISECONDS_IN_SECOND = 1000
+    private const val SECOND_IN_MINUTE = 60
 
     /**
      * save statistic to redis
      * start timer schedule.
      */
-    fun init(){
+    fun init() {
         val period: Int = if (Config.isTesting) {
             1
         } else {

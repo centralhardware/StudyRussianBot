@@ -4,14 +4,24 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto
 import org.telegram.telegrambots.meta.api.methods.send.SendVoice
 import org.telegram.telegrambots.meta.api.objects.Update
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.Enums.UserStatus.*
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.User
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.RSA
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Redis
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Resource
 import ru.alexeyFedechkin.znatoki.studyRussianBot.WordManager
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus.*
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.User
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.RSA
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
 import java.util.*
 
+/**
+ *parse message
+ * support type:
+ * - text
+ * - callback
+ * - audio
+ * - image
+ *
+ * @property sender instance of sender class
+ */
 class TelegramParser
 /**
  * set telegramBot and create InlineKeyboard
@@ -19,7 +29,10 @@ class TelegramParser
  */(private val sender: Sender) {
     private var inlineKeyboard: InlineKeyboard = InlineKeyboard(sender)
     private var botUtil: BotUtil = BotUtil(sender)
-    val users = HashMap<Long, User>()
+    /**
+     *
+     */
+    val users: HashMap<Long, User> = HashMap<Long, User>()
 
     /**
      * parse text message
@@ -56,13 +69,13 @@ class TelegramParser
                     inlineKeyboard.sendLoginInfo(chatId!!)
                 }
             }
-            "/help"     -> sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
-            "/rules"    -> inlineKeyboard.sendRuleInlineKeyboard(update, 0)
-            "/book"     -> inlineKeyboard.sendBookInlineKeyBoard(update, 0)
-            "/profile"  -> sender.send(user!!.getProfile(), chatId)
-            "/menu"     -> inlineKeyboard.sendMenu(chatId!!)
+            "/help" -> sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
+            "/rules" -> inlineKeyboard.sendRuleInlineKeyboard(update, 0)
+            "/book" -> inlineKeyboard.sendBookInlineKeyBoard(update, 0)
+            "/profile" -> sender.send(user!!.getProfile(), chatId)
+            "/menu" -> inlineKeyboard.sendMenu(chatId!!)
             else -> {
-                when{
+                when {
                     message.startsWith("/gen ") -> {
                         if (Config.admins.contains(chatId)) {
                             if (message.replace("/gen ", "").isEmpty()) {
@@ -84,7 +97,7 @@ class TelegramParser
                             sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
                         }
                     }
-                    message.startsWith("/stat") ->  botUtil.sendStatistic(chatId)
+                    message.startsWith("/stat") -> botUtil.sendStatistic(chatId)
                     message.startsWith("/") -> sender.send(Resource.getStringByKey("STR_101"), chatId)
                     else -> when (user!!.status) {
                         WAIT_COUNT_OF_WORD -> {
@@ -202,8 +215,8 @@ class TelegramParser
             }
             "statistic" -> botUtil.sendStatistic(chatId)
             else -> {
-                when{
-                    callback.startsWith("to_") ->{
+                when {
+                    callback.startsWith("to_") -> {
                         if (user!!.status !== WAIT_COUNT_OF_WORD && user!!.status !== TESTING) {
                             inlineKeyboard.sendRuleInlineKeyboard(update, callback.replace("to_", "").toInt())
                         }
@@ -212,12 +225,7 @@ class TelegramParser
                         inlineKeyboard.sendBookInlineKeyBoard(update, callback.replace("book_to_", "").toInt())
                     callback.startsWith("book") && !callback.startsWith("book_to_") -> {
                         sender.send(WordManager.getRuleDescriptionById(Integer.parseInt(callback.replace("book", "")))!!.description, chatId)
-                        val builder = InlineKeyboardBuilder.
-                                create(chatId).
-                                setText(Resource.getStringByKey("STR_18")).
-                                row().
-                                button("↑", "book").
-                                endRow()
+                        val builder = InlineKeyboardBuilder.create(chatId).setText(Resource.getStringByKey("STR_18")).row().button("↑", "book").endRow()
                         sender.send(builder.build())
                     }
                     user!!.status === NONE -> {
@@ -233,12 +241,7 @@ class TelegramParser
                     }
                     user!!.status != NONE -> {
                         sender.delete(chatId, update.callbackQuery.message.messageId)
-                        val builder = InlineKeyboardBuilder.
-                                create(chatId).setText(Resource.getStringByKey("STR_9")).
-                                row().
-                                button(Resource.getStringByKey("YES"), "reset_testing").
-                                button(Resource.getStringByKey("NO"), "noreset_testing").
-                                endRow()
+                        val builder = InlineKeyboardBuilder.create(chatId).setText(Resource.getStringByKey("STR_9")).row().button(Resource.getStringByKey("YES"), "reset_testing").button(Resource.getStringByKey("NO"), "noreset_testing").endRow()
                         sender.send(builder.build())
                     }
                 }

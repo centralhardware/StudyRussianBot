@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.Utils
+package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
 
 import org.junit.Assert.assertTrue
 import org.junit.Test

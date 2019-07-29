@@ -8,34 +8,36 @@ import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.Enums.UserStatus.*
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.User
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Statistic
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.RSA
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Redis
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Resource
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus.*
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.User
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.RSA
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
 import kotlin.system.exitProcess
 
-class TelegramBot : TelegramLongPollingBot{
-    private val logger = KotlinLogging.logger {  }
+/**
+ *telegram bot class
+ */
+class TelegramBot : TelegramLongPollingBot {
+    private val logger = KotlinLogging.logger { }
     private var telegramParser: TelegramParser? = null
     private var inlineKeyboard: InlineKeyboard
-    private var sender: Sender
+    private var sender: Sender = Sender(this)
 
     /**
      * set proxy setting
      * @param botOptions proxy option
      */
-    constructor(botOptions: DefaultBotOptions): super(botOptions){
-        sender = Sender(this)
-        inlineKeyboard = InlineKeyboard(sender)
-    }
+    constructor(botOptions: DefaultBotOptions) : super(botOptions)
 
     /**
      * need to create instance from main class
      */
-    constructor(){
-        sender = Sender(this)
+    constructor() {
+    }
+
+    init {
         inlineKeyboard = InlineKeyboard(sender)
     }
 
@@ -79,7 +81,7 @@ class TelegramBot : TelegramLongPollingBot{
             update.message.chatId!!
         }
         Statistic.checkReceived(chatId)
-        when{
+        when {
             update.hasCallbackQuery() -> {
                 logger.info("receive callback \"" + update.callbackQuery.data + "\" " +
                         update.callbackQuery.from.firstName + "\" " +
@@ -168,8 +170,8 @@ class TelegramBot : TelegramLongPollingBot{
                     }
                 }
             }
-            update.hasCallbackQuery()   -> telegramParser!!.parsCallback(update)
-            !update.hasCallbackQuery()  -> telegramParser!!.parseText(update)
+            update.hasCallbackQuery() -> telegramParser!!.parsCallback(update)
+            !update.hasCallbackQuery() -> telegramParser!!.parseText(update)
         }
     }
 

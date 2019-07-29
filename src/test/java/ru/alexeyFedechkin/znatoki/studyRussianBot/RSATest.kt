@@ -3,7 +3,7 @@ package ru.alexeyFedechkin.znatoki.studyRussianBot
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.RSA
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.RSA
 
 class RSATest {
     private val key = "f05CRI93II5ToscYyOx9k6m+qBOkOCRjOtKV0xwGPOk5/kgPMT7/p4YZfv7JfXBuNM9pXp/t4zDVjq7NqE0FIFOF" +

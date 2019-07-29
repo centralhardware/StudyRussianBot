@@ -5,6 +5,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton
 import java.util.*
 
+/**
+ *builder of inlineKeyboardMarkup
+ */
 class InlineKeyboardBuilder
 /**
  * need to ban creation of instance of class without create method
@@ -15,7 +18,7 @@ class InlineKeyboardBuilder
     private val keyboard = ArrayList<List<InlineKeyboardButton>>()
     private var row: MutableList<InlineKeyboardButton>? = null
 
-    companion object{
+    companion object {
         /**
          * create builder without args
          *

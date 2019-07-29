@@ -1,5 +1,8 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.Enums
+package ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums
 
+/**
+ *student learning stage
+ */
 enum class SchoolStage {
     /**
      * 1 - 4 class

@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.Utils
+package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
 
 import mu.KotlinLogging
 import org.knowm.xchart.BitmapEncoder
@@ -8,8 +8,11 @@ import java.io.File
 import java.io.IOException
 import java.util.*
 
+/**
+ *object for generate graf
+ */
 object Chart {
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
     private val random = Random()
 
     /**

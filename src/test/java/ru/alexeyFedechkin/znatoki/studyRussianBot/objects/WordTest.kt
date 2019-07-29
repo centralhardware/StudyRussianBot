@@ -1,10 +1,10 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.Objects
+package ru.alexeyFedechkin.znatoki.studyRussianBot.objects
 
 import org.json.JSONObject
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Resource
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
 import java.io.IOException
 
 class WordTest {

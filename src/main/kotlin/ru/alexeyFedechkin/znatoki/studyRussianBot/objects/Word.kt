@@ -1,17 +1,33 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.Objects
+package ru.alexeyFedechkin.znatoki.studyRussianBot.objects
 
 import mu.KotlinLogging
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Objects.Enums.SchoolStage
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.SchoolStage
 
-data class Word(val wrightName: String,
-           val name: String,
-           val section: String,
-           val answer: String,
-           private val schoolStage: SchoolStage) {
+/**
+ *date class containing the structure of the word used for testing
+ */
+data class Word(
+        /**
+         *word without missing character
+         */
+        val wrightName: String,
+        /**
+         *word with missed character in place in which you need to insert the correct character
+         */
+        val name: String,
+        /**
+         *section identifier that used for mapping word to its rule
+         */
+        val section: String,
+        /**
+         * user answer that considered correct
+         */
+        val answer: String,
+        private val schoolStage: SchoolStage) {
 
-    companion object{
-        private val logger = KotlinLogging.logger {  }
+    companion object {
+        private val logger = KotlinLogging.logger { }
         /**
          * parseText string from json file to object
          * name + wright name + answer + section + isHigh + isSecondary + isPrimary

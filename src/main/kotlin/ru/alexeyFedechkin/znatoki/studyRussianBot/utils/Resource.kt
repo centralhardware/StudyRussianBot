@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.Utils
+package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
 
 import mu.KotlinLogging
 import org.apache.commons.io.IOUtils
@@ -7,8 +7,11 @@ import java.io.IOException
 import java.io.StringWriter
 import java.util.*
 
+/**
+ *provide access to resource bundle
+ */
 object Resource {
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
     private val resourceBundle = ResourceBundle.getBundle("string")
 
     /**

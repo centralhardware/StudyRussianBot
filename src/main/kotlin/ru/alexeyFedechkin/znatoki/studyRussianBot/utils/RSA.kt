@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.Utils
+package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
 
 import mu.KotlinLogging
 import org.glassfish.jersey.internal.util.Base64
@@ -9,10 +9,13 @@ import java.security.spec.InvalidKeySpecException
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 
+/**
+ *work with RSA signature
+ */
 object RSA {
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
     private const val SOLID = "aYbWZRqZgBWkxQL2z8Z4kWPBz"
-    private var signature : Signature = Signature.getInstance("SHA256withRSA")
+    private var signature: Signature = Signature.getInstance("SHA256withRSA")
     private val base64 = org.apache.commons.codec.binary.Base64()
     /**
      * generate activated code.
@@ -23,7 +26,7 @@ object RSA {
      * @param message first name of telegram user with solid
      * @return base64 encoded signature
      */
-    fun generateKey(message:String):String{
+    fun generateKey(message: String): String {
         try {
             val messageWithSolid = message + SOLID
             signature = Signature.getInstance("SHA256withRSA")
@@ -58,7 +61,7 @@ object RSA {
      * @param key activated key from user
      * @return true if key is valid
      */
-     fun validateKey(userName: String, key: String): Boolean {
+    fun validateKey(userName: String, key: String): Boolean {
         var userName = userName
         try {
             userName += SOLID

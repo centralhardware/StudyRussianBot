@@ -8,11 +8,15 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Statistic
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Utils.Redis
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
 import java.io.File
 
+/**
+ *telegram message sender
+ *@property telegramBot instance of telegram bot
+ */
 class Sender(private val telegramBot: TelegramBot) {
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
 
     /**
      * send message to telegram user
@@ -49,6 +53,7 @@ class Sender(private val telegramBot: TelegramBot) {
     }
 
     /**
+     * send audio
      * @param sendVoice sending audio file
      */
     fun send(sendVoice: SendVoice) {
@@ -92,6 +97,7 @@ class Sender(private val telegramBot: TelegramBot) {
     }
 
     /**
+     * send photo
      * @param sendPhoto sending photo object
      */
     fun send(sendPhoto: SendPhoto) {

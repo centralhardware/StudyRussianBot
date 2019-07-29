@@ -1,7 +1,10 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.Utils
+package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
 
 import org.apache.commons.lang3.ArrayUtils
 
+/**
+ *util object for Chart
+ */
 object ChartUtil {
     /**
      * convert list to array
