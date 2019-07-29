@@ -5,7 +5,7 @@ import redis.clients.jedis.Jedis
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.WordManager
-import java.util.HashSet
+import java.util.*
 
 object Redis {
         private val logger = KotlinLogging.logger {  }
@@ -19,7 +19,7 @@ object Redis {
         private const val CHECKED_WORD_POSTFIX = "_checked_word"
         private const val CHECKED_RULE_POSTFIX = "_checked_rule"
 
-        /**
+    /**
          * store data in redis about count of received messages
          * @param chatId id of user
          */

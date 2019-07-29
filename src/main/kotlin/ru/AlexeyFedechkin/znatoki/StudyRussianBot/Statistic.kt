@@ -25,7 +25,7 @@ object Statistic {
      * save statistic to redis
      * start timer schedule.
      */
-    fun init() {
+    fun init(){
         val period: Int = if (Config.isTesting) {
             1
         } else {
@@ -47,8 +47,7 @@ object Statistic {
                 }
                 clearVariable()
             }
-        }, 1, (MILLISECONDS_IN_SECOND * SECOND_IN_MINUTE * period).toLong())
-
+        }, 0, (MILLISECONDS_IN_SECOND * SECOND_IN_MINUTE * period).toLong())
     }
 
     /**

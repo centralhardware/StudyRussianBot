@@ -4,7 +4,7 @@ import mu.KotlinLogging
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.SchoolStage
 
-class Word(val wrightName: String,
+data class Word(val wrightName: String,
            val name: String,
            val section: String,
            val answer: String,

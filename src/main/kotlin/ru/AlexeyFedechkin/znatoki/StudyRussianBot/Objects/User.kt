@@ -5,10 +5,9 @@ import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.WordManager
-import java.util.ArrayList
-import java.util.HashMap
+import java.util.*
 
-class User(val chatId: Long) {
+data class User(val chatId: Long) {
     var currRule: Rule? = null
     var status: UserStatus? = null
     var words: ArrayList<Word>

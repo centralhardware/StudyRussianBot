@@ -4,27 +4,22 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto
 import org.telegram.telegrambots.meta.api.methods.send.SendVoice
 import org.telegram.telegrambots.meta.api.objects.Update
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus.*
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.RSA
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Redis
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.Resource
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.WordManager
-import java.util.HashMap
+import java.util.*
 
 class TelegramParser
 /**
  * set telegramBot and create InlineKeyboard
  * @param sender object for sending message
  */(private val sender: Sender) {
-    private var inlineKeyboard: InlineKeyboard
-    private var botUtil: BotUtil
+    private var inlineKeyboard: InlineKeyboard = InlineKeyboard(sender)
+    private var botUtil: BotUtil = BotUtil(sender)
     val users = HashMap<Long, User>()
-
-    init {
-        inlineKeyboard = InlineKeyboard(sender)
-        botUtil = BotUtil(sender)
-    }
 
     /**
      * parse text message
@@ -61,154 +56,86 @@ class TelegramParser
                     inlineKeyboard.sendLoginInfo(chatId!!)
                 }
             }
-            "/help" -> sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
-            "/rules" -> inlineKeyboard.sendRuleInlineKeyboard(update, 0)
-            "/book" -> inlineKeyboard.sendBookInlineKeyBoard(update, 0)
-            "/profile" -> sender.send(user!!.getProfile(), chatId)
-            "/menu" -> {
-                inlineKeyboard.sendMenu(chatId!!)
-                if (message.startsWith("/gen ")) {
-                    if (Config.admins.contains(chatId)) {
-                        if (message.replace("/gen ", "").isEmpty()) {
-                            sender.send(Resource.getStringByKey("STR_31"), chatId)
-                            return
-                        }
-                        sender.send(RSA.generateKey(message.replace("/gen ", "")), chatId)
-                    } else {
-                        sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
-                    }
-                } else if (message.startsWith("/ver ")) {
-                    val args = message.replace("/ver ", "").split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    val key = args[0]
-                    val msg = args[1]
-                    if (Config.admins.contains(chatId)) {
-                        sender.send(RSA.validateKey(msg, key).toString(), chatId)
-                    } else {
-                        sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
-                    }
-                } else if (message.startsWith("/stat")) {
-                    botUtil.sendStatistic(chatId)
-                } else if (message.startsWith("/")) {
-                    sender.send(Resource.getStringByKey("STR_101"), chatId)
-                }
-                when (user!!.status) {
-                    UserStatus.WAIT_COUNT_OF_WORD -> {
-                        val count: Int
-                        try {
-                            count = Integer.parseInt(message)
-                            if (count <= 0) {
-                                sender.send(Resource.getStringByKey("STR_43"), chatId)
-                                return
-                            }
-                            user.count = count
-                            if (count > user.currRule!!.words.size) {
-                                sender.send(Resource.getStringByKey("STR_1"), chatId)
-                                user.status = UserStatus.NONE
-                                user.words.clear()
-                            } else {
-                                user.status = UserStatus.TESTING
-                                user.words.addAll(user.currRule!!.getWord(count))
-                                sender.send(user.words[0].name, chatId)
-                            }
-                        } catch (e: NumberFormatException) {
-                            sender.send(Resource.getStringByKey("STR_2"), chatId)
-                        }
-
-                    }
-                    UserStatus.TESTING -> if (user.words[0].answer.toLowerCase() == message.toLowerCase()) {
-                        sender.send(Resource.getStringByKey("STR_3"), chatId)
-                        user.words.removeAt(0)
-                        if (user.words.isEmpty()) {
-                            sender.send(Resource.getStringByKey("STR_4"), chatId)
-                            sender.send(user.getTestingResult(), chatId)
-                            Redis.checkRule(user)
-                            inlineKeyboard.sendMenu(chatId)
-                            user.reset()
-                            return
-                        }
-                        sender.send(user.words[0].name, chatId)
-                        Redis.checkWord(user)
-                    } else {
-                        sender.send(Resource.getStringByKey("STR_5"), chatId)
-                        Redis.checkWrongWord(user)
-                        val temp = user.words[0]
-                        user.words.removeAt(0)
-                        user.words.add(temp)
-                        user.wrongWords.add(temp)
-                        sender.send(user.words[0].name, chatId)
-                    }
-                }
-            }
+            "/help"     -> sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
+            "/rules"    -> inlineKeyboard.sendRuleInlineKeyboard(update, 0)
+            "/book"     -> inlineKeyboard.sendBookInlineKeyBoard(update, 0)
+            "/profile"  -> sender.send(user!!.getProfile(), chatId)
+            "/menu"     -> inlineKeyboard.sendMenu(chatId!!)
             else -> {
-                if (message.startsWith("/gen ")) {
-                    if (Config.admins.contains(chatId)) {
-                        if (message.replace("/gen ", "").isEmpty()) {
-                            sender.send(Resource.getStringByKey("STR_31"), chatId)
-                            return
-                        }
-                        sender.send(RSA.generateKey(message.replace("/gen ", "")), chatId)
-                    } else {
-                        sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
-                    }
-                } else if (message.startsWith("/ver ")) {
-                    val args = message.replace("/ver ", "").split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    val key = args[0]
-                    val msg = args[1]
-                    if (Config.admins.contains(chatId)) {
-                        sender.send(RSA.validateKey(msg, key).toString(), chatId!!)
-                    } else {
-                        sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
-                    }
-                } else if (message.startsWith("/stat")) {
-                    botUtil.sendStatistic(chatId)
-                } else if (message.startsWith("/")) {
-                    sender.send(Resource.getStringByKey("STR_101"), chatId)
-                }
-                when (user!!.status) {
-                    UserStatus.WAIT_COUNT_OF_WORD -> {
-                        val count: Int
-                        try {
-                            count = Integer.parseInt(message)
-                            if (count <= 0) {
-                                sender.send(Resource.getStringByKey("STR_43"), chatId)
+                when{
+                    message.startsWith("/gen ") -> {
+                        if (Config.admins.contains(chatId)) {
+                            if (message.replace("/gen ", "").isEmpty()) {
+                                sender.send(Resource.getStringByKey("STR_31"), chatId)
                                 return
                             }
-                            user.count = count
-                            if (count > user.currRule!!.words.size) {
-                                sender.send(Resource.getStringByKey("STR_1"), chatId)
-                                user.status = UserStatus.NONE
-                                user.words.clear()
-                            } else {
-                                user.status = UserStatus.TESTING
-                                user.words.addAll(user.currRule!!.getWord(count))
-                                sender.send(user.words[0].name, chatId)
-                            }
-                        } catch (e: NumberFormatException) {
-                            sender.send(Resource.getStringByKey("STR_2"), chatId)
+                            sender.send(RSA.generateKey(message.replace("/gen ", "")), chatId)
+                        } else {
+                            sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
                         }
-
                     }
-                    UserStatus.TESTING -> if (user.words[0].answer.toLowerCase() == message.toLowerCase()) {
-                        sender.send(Resource.getStringByKey("STR_3"), chatId)
-                        user.words.removeAt(0)
-                        if (user.words.isEmpty()) {
-                            sender.send(Resource.getStringByKey("STR_4"), chatId)
-                            sender.send(user.getTestingResult(), chatId)
-                            Redis.checkRule(user)
-                            inlineKeyboard.sendMenu(chatId!!)
-                            user.reset()
-                            return
+                    message.startsWith("/ver ") -> {
+                        val args = message.replace("/ver ", "").split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                        val key = args[0]
+                        val msg = args[1]
+                        if (Config.admins.contains(chatId)) {
+                            sender.send(RSA.validateKey(msg, key).toString(), chatId!!)
+                        } else {
+                            sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
                         }
-                        sender.send(user.words[0].name, chatId)
-                        Redis.checkWord(user)
-                    } else {
-                        sender.send(Resource.getStringByKey("STR_5"), chatId)
-                        Redis.checkWrongWord(user)
-                        val temp = user.words[0]
-                        user.words.removeAt(0)
-                        user.words.add(temp)
-                        user.wrongWords.add(temp)
-                        sender.send(user.words[0].name, chatId)
+                    }
+                    message.startsWith("/stat") ->  botUtil.sendStatistic(chatId)
+                    message.startsWith("/") -> sender.send(Resource.getStringByKey("STR_101"), chatId)
+                    else -> when (user!!.status) {
+                        WAIT_COUNT_OF_WORD -> {
+                            val count: Int
+                            try {
+                                count = Integer.parseInt(message)
+                                if (count <= 0) {
+                                    sender.send(Resource.getStringByKey("STR_43"), chatId)
+                                    return
+                                }
+                                user.count = count
+                                if (count > user.currRule!!.words.size) {
+                                    sender.send(Resource.getStringByKey("STR_1"), chatId)
+                                    user.status = NONE
+                                    user.words.clear()
+                                } else {
+                                    user.status = TESTING
+                                    user.words.addAll(user.currRule!!.getWord(count))
+                                    sender.send(user.words[0].name, chatId)
+                                }
+                            } catch (e: NumberFormatException) {
+                                sender.send(Resource.getStringByKey("STR_2"), chatId)
+                            }
+
+                        }
+                        TESTING -> if (user.words[0].answer.toLowerCase() == message.toLowerCase()) {
+                            sender.send(Resource.getStringByKey("STR_3"), chatId)
+                            user.words.removeAt(0)
+                            if (user.words.isEmpty()) {
+                                sender.send(Resource.getStringByKey("STR_4"), chatId)
+                                sender.send(user.getTestingResult(), chatId)
+                                Redis.checkRule(user)
+                                inlineKeyboard.sendMenu(chatId!!)
+                                user.reset()
+                                return
+                            }
+                            sender.send(user.words[0].name, chatId)
+                            Redis.checkWord(user)
+                        } else {
+                            sender.send(Resource.getStringByKey("STR_5"), chatId)
+                            Redis.checkWrongWord(user)
+                            val temp = user.words[0]
+                            user.words.removeAt(0)
+                            user.words.add(temp)
+                            user.wrongWords.add(temp)
+                            sender.send(user.words[0].name, chatId)
+                        }
+                        NONE -> TODO()
+                        WAIT_KEY -> TODO()
+                        WAIT_REPORT -> TODO()
+                        null -> TODO()
                     }
                 }
             }
@@ -248,7 +175,6 @@ class TelegramParser
             "noreset_testing" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 sender.send(user!!.words[0].name, chatId)
-                return
             }
             "testing" -> inlineKeyboard.sendRuleInlineKeyboard(update, 0)
             "profile" -> sender.send(user!!.getProfile(), chatId)
@@ -257,65 +183,70 @@ class TelegramParser
             } else {
                 sender.send(Resource.getStringByKey("STR_32"), chatId)
             }
-            "menu" -> if (user!!.status !== UserStatus.TESTING && user!!.status !== UserStatus.WAIT_COUNT_OF_WORD) {
+            "menu" -> if (user!!.status !== TESTING && user!!.status !== WAIT_COUNT_OF_WORD) {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 inlineKeyboard.sendMenu(chatId!!)
             }
             "enter_key" -> {
                 sender.send(Resource.getStringByKey("STR_22"), chatId)
-                user!!.status = UserStatus.WAIT_KEY
-                return
+                user!!.status = WAIT_KEY
             }
             "login" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 inlineKeyboard.sendLoginInfo(chatId!!)
-                return
             }
-            "buy_key" ->
-                // telegramBot.send(resource.getStringByKey("STR_33"), chatId);
-                return
+//            "buy_key" ->  telegramBot.send(resource.getStringByKey("STR_33"), chatId);}
             "book" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 inlineKeyboard.sendBookInlineKeyBoard(update, 0)
-                return
             }
             "report" -> {
-                user!!.status = UserStatus.WAIT_REPORT
+                user!!.status = WAIT_REPORT
                 sender.send(Resource.getStringByKey("STR_62"), chatId)
-                return
             }
-            "statistic" -> {
-                botUtil.sendStatistic(chatId)
-                return
-            }
-        }
-        if (callback.startsWith("to_")) {
-            if (user!!.status !== UserStatus.WAIT_COUNT_OF_WORD && user!!.status !== UserStatus.TESTING) {
-                inlineKeyboard.sendRuleInlineKeyboard(update, callback.replace("to_", "").toInt())
-            }
-        }
-        if (callback.startsWith("book_to_")) {
-            inlineKeyboard.sendBookInlineKeyBoard(update, callback.replace("book_to_", "").toInt())
-        }
-        if (callback.startsWith("book") && !callback.startsWith("book_to_")) {
-            sender.send(WordManager.getRuleDescriptionById(Integer.parseInt(callback.replace("book", "")))!!.description, chatId)
-            val builder = InlineKeyboardBuilder.create(chatId).setText(Resource.getStringByKey("STR_18")).row().button("↑", "book").endRow()
-            sender.send(builder.build())
-        }
-        if (user!!.status === UserStatus.NONE) {
-            for (rule in WordManager.rules) {
-                if (rule.section == callback) {
-                    user!!.status = UserStatus.WAIT_COUNT_OF_WORD
-                    user.currRule = rule
-                    sender.send(Resource.getStringByKey("STR_6") + rule.name, chatId)
-                    sender.send(Resource.getStringByKey("STR_7"), chatId)
-                    return
+            "statistic" -> botUtil.sendStatistic(chatId)
+            else -> {
+                when{
+                    callback.startsWith("to_") ->{
+                        if (user!!.status !== WAIT_COUNT_OF_WORD && user!!.status !== TESTING) {
+                            inlineKeyboard.sendRuleInlineKeyboard(update, callback.replace("to_", "").toInt())
+                        }
+                    }
+                    callback.startsWith("book_to_") ->
+                        inlineKeyboard.sendBookInlineKeyBoard(update, callback.replace("book_to_", "").toInt())
+                    callback.startsWith("book") && !callback.startsWith("book_to_") -> {
+                        sender.send(WordManager.getRuleDescriptionById(Integer.parseInt(callback.replace("book", "")))!!.description, chatId)
+                        val builder = InlineKeyboardBuilder.
+                                create(chatId).
+                                setText(Resource.getStringByKey("STR_18")).
+                                row().
+                                button("↑", "book").
+                                endRow()
+                        sender.send(builder.build())
+                    }
+                    user!!.status === NONE -> {
+                        for (rule in WordManager.rules) {
+                            if (rule.section == callback) {
+                                user!!.status = WAIT_COUNT_OF_WORD
+                                user.currRule = rule
+                                sender.send(Resource.getStringByKey("STR_6") + rule.name, chatId)
+                                sender.send(Resource.getStringByKey("STR_7"), chatId)
+                                return
+                            }
+                        }
+                    }
+                    user!!.status != NONE -> {
+                        sender.delete(chatId, update.callbackQuery.message.messageId)
+                        val builder = InlineKeyboardBuilder.
+                                create(chatId).setText(Resource.getStringByKey("STR_9")).
+                                row().
+                                button(Resource.getStringByKey("YES"), "reset_testing").
+                                button(Resource.getStringByKey("NO"), "noreset_testing").
+                                endRow()
+                        sender.send(builder.build())
+                    }
                 }
             }
-        } else {
-            sender.delete(chatId, update.callbackQuery.message.messageId)
-            val builder = InlineKeyboardBuilder.create(chatId).setText(Resource.getStringByKey("STR_9")).row().button(Resource.getStringByKey("YES"), "reset_testing").button(Resource.getStringByKey("NO"), "noreset_testing").endRow()
-            sender.send(builder.build())
         }
     }
 
@@ -324,7 +255,7 @@ class TelegramParser
      * @param update
      */
     fun parseAudio(update: Update) {
-        if (users[update.message.chatId]!!.status === UserStatus.WAIT_REPORT) {
+        if (users[update.message.chatId]!!.status === WAIT_REPORT) {
             for (chatId in Config.admins) {
                 val sendVoice = SendVoice()
                 sendVoice.chatId = chatId.toString()
@@ -341,7 +272,7 @@ class TelegramParser
      * @param update
      */
     fun parseImage(update: Update) {
-        if (users[update.message.chatId]!!.status === UserStatus.WAIT_REPORT) {
+        if (users[update.message.chatId]!!.status === WAIT_REPORT) {
             for (chatId in Config.admins) {
                 val photo = update.message.photo[update.message.photo.size - 1]
                 val sendPhoto = SendPhoto()

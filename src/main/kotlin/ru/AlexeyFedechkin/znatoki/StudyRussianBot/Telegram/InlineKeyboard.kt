@@ -69,8 +69,8 @@ class InlineKeyboard
         } else if (pageNumber < Rule.maxRulePage) {
             builder.
                     row().
-                    button(Resource.getStringByKey("STR_18"), "book_to_" + (pageNumber - 1)).
-                    button(Resource.getStringByKey("STR_17") + (pageNumber + 1), "book_to_" + (pageNumber + 1)).
+                    button(Resource.getStringByKey("STR_18") + " - " + pageNumber, "book_to_" + (pageNumber - 1)).
+                    button(Resource.getStringByKey("STR_17") + " - " +  (pageNumber + 2), "book_to_" + (pageNumber + 1)).
                     button(Resource.getStringByKey("STR_24"), "menu").
                     endRow()
             sender.delete(chatId, update.callbackQuery.message.messageId)

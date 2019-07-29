@@ -3,7 +3,7 @@ package ru.AlexeyFedechkin.znatoki.StudyRussianBot.Telegram
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton
-import java.util.ArrayList
+import java.util.*
 
 class InlineKeyboardBuilder
 /**
@@ -30,7 +30,7 @@ class InlineKeyboardBuilder
          * @param chatId id of user
          * @return instance of InlineKeyboardBuilder with given chat id
          */
-        fun create(chatId: Long?): InlineKeyboardBuilder {
+        fun create(chatId: Long): InlineKeyboardBuilder {
             val builder = InlineKeyboardBuilder()
             builder.setChatId(chatId)
             return builder
@@ -53,7 +53,7 @@ class InlineKeyboardBuilder
      * @param chatId id of user
      * @return instance of this class
      */
-    fun setChatId(chatId: Long?): InlineKeyboardBuilder {
+    fun setChatId(chatId: Long): InlineKeyboardBuilder {
         this.chatId = chatId
         return this
     }

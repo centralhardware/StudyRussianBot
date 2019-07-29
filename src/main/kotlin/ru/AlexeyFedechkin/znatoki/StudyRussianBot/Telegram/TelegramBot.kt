@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Config
-import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus
+import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.Enums.UserStatus.*
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Objects.User
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Statistic
 import ru.AlexeyFedechkin.znatoki.StudyRussianBot.Utils.RSA
@@ -79,98 +79,97 @@ class TelegramBot : TelegramLongPollingBot{
             update.message.chatId!!
         }
         Statistic.checkReceived(chatId)
-        if (update.hasCallbackQuery()) {
-            logger.info("receive callback \"" + update.callbackQuery.data + "\" " +
-                    update.callbackQuery.from.firstName + "\" " +
-                    update.callbackQuery.from.lastName + "\" " +
-                    update.callbackQuery.from.userName + "\"")
-            if (!telegramParser!!.users.containsKey(update.callbackQuery.message.chatId)) {
-                telegramParser!!.users[update.callbackQuery.message.chatId] = User(update.callbackQuery.message.chatId)
-            }
-        } else if (update.message.hasText()) {
-            logger.info("receive message \"" + update.message.text +
-                    "\" from \"" + update.message.from.firstName + "\" " +
-                    update.message.from.lastName + "\" " +
-                    update.message.from.userName + "\" " +
-                    update.message.from.id + "\"")
-            if (!telegramParser!!.users.containsKey(update.message.chatId)) {
-                telegramParser!!.users[update.message.chatId] = User(update.message.chatId)
-            }
-            if (update.message.text.toLowerCase() == "ping") {
-                sender.send("pong", update.message.chatId!!)
-            } else if (update.message.text.toLowerCase() == "pong") {
-                sender.send("ping", update.message.chatId!!)
-            }
-        } else if (update.message.hasVoice() || update.message.hasAudio()) {
-            logger.info("receive voice \"" + update.message.text +
-                    "\" from \"" + update.message.from.firstName + "\" " +
-                    update.message.from.lastName + "\" " +
-                    update.message.from.userName + "\" " +
-                    update.message.from.id + "\"")
-            telegramParser!!.parseAudio(update)
-        } else if (update.message.hasPhoto()) {
-            logger.info("receive photo \"" + update.message.text +
-                    "\" from \"" + update.message.from.firstName + "\" " +
-                    update.message.from.lastName + "\" " +
-                    update.message.from.userName + "\" " +
-                    update.message.from.id + "\"")
-            telegramParser!!.parseImage(update)
-        }
-        if (!(Redis.checkRight(chatId) || Config.admins.contains(chatId))) {
-            when (telegramParser!!.users[chatId]!!.status) {
-                UserStatus.WAIT_KEY -> {
-                    if (!update.hasCallbackQuery()) {
-                        if (RSA.validateKey(update.message.from.userName, update.message.text)) {
-                            telegramParser!!.users[chatId]!!.status = UserStatus.NONE
-                            Redis.setRight(chatId, update.message.text)
-                            sender.send(Resource.getStringByKey("STR_19"), chatId)
-                            inlineKeyboard.sendMenu(chatId)
-                        } else {
-                            if (update.hasCallbackQuery()) {
-                                telegramParser!!.parsCallback(update)
-                                return
-                            }
-                            sender.send(Resource.getStringByKey("STR_21"), chatId)
-                        }
-                    } else {
-                        telegramParser!!.parsCallback(update)
-                    }
-                    return
+        when{
+            update.hasCallbackQuery() -> {
+                logger.info("receive callback \"" + update.callbackQuery.data + "\" " +
+                        update.callbackQuery.from.firstName + "\" " +
+                        update.callbackQuery.from.lastName + "\" " +
+                        update.callbackQuery.from.userName + "\"")
+                if (!telegramParser!!.users.containsKey(update.callbackQuery.message.chatId)) {
+                    telegramParser!!.users[update.callbackQuery.message.chatId] = User(update.callbackQuery.message.chatId)
                 }
-                UserStatus.WAIT_COUNT_OF_WORD, UserStatus.TESTING -> {
-                    if (update.hasCallbackQuery()) {
-                        telegramParser!!.parsCallback(update)
-                    } else {
-                        telegramParser!!.parseText(update)
-                    }
-                    return
+            }
+            update.message.hasText() -> {
+                logger.info("receive message \"" + update.message.text +
+                        "\" from \"" + update.message.from.firstName + "\" " +
+                        update.message.from.lastName + "\" " +
+                        update.message.from.userName + "\" " +
+                        update.message.from.id + "\"")
+                when {
+                    !telegramParser!!.users.containsKey(update.message.chatId) ->
+                        telegramParser!!.users[update.message.chatId] = User(update.message.chatId)
+                    update.message.text.toLowerCase() == "ping" ->
+                        sender.send("pong", update.message.chatId!!)
+                    update.message.text.toLowerCase() == "pong" ->
+                        sender.send("ping", update.message.chatId!!)
                 }
-                UserStatus.WAIT_REPORT -> {
-                    if (update.hasCallbackQuery()) {
-                        telegramParser!!.parsCallback(update)
-                    } else {
-                        for (id in Config.admins) {
-                            val user = update.message.from
-                            if (update.message.from.userName == null) {
-                                sender.send(Resource.getStringByKey("STR_59") + user.firstName + " "
-                                        + user.lastName + " \n" + update.message.text, id)
+            }
+            update.message.hasVoice() || update.message.hasAudio() -> {
+                logger.info("receive voice \"" + update.message.text +
+                        "\" from \"" + update.message.from.firstName + "\" " +
+                        update.message.from.lastName + "\" " +
+                        update.message.from.userName + "\" " +
+                        update.message.from.id + "\"")
+                telegramParser!!.parseAudio(update)
+            }
+            update.message.hasPhoto() -> {
+                logger.info("receive photo \"" + update.message.text +
+                        "\" from \"" + update.message.from.firstName + "\" " +
+                        update.message.from.lastName + "\" " +
+                        update.message.from.userName + "\" " +
+                        update.message.from.id + "\"")
+                telegramParser!!.parseImage(update)
+            }
+            Redis.checkRight(chatId) || Config.admins.contains(chatId) -> {
+                when (telegramParser!!.users[chatId]!!.status) {
+                    WAIT_KEY -> {
+                        if (!update.hasCallbackQuery()) {
+                            if (RSA.validateKey(update.message.from.userName, update.message.text)) {
+                                telegramParser!!.users[chatId]!!.status = NONE
+                                Redis.setRight(chatId, update.message.text)
+                                sender.send(Resource.getStringByKey("STR_19"), chatId)
+                                inlineKeyboard.sendMenu(chatId)
                             } else {
-                                sender.send(Resource.getStringByKey("STR_60") + user.userName + " " +
-                                        user.firstName + " " + user.lastName + " \n"
-                                        + update.message.text, id)
+                                if (update.hasCallbackQuery()) {
+                                    telegramParser!!.parsCallback(update)
+                                    return
+                                }
+                                sender.send(Resource.getStringByKey("STR_21"), chatId)
                             }
+                        } else {
+                            telegramParser!!.parsCallback(update)
                         }
-                        sender.send(Resource.getStringByKey("STR_61"), chatId)
-                        telegramParser!!.users[chatId]!!.status = UserStatus.NONE
                     }
-                    return
+                    WAIT_COUNT_OF_WORD, TESTING -> {
+                        if (update.hasCallbackQuery()) {
+                            telegramParser!!.parsCallback(update)
+                        } else {
+                            telegramParser!!.parseText(update)
+                        }
+                    }
+                    WAIT_REPORT -> {
+                        if (update.hasCallbackQuery()) {
+                            telegramParser!!.parsCallback(update)
+                        } else {
+                            for (id in Config.admins) {
+                                val user = update.message.from
+                                if (update.message.from.userName == null) {
+                                    sender.send(Resource.getStringByKey("STR_59") + user.firstName + " "
+                                            + user.lastName + " \n" + update.message.text, id)
+                                } else {
+                                    sender.send(Resource.getStringByKey("STR_60") + user.userName + " " +
+                                            user.firstName + " " + user.lastName + " \n"
+                                            + update.message.text, id)
+                                }
+                            }
+                            sender.send(Resource.getStringByKey("STR_61"), chatId)
+                            telegramParser!!.users[chatId]!!.status = NONE
+                        }
+                    }
                 }
             }
-        }
-        if (update.hasCallbackQuery()) {
-            telegramParser!!.parsCallback(update)
-        } else {
-            telegramParser!!.parseText(update)
+            update.hasCallbackQuery()   -> telegramParser!!.parsCallback(update)
+            !update.hasCallbackQuery()  -> telegramParser!!.parseText(update)
         }
     }
 
