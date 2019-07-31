@@ -81,7 +81,7 @@ class TelegramBot : TelegramLongPollingBot {
             update.message.chatId!!
         }
         Statistic.checkReceived(chatId)
-        telegramParser!!.botUtil.easterAgg(chatId)
+        telegramParser!!.botUtil.birthday(chatId)
         when {
             update.hasCallbackQuery() -> {
                 logger.info("receive callback \"" + update.callbackQuery.data + "\" " +
