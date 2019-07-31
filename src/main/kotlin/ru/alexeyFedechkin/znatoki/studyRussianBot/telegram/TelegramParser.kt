@@ -5,8 +5,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendVoice
 import org.telegram.telegrambots.meta.api.objects.Update
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
 import ru.alexeyFedechkin.znatoki.studyRussianBot.WordManager
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus.*
 import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.User
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus.*
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.RSA
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
@@ -28,7 +28,7 @@ class TelegramParser
  * @param sender object for sending message
  */(private val sender: Sender) {
     private var inlineKeyboard: InlineKeyboard = InlineKeyboard(sender)
-    private var botUtil: BotUtil = BotUtil(sender)
+    val botUtil: BotUtil = BotUtil(sender)
     /**
      *
      */
@@ -241,7 +241,13 @@ class TelegramParser
                     }
                     user!!.status != NONE -> {
                         sender.delete(chatId, update.callbackQuery.message.messageId)
-                        val builder = InlineKeyboardBuilder.create(chatId).setText(Resource.getStringByKey("STR_9")).row().button(Resource.getStringByKey("YES"), "reset_testing").button(Resource.getStringByKey("NO"), "noreset_testing").endRow()
+                        val builder = InlineKeyboardBuilder.
+                            create(chatId).
+                            setText(Resource.getStringByKey("STR_9")).
+                            row().
+                            button(Resource.getStringByKey("YES"), "reset_testing").
+                            button(Resource.getStringByKey("NO"), "noreset_testing").
+                            endRow()
                         sender.send(builder.build())
                     }
                 }

@@ -9,8 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Statistic
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus.*
 import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.User
+import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus.*
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.RSA
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
@@ -81,6 +81,7 @@ class TelegramBot : TelegramLongPollingBot {
             update.message.chatId!!
         }
         Statistic.checkReceived(chatId)
+        telegramParser!!.botUtil.easterAgg(chatId)
         when {
             update.hasCallbackQuery() -> {
                 logger.info("receive callback \"" + update.callbackQuery.data + "\" " +

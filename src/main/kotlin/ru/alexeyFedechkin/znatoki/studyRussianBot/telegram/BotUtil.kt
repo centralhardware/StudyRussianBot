@@ -6,6 +6,7 @@ import ru.alexeyFedechkin.znatoki.studyRussianBot.Statistic
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Chart
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.ChartUtil
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
+import java.util.*
 
 /**
  *Util class for telegram bot
@@ -42,6 +43,17 @@ class BotUtil(private val sender: Sender) {
 
         } else {
             sender.send(Resource.getStringByKey("STR_47"), chatId)
+        }
+    }
+
+    private var isCongratulation = false
+    fun birthday(chatID: Long) {
+        val now = Date()
+
+        if (chatID == Config.admins[1] && now.month == 7 && now.date == 1 && !isCongratulation){
+            sender.send("https://www.youtube.com/watch?v=HGE79KpCzHA", chatID)
+            sender.send("С днем рождения", chatID)
+            isCongratulation = true
         }
     }
 }
