@@ -91,6 +91,7 @@ class TelegramBot : TelegramLongPollingBot {
                 if (!telegramParser!!.users.containsKey(update.callbackQuery.message.chatId)) {
                     telegramParser!!.users[update.callbackQuery.message.chatId] = User(update.callbackQuery.message.chatId)
                 }
+                telegramParser!!.parsCallback(update)
             }
             update.message.hasText() -> {
                 logger.info("receive message \"" + update.message.text +
@@ -106,6 +107,7 @@ class TelegramBot : TelegramLongPollingBot {
                     update.message.text.toLowerCase() == "pong" ->
                         sender.send("ping", update.message.chatId!!)
                 }
+                telegramParser!!.parseText(update)
             }
             update.message.hasVoice() || update.message.hasAudio() -> {
                 logger.info("receive voice \"" + update.message.text +
@@ -171,8 +173,6 @@ class TelegramBot : TelegramLongPollingBot {
                     }
                 }
             }
-            update.hasCallbackQuery() -> telegramParser!!.parsCallback(update)
-            !update.hasCallbackQuery() -> telegramParser!!.parseText(update)
         }
     }
 
