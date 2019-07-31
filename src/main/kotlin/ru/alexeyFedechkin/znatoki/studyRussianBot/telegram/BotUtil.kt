@@ -49,7 +49,6 @@ class BotUtil(private val sender: Sender) {
     private var isCongratulation = false
     fun birthday(chatID: Long) {
         val now = Date()
-
         if (chatID == Config.admins[1] && now.month == 7 && now.date == 1 && !isCongratulation){
             sender.send("https://www.youtube.com/watch?v=HGE79KpCzHA", chatID)
             sender.send("С днем рождения", chatID)
