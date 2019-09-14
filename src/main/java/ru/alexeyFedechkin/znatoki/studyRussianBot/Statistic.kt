@@ -1,8 +1,8 @@
 package ru.alexeyFedechkin.znatoki.studyRussianBot
 
 import mu.KotlinLogging
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
 import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.UserStatistic
+import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -94,7 +94,7 @@ object Statistic {
 
     /**
      * get statistic
-     * @return object with all statistic
+     * @return instance of UserStatistic with current statistic
      */
     fun getStatistic(): UserStatistic {
         val res = UserStatistic()

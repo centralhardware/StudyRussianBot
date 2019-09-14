@@ -19,7 +19,6 @@ import java.util.*
  * - callback
  * - audio
  * - image
- *
  * @property sender instance of sender class
  */
 class TelegramParser
@@ -88,7 +87,10 @@ class TelegramParser
                         }
                     }
                     message.startsWith("/ver ") -> {
-                        val args = message.replace("/ver ", "").split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                        val args = message.replace("/ver ", "")
+                            .split(" ".toRegex())
+                            .dropLastWhile { it.isEmpty() }
+                            .toTypedArray()
                         val key = args[0]
                         val msg = args[1]
                         if (Config.admins.contains(chatId)) {
@@ -225,7 +227,11 @@ class TelegramParser
                         inlineKeyboard.sendBookInlineKeyBoard(update, callback.replace("book_to_", "").toInt())
                     callback.startsWith("book") && !callback.startsWith("book_to_") -> {
                         sender.send(WordManager.getRuleDescriptionById(Integer.parseInt(callback.replace("book", "")))!!.description, chatId)
-                        val builder = InlineKeyboardBuilder.create(chatId).setText(Resource.getStringByKey("STR_18")).row().button("↑", "book").endRow()
+                        val builder = InlineKeyboardBuilder.create(chatId)
+                            .setText(Resource.getStringByKey("STR_18"))
+                            .row()
+                            .button("↑", "book")
+                            .endRow()
                         sender.send(builder.build())
                     }
                     user!!.status === NONE -> {
@@ -241,13 +247,12 @@ class TelegramParser
                     }
                     user!!.status != NONE -> {
                         sender.delete(chatId, update.callbackQuery.message.messageId)
-                        val builder = InlineKeyboardBuilder.
-                            create(chatId).
-                            setText(Resource.getStringByKey("STR_9")).
-                            row().
-                            button(Resource.getStringByKey("YES"), "reset_testing").
-                            button(Resource.getStringByKey("NO"), "noreset_testing").
-                            endRow()
+                        val builder = InlineKeyboardBuilder.create(chatId)
+                            .setText(Resource.getStringByKey("STR_9"))
+                            .row()
+                            .button(Resource.getStringByKey("YES"), "reset_testing")
+                            .button(Resource.getStringByKey("NO"), "noreset_testing")
+                            .endRow()
                         sender.send(builder.build())
                     }
                 }

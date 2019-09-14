@@ -33,7 +33,6 @@ class Sender(private val telegramBot: TelegramBot) {
         } catch (e: TelegramApiException) {
             logger.warn("fail to send message", e)
         }
-
     }
 
     /**

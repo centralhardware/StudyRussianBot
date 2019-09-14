@@ -1,6 +1,6 @@
 package ru.alexeyFedechkin.znatoki.studyRussianBot
 
-import java.util.ResourceBundle
+import java.util.*
 
 /**
  *provide access to application config file
@@ -30,15 +30,18 @@ object Config {
     /**
      * port of proxy server
      */
-    val proxyPort: Int = config.getString("PROXY_PORT").toInt()
+    val proxyPort: Int = config.getString("PROXY_PORT")
+        .toInt()
     /**
      * if true will be used test bot and debug message will by displayed
      */
-    val isTesting: Boolean = config.getString("IS_TESTING").toBoolean()
+    val isTesting: Boolean = config.getString("IS_TESTING")
+        .toBoolean()
     /**
      * is setting proxy option
      */
-    val isUseProxy: Boolean = config.getString("IS_USE_PROXY").toBoolean()
+    val isUseProxy: Boolean = config.getString("IS_USE_PROXY")
+        .toBoolean()
     /**
      * host of redis server
      */
@@ -46,7 +49,8 @@ object Config {
     /**
      * port of redis server
      */
-    val redisPort: Int = config.getString("REDIS_PORT").toInt()
+    val redisPort: Int = config.getString("REDIS_PORT")
+        .toInt()
     /**
      * RSA private key
      */
@@ -60,8 +64,10 @@ object Config {
      * separator - ","
      */
     val admins: ArrayList<Long> = {
-        val adminsArr = config.getString("ADMIN_ID").split(",".toRegex())
-                .dropLastWhile { it.isEmpty() }.toTypedArray()
+        val adminsArr = config.getString("ADMIN_ID")
+            .split(",".toRegex())
+            .dropLastWhile { it.isEmpty() }
+            .toTypedArray()
         val admins = java.util.ArrayList<Long>()
         for (id in adminsArr) {
             admins.add(java.lang.Long.valueOf(id))
