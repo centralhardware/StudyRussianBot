@@ -158,7 +158,7 @@ class TelegramBot : TelegramLongPollingBot {
                 }
             }
         }
-        }
+    }
 
     /**
      * get bot user name

@@ -199,8 +199,12 @@ class TelegramParser
                 inlineKeyboard.sendMenu(chatId!!)
             }
             "enter_key" -> {
-                sender.send(Resource.getStringByKey("STR_22"), chatId)
-                user!!.status = WAIT_KEY
+                if (update.callbackQuery.from.userName == null){
+                    sender.send("вы должны иметь заполненое имя пользователя", chatId)
+                } else {
+                    sender.send(Resource.getStringByKey("STR_22"), chatId)
+                    user!!.status = WAIT_KEY
+                }
             }
             "login" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
