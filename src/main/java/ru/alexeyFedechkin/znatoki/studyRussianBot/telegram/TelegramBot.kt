@@ -134,21 +134,8 @@ class TelegramBot : TelegramLongPollingBot {
                         sender.send(Resource.getStringByKey("STR_19"), chatId)
                         inlineKeyboard.sendMenu(chatId)
                     } else {
-                        if (update.hasCallbackQuery()) {
-                            telegramParser!!.parsCallback(update)
-                            return
-                        }
                         sender.send(Resource.getStringByKey("STR_21"), chatId)
                     }
-                } else {
-                    telegramParser!!.parsCallback(update)
-                }
-            }
-            UserStatus.WAIT_COUNT_OF_WORD, UserStatus.TESTING -> {
-                if (update.hasCallbackQuery()) {
-                    telegramParser!!.parsCallback(update)
-                } else {
-                    telegramParser!!.parseText(update)
                 }
             }
             UserStatus.WAIT_REPORT -> {
@@ -171,7 +158,7 @@ class TelegramBot : TelegramLongPollingBot {
                 }
             }
         }
-    }
+        }
 
     /**
      * get bot user name
