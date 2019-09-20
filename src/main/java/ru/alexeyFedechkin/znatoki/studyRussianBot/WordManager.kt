@@ -61,7 +61,7 @@ object WordManager {
         for (i in 1 until ruleObject.getInt("count")) {
             val `object` = ruleData.getJSONObject(i.toString())
             if (`object`.getInt("parent") != -1) {
-                rules[i].parent = rules[`object`.getInt("parent") - 1]
+                rules[i -1].parent = rules[`object`.getInt("parent") -1]
             }
         }
         // parse word.json
