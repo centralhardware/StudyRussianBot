@@ -43,13 +43,18 @@ class InlineKeyboard
         } else {
             update.message.from.id!!.toLong()
         }
-        if (!(Redis.checkRight(userId) || Config.admins.contains(userId))) {
+        if (!(Redis.checkRight(userId) || !Config.admins.contains(userId))) {
             for (i in 0..2) {
                 val ruleDescription = WordManager.ruleDescriptions[i]
                 builder.row()
                     .button(ruleDescription.name, "book" + ruleDescription.id)
                     .endRow()
             }
+            builder.row()
+                .button(Resource.getStringByKey("STR_24"), "menu")
+                .endRow()
+            sender.delete(chatId, update.callbackQuery.message.messageId)
+            sender.send(builder.build())
         } else {
             for (ruleDescription in WordManager.ruleDescriptions) {
                 if (ruleDescription.pageNumber == pageNumber) {
@@ -58,35 +63,35 @@ class InlineKeyboard
                         .endRow()
                 }
             }
-        }
-        // add buttons to go to other page
-        if (pageNumber == 0) {
-            builder.row()
-                .button(Resource.getStringByKey("STR_17"), "book_to_1")
-                .button(Resource.getStringByKey("STR_24"), "menu")
-                .endRow()
-            if (message != "/book") {
+            // add buttons to go to other page
+            if (pageNumber == 0) {
+                builder.row()
+                    .button(Resource.getStringByKey("STR_17"), "book_to_1")
+                    .button(Resource.getStringByKey("STR_24"), "menu")
+                    .endRow()
+                if (message != "/book") {
+                    sender.delete(chatId, update.callbackQuery.message.messageId)
+                    sender.send(builder.build())
+                }
+            } else if (pageNumber < Rule.maxRulePage) {
+                builder.row()
+                    .button(Resource.getStringByKey("STR_18") + " - " + pageNumber, "book_to_" + (pageNumber - 1))
+                    .button(Resource.getStringByKey("STR_17") + " - " + (pageNumber + 2), "book_to_" + (pageNumber + 1))
+                    .button(Resource.getStringByKey("STR_24"), "menu")
+                    .endRow()
                 sender.delete(chatId, update.callbackQuery.message.messageId)
+                sender.send(builder.build())
+                return
+            } else if (pageNumber == Rule.maxRulePage) {
+                builder.row()
+                    .button(Resource.getStringByKey("STR_18"), "book_to_" + (pageNumber - 1))
+                    .button(Resource.getStringByKey("STR_24"), "menu")
+                    .endRow()
+                sender.delete(chatId, update.callbackQuery.message.messageId)
+                sender.send(builder.build())
+                return
             }
-        } else if (pageNumber < Rule.maxRulePage) {
-            builder.row()
-                .button(Resource.getStringByKey("STR_18") + " - " + pageNumber, "book_to_" + (pageNumber - 1))
-                .button(Resource.getStringByKey("STR_17") + " - " + (pageNumber + 2), "book_to_" + (pageNumber + 1))
-                .button(Resource.getStringByKey("STR_24"), "menu")
-                .endRow()
-            sender.delete(chatId, update.callbackQuery.message.messageId)
-            sender.send(builder.build())
-            return
-        } else if (pageNumber == Rule.maxRulePage) {
-            builder.row()
-                .button(Resource.getStringByKey("STR_18"), "book_to_" + (pageNumber - 1))
-                .button(Resource.getStringByKey("STR_24"), "menu")
-                .endRow()
-            sender.delete(chatId, update.callbackQuery.message.messageId)
-            sender.send(builder.build())
-            return
         }
-        sender.send(builder.build())
     }
 
     /**
@@ -112,7 +117,7 @@ class InlineKeyboard
         } else {
             update.message.from.id!!.toLong()
         }
-        if (!(Redis.checkRight(userId) || Config.admins.contains(userId))) {
+        if (!(Redis.checkRight(userId) || !Config.admins.contains(userId))) {
             for (i in 1..3) {
                 val rule = WordManager.rules[i]
                 builder.row()
@@ -123,6 +128,11 @@ class InlineKeyboard
                 }
                 builder.endRow()
             }
+            builder.row()
+                .button(Resource.getStringByKey("STR_24"), "menu")
+                .endRow()
+            sender.delete(chatId, update.callbackQuery.message.messageId)
+            sender.send(builder.build())
         } else {
             for (rule in WordManager.rules) {
                 if (rule.pageNumber == pageNumber) {
@@ -135,35 +145,35 @@ class InlineKeyboard
                     builder.endRow()
                 }
             }
-        }
-        // add buttons to got to other pages
-        if (pageNumber == 0) {
-            builder.row()
-                .button(Resource.getStringByKey("STR_17"), "to_1")
-                .button(Resource.getStringByKey("STR_24"), "menu")
-                .endRow()
-            if (message != "/rules") {
+            // add buttons to got to other pages
+            if (pageNumber == 0) {
+                builder.row()
+                    .button(Resource.getStringByKey("STR_17"), "to_1")
+                    .button(Resource.getStringByKey("STR_24"), "menu")
+                    .endRow()
+                if (message != "/rules") {
+                    sender.delete(chatId, update.callbackQuery.message.messageId)
+                    sender.send(builder.build())
+                }
+            } else if (pageNumber < Rule.maxRulePage) {
+                builder.row()
+                    .button(Resource.getStringByKey("STR_18") + " - " + pageNumber, "to_" + (pageNumber - 1))
+                    .button(Resource.getStringByKey("STR_17") + " - " + (pageNumber + 2), "to_" + (pageNumber + 1))
+                    .button(Resource.getStringByKey("STR_24"), "menu")
+                    .endRow()
                 sender.delete(chatId, update.callbackQuery.message.messageId)
+                sender.send(builder.build())
+                return
+            } else if (pageNumber == Rule.maxRulePage) {
+                builder.row()
+                    .button(Resource.getStringByKey("STR_18"), "to_" + (pageNumber - 1))
+                    .button(Resource.getStringByKey("STR_24"), "menu")
+                    .endRow()
+                sender.delete(chatId, update.callbackQuery.message.messageId)
+                sender.send(builder.build())
+                return
             }
-        } else if (pageNumber < Rule.maxRulePage) {
-            builder.row()
-                .button(Resource.getStringByKey("STR_18") + " - " + pageNumber, "to_" + (pageNumber - 1))
-                .button(Resource.getStringByKey("STR_17") + " - " + (pageNumber + 2), "to_" + (pageNumber + 1))
-                .button(Resource.getStringByKey("STR_24"), "menu")
-                .endRow()
-            sender.delete(chatId, update.callbackQuery.message.messageId)
-            sender.send(builder.build())
-            return
-        } else if (pageNumber == Rule.maxRulePage) {
-            builder.row()
-                .button(Resource.getStringByKey("STR_18"), "to_" + (pageNumber - 1))
-                .button(Resource.getStringByKey("STR_24"), "menu")
-                .endRow()
-            sender.delete(chatId, update.callbackQuery.message.messageId)
-            sender.send(builder.build())
-            return
         }
-        sender.send(builder.build())
     }
 
     /**
