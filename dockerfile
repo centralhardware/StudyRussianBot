@@ -1,3 +1,18 @@
-FROM openjdk:12
-COPY ./target/StudyRussian-jar-with-dependencies.jar /
-ENTRYPOINT ["java","-jar","StudyRussian-jar-with-dependencies.jar"]
+FROM maven:3.6-jdk-12 as maven
+
+COPY ./pom.xml ./pom.xml
+
+RUN mvn dependency:go-offline -B
+
+COPY ./src ./src
+
+RUN mvn package -DskipTests
+
+
+FROM openjdk:12-alpine
+
+
+COPY --from=maven target/StudyRussian-jar-with-dependencies.jar .
+
+
+CMD ["java", "-jar", "StudyRussian-jar-with-dependencies.jar" ]
