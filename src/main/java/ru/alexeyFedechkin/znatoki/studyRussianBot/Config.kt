@@ -52,14 +52,6 @@ object Config {
     val redisPort: Int = config.getString("REDIS_PORT")
         .toInt()
     /**
-     * RSA private key
-     */
-    val privateKey: String = config.getString("RSA_PRIVATE_KEY")
-    /**
-     * RSA public key
-     */
-    val publicKey: String = config.getString("RSA_PUBLIC_KEY")
-    /**
      * List of admins id
      * separator - ","
      */
