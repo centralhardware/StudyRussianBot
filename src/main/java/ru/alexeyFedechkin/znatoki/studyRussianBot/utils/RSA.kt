@@ -1,12 +1,9 @@
 package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
 
 import mu.KotlinLogging
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
 import java.nio.charset.StandardCharsets
-import java.security.*
-import java.security.spec.InvalidKeySpecException
-import java.security.spec.PKCS8EncodedKeySpec
-import java.security.spec.X509EncodedKeySpec
+import java.security.MessageDigest
+import java.security.Signature
 import java.util.*
 
 /**
@@ -15,8 +12,6 @@ import java.util.*
 object RSA {
     private val logger = KotlinLogging.logger { }
     private const val SOLID = "aYbWZRqZgBWkxQL2z8Z4kWPBz"
-    private var signature: Signature = Signature.getInstance("SHA256withRSA")
-    private val base64 = org.apache.commons.codec.binary.Base64()
     /**
      * generate activated code.
      * sign signature with giving message (userName of telegram user).
