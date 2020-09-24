@@ -9,7 +9,7 @@ COPY ./src ./src
 RUN mvn package -DskipTests
 
 
-FROM openjdk:12-alpine
+FROM openjdk:12
 
 
 COPY --from=maven target/StudyRussian-jar-with-dependencies.jar .

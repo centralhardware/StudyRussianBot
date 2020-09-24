@@ -31,7 +31,6 @@ object RSA {
             val messageWithSolid = message + SOLID
             signature = Signature.getInstance("SHA256withRSA")
             var pkcs8Pem = Config.privateKey
-            pkcs8Pem = pkcs8Pem.replace("\\s+".toRegex(), "")
             val pkcs8EncodedBytes = Base64.decode(pkcs8Pem.toByteArray(StandardCharsets.UTF_8))
             val keySpec = PKCS8EncodedKeySpec(pkcs8EncodedBytes)
             val kf = KeyFactory.getInstance("RSA")
