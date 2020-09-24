@@ -28,7 +28,7 @@ object RSA {
      */
     fun generateKey(message: String): String {
         var s = message + SOLID
-        return MessageDigest.getInstance("SHA-256").digest(s.toByteArray(StandardCharsets.UTF_8)).toString()
+        return Base64.getEncoder().encodeToString( MessageDigest.getInstance("SHA-256").digest(s.toByteArray(StandardCharsets.UTF_8)))
     }
 
     /**
@@ -40,7 +40,7 @@ object RSA {
      */
     fun validateKey(userName: String, key: String): Boolean {
         var s = userName + SOLID
-        if (MessageDigest.getInstance("SHA-256").digest(s.toByteArray(StandardCharsets.UTF_8)).toString() == key) return true;
+        if (Base64.getEncoder().encodeToString( MessageDigest.getInstance("SHA-256").digest(s.toByteArray(StandardCharsets.UTF_8))) == key) return true;
         return false;
     }
 }
