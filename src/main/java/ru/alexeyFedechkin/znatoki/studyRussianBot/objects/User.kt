@@ -92,7 +92,7 @@ data class User(
             100
         }
         val builder = StringBuilder()
-        builder.append(Resource.getStringByKey("STR_12")).append("\n").append(Resource.getStringByKey("STR_13")).append(Redis.getCountOfSentMessage(chatId)).append("\n").append(Resource.getStringByKey("STR_14")).append(Redis.getCountOfReceivedMessage(chatId)).append("\n").append(Resource.getStringByKey("STR_15")).append(Redis.getCountOfCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_45")).append(Redis.getCountOfWrongCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_46")).append(rightPercent).append("%").append("\n").append(Resource.getStringByKey("STR_16")).append("\n")
+        builder.append(Resource.getStringByKey("STR_12")).append("\n").append("\n").append("\n").append(Resource.getStringByKey("STR_15")).append(Redis.getCountOfCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_45")).append(Redis.getCountOfWrongCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_46")).append(rightPercent).append("%").append("\n").append(Resource.getStringByKey("STR_16")).append("\n")
         for ((name) in WordManager.rules) {
             if (Redis.isCheckRule(chatId, name)) {
                 builder.append(" - ").append("\"").append(name).append("\"").append("\n")

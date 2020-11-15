@@ -12,7 +12,7 @@ class InlineKeyboardBuilder
 /**
  * need to ban creation of instance of class without create method
  */ private constructor() {
-    private var chatId: Long? = null
+    private var chatId: String? = null
     private var text: String? = null
 
     private val keyboard = ArrayList<List<InlineKeyboardButton>>()
@@ -20,20 +20,11 @@ class InlineKeyboardBuilder
 
     companion object {
         /**
-         * create builder without args
-         *
-         * @return instance of InlineKeyboardBuilder
-         */
-        fun create(): InlineKeyboardBuilder {
-            return InlineKeyboardBuilder()
-        }
-
-        /**
          * create builder with given chat id
          * @param chatId id of user
          * @return instance of InlineKeyboardBuilder with given chat id
          */
-        fun create(chatId: Long): InlineKeyboardBuilder {
+        fun create(chatId: String): InlineKeyboardBuilder {
             val builder = InlineKeyboardBuilder()
             builder.setChatId(chatId)
             return builder
@@ -56,7 +47,7 @@ class InlineKeyboardBuilder
      * @param chatId id of user
      * @return instance of this class
      */
-    fun setChatId(chatId: Long): InlineKeyboardBuilder {
+    fun setChatId(chatId: String): InlineKeyboardBuilder {
         this.chatId = chatId
         return this
     }
@@ -76,7 +67,10 @@ class InlineKeyboardBuilder
      * @return instance of this class
      */
     fun button(text: String, callbackData: String): InlineKeyboardBuilder {
-        row!!.add(InlineKeyboardButton().setText(text).setCallbackData(callbackData))
+        row!!.add(InlineKeyboardButton.
+            builder().
+            text(text).
+            callbackData(callbackData).build())
         return this
     }
 
@@ -90,18 +84,19 @@ class InlineKeyboardBuilder
         return this
     }
 
-
     /**
      * build Inline keyboard
      * @return SendMessage
      */
     fun build(): SendMessage {
-        val message = SendMessage()
-        message.setChatId(chatId!!)
-        message.text = text
-        val keyboardMarkup = InlineKeyboardMarkup()
-        keyboardMarkup.keyboard = keyboard
-        message.replyMarkup = keyboardMarkup
-        return message
+        return SendMessage.
+            builder().
+            text(text!!).
+            chatId(chatId!!).
+            replyMarkup(InlineKeyboardMarkup.
+                builder().
+                keyboard(keyboard).
+                build()).
+            build()
     }
 }

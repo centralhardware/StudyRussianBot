@@ -2,7 +2,6 @@ package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
 
 import mu.KotlinLogging
 import org.apache.commons.io.IOUtils
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
 import java.io.IOException
 import java.io.StringWriter
 import java.util.*
@@ -11,7 +10,6 @@ import java.util.*
  *provide access to resource bundle
  */
 object Resource {
-    private val logger = KotlinLogging.logger { }
     private val resourceBundle = ResourceBundle.getBundle("string")
 
     /**
@@ -20,15 +18,11 @@ object Resource {
      * @return string by giving constant if value is exist
      */
     fun getStringByKey(key: String): String {
-        if (Config.isTesting) {
-            logger.info("get string from resource bundle string.properties. key = $key")
-        }
         return resourceBundle.getString(key)
     }
 
     /**
      * get string from resource folder file
-     *
      * @param fileName name of file to search
      * @return string from file that placed in resource folder
      */

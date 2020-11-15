@@ -1,7 +1,6 @@
 package ru.alexeyFedechkin.znatoki.studyRussianBot.objects
 
 import mu.KotlinLogging
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
 import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.SchoolStage
 
 /**
@@ -38,9 +37,7 @@ data class Word(
          * @return object crated from parsing string
          */
         fun parse(str: String): Word? {
-            if (Config.isTesting) {
-                logger.info("parsing string $str")
-            }
+            logger.info("parsing string $str")
             val args = str.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             if (args.size != 7) {
                 logger.warn("error in data file $str")

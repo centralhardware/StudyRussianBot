@@ -1,14 +1,12 @@
 package ru.alexeyFedechkin.znatoki.studyRussianBot.telegram
 
 import mu.KotlinLogging
-import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
-import org.telegram.telegrambots.meta.ApiContext
 import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Statistic
 import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.User
 import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.RSA
@@ -16,26 +14,15 @@ import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
 import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
 import kotlin.system.exitProcess
 
+
 /**
  *telegram bot class
  */
-class TelegramBot : TelegramLongPollingBot {
+class TelegramBot : TelegramLongPollingBot() {
     private val logger = KotlinLogging.logger { }
     private var telegramParser: TelegramParser? = null
     private var inlineKeyboard: InlineKeyboard
     private var sender: Sender = Sender(this)
-
-    /**
-     * set proxy setting
-     * @param botOptions proxy option
-     */
-    constructor(botOptions: DefaultBotOptions) : super(botOptions)
-
-    /**
-     * need to create instance from main class
-     */
-    constructor() {
-    }
 
     init {
         inlineKeyboard = InlineKeyboard(sender)
@@ -46,18 +33,8 @@ class TelegramBot : TelegramLongPollingBot {
      */
     fun init() {
         try {
-            if (Config.isUseProxy) {
-                val botsApi = TelegramBotsApi()
-                val botOptions = ApiContext.getInstance(DefaultBotOptions::class.java)
-                botOptions.proxyHost = Config.proxyHost
-                botOptions.proxyPort = Config.proxyPort
-                botOptions.proxyType = DefaultBotOptions.ProxyType.SOCKS5
-                logger.info("proxy configure")
-                botsApi.registerBot(TelegramBot(botOptions))
-            } else {
-                val botsApi = TelegramBotsApi()
-                botsApi.registerBot(TelegramBot())
-            }
+            val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
+            botsApi.registerBot(TelegramBot())
             logger.info("bot register")
         } catch (e: TelegramApiRequestException) {
             logger.warn("bot start fail", e)
@@ -72,15 +49,12 @@ class TelegramBot : TelegramLongPollingBot {
      * @param update received message
      */
     override fun onUpdateReceived(update: Update) {
-        if (telegramParser == null) {
-            telegramParser = TelegramParser(sender)
-        }
+        if (telegramParser == null) telegramParser = TelegramParser(sender)
         val chatId: Long = if (update.hasCallbackQuery()) {
             update.callbackQuery.message.chatId!!
         } else {
             update.message.chatId!!
         }
-        Statistic.checkReceived(chatId)
         when {
             update.hasCallbackQuery() -> {
                 logger.info("receive callback \"" + update.callbackQuery.data + "\" " +
@@ -108,22 +82,6 @@ class TelegramBot : TelegramLongPollingBot {
                 }
                 telegramParser!!.parseText(update)
             }
-            update.message.hasVoice() || update.message.hasAudio() -> {
-                logger.info("receive voice \"" + update.message.text +
-                        "\" from \"" + update.message.from.firstName + "\" " +
-                        update.message.from.lastName + "\" " +
-                        update.message.from.userName + "\" " +
-                        update.message.from.id + "\"")
-                telegramParser!!.parseAudio(update)
-            }
-            update.message.hasPhoto() -> {
-                logger.info("receive photo \"" + update.message.text +
-                        "\" from \"" + update.message.from.firstName + "\" " +
-                        update.message.from.lastName + "\" " +
-                        update.message.from.userName + "\" " +
-                        update.message.from.id + "\"")
-                telegramParser!!.parseImage(update)
-            }
         }
         when (telegramParser!!.users[chatId]!!.status) {
             UserStatus.WAIT_KEY -> {
@@ -138,53 +96,22 @@ class TelegramBot : TelegramLongPollingBot {
                     }
                 }
             }
-            UserStatus.WAIT_REPORT -> {
-                if (update.hasCallbackQuery()) {
-                    telegramParser!!.parsCallback(update)
-                } else {
-                    for (id in Config.admins) {
-                        val user = update.message.from
-                        if (update.message.from.userName == null) {
-                            sender.send(Resource.getStringByKey("STR_59") + user.firstName + " "
-                                    + user.lastName + " \n" + update.message.text, id)
-                        } else {
-                            sender.send(Resource.getStringByKey("STR_60") + user.userName + " " +
-                                    user.firstName + " " + user.lastName + " \n"
-                                    + update.message.text, id)
-                        }
-                    }
-                    sender.send(Resource.getStringByKey("STR_61"), chatId)
-                    telegramParser!!.users[chatId]!!.status = UserStatus.NONE
-                }
-            }
         }
     }
 
     /**
      * get bot user name
-     * @return product or testing bot username
+     * @return bot username
      */
     override fun getBotUsername(): String {
-        return if (Config.isTesting) {
-            logger.info("getting testing bot user name")
-            Config.testUserName
-        } else {
-            logger.info("getting production bot user name")
-            Config.userName
-        }
+        return Config.userName
     }
 
     /**
      * get bot token
-     * @return production or testing bot token
+     * @return bot token
      */
     override fun getBotToken(): String {
-        return if (Config.isTesting) {
-            logger.info("getting testing bot token")
-            Config.testToken
-        } else {
-            logger.info("getting production bot token")
-            Config.token
-        }
+        return Config.token
     }
 }

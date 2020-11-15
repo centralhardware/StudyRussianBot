@@ -1,7 +1,5 @@
 package ru.alexeyFedechkin.znatoki.studyRussianBot.telegram
 
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto
-import org.telegram.telegrambots.meta.api.methods.send.SendVoice
 import org.telegram.telegrambots.meta.api.objects.Update
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
 import ru.alexeyFedechkin.znatoki.studyRussianBot.WordManager
@@ -27,10 +25,7 @@ class TelegramParser
  * @param sender object for sending message
  */(private val sender: Sender) {
     private var inlineKeyboard: InlineKeyboard = InlineKeyboard(sender)
-    val botUtil: BotUtil = BotUtil(sender)
-    /**
-     *
-     */
+
     val users: HashMap<Long, User> = HashMap<Long, User>()
 
     /**
@@ -43,7 +38,6 @@ class TelegramParser
      * - /menu: show menu
      * - /gen: generate activated code. Param: userName. only for admin
      * - /ver: verify activated code. Param: key userName. only for admin
-     * - /stat: show bot statistic. only for admin
      * if message have not command: next action depending on status
      * - WAIT_COUNT_OF_WORD: start testing with giving count of word
      * - TESTING: message is answer on word with missing later. if answer is wright - send next word or result
@@ -54,17 +48,13 @@ class TelegramParser
         val message = update.message.text
         val chatId = update.message.chatId
         val user = users[chatId]
-        Redis.received(chatId)
         when (message) {
             "/start" -> {
                 user!!.reset()
+                sender.send(Resource.getStringByKey("START_MESSAGE"), update.message.chatId)
                 if (Redis.checkRight(chatId)) {
-                    sender.send(Resource.getStringByKey("START_MESSAGE"),
-                            update.message.chatId)
                     inlineKeyboard.sendMenu(chatId!!)
                 } else {
-                    sender.send(Resource.getStringByKey("START_MESSAGE"),
-                            update.message.chatId)
                     inlineKeyboard.sendLoginInfo(chatId!!)
                 }
             }
@@ -99,7 +89,6 @@ class TelegramParser
                             sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
                         }
                     }
-                    message.startsWith("/stat") -> botUtil.sendStatistic(chatId)
                     message.startsWith("/") -> sender.send(Resource.getStringByKey("STR_101"), chatId)
                     else -> when (user!!.status) {
                         WAIT_COUNT_OF_WORD -> {
@@ -164,10 +153,7 @@ class TelegramParser
      * - menu - show menu
      * - enter_key - set status to wait_key and waiting input of activated code. only for demo access
      * - login - send login inline menu. only for demo access.
-     * - buy_key - send message with data about buy access. only for demo access.
      * - book - show rule help. for demo aviable only tree rule description
-     * - report - send message to admins. only for demo or full access
-     * - statistic - show statistic. only for admin
      * - to_$pageNumber - show page of rule
      * - book_to_#pageNumber - show page of rule description
      * @param update received message
@@ -176,7 +162,6 @@ class TelegramParser
         val callback = update.callbackQuery.data
         val chatId = update.callbackQuery.message.chatId
         val user = users[chatId]
-        Redis.received(chatId)
         when (callback) {
             "reset_testing" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
@@ -210,16 +195,10 @@ class TelegramParser
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 inlineKeyboard.sendLoginInfo(chatId!!)
             }
-//            "buy_key" ->  telegramBot.send(resource.getStringByKey("STR_33"), chatId);}
             "book" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 inlineKeyboard.sendBookInlineKeyBoard(update, 0)
             }
-            "report" -> {
-                user!!.status = WAIT_REPORT
-                sender.send(Resource.getStringByKey("STR_62"), chatId)
-            }
-            "statistic" -> botUtil.sendStatistic(chatId)
             else -> {
                 when {
                     callback.startsWith("to_") -> {
@@ -231,7 +210,7 @@ class TelegramParser
                         inlineKeyboard.sendBookInlineKeyBoard(update, callback.replace("book_to_", "").toInt())
                     callback.startsWith("book") && !callback.startsWith("book_to_") -> {
                         sender.send(WordManager.getRuleDescriptionById(Integer.parseInt(callback.replace("book", "")))!!.description, chatId)
-                        val builder = InlineKeyboardBuilder.create(chatId)
+                        val builder = InlineKeyboardBuilder.create(chatId.toString())
                             .setText(Resource.getStringByKey("STR_18"))
                             .row()
                             .button("↑", "book")
@@ -251,7 +230,7 @@ class TelegramParser
                     }
                     user!!.status != NONE -> {
                         sender.delete(chatId, update.callbackQuery.message.messageId)
-                        val builder = InlineKeyboardBuilder.create(chatId)
+                        val builder = InlineKeyboardBuilder.create(chatId.toString())
                             .setText(Resource.getStringByKey("STR_9"))
                             .row()
                             .button(Resource.getStringByKey("YES"), "reset_testing")
@@ -261,41 +240,6 @@ class TelegramParser
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * parse audio message using only for reporting to admin
-     * @param update
-     */
-    fun parseAudio(update: Update) {
-        if (users[update.message.chatId]!!.status === WAIT_REPORT) {
-            for (chatId in Config.admins) {
-                val sendVoice = SendVoice()
-                sendVoice.chatId = chatId.toString()
-                sendVoice.setVoice(update.message.voice.fileId)
-                sender.send(sendVoice)
-            }
-        } else {
-            sender.send(Resource.getStringByKey("STR_102"), update.message.chatId)
-        }
-    }
-
-    /**
-     * parse image message using only for reporting to admin
-     * @param update
-     */
-    fun parseImage(update: Update) {
-        if (users[update.message.chatId]!!.status === WAIT_REPORT) {
-            for (chatId in Config.admins) {
-                val photo = update.message.photo[update.message.photo.size - 1]
-                val sendPhoto = SendPhoto()
-                sendPhoto.chatId = chatId.toString()
-                sendPhoto.setPhoto(photo.fileId)
-                sender.send(sendPhoto)
-            }
-        } else {
-            sender.send(Resource.getStringByKey("STR_103"), update.message.chatId)
         }
     }
 }

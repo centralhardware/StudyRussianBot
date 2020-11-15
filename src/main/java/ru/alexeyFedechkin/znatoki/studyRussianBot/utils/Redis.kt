@@ -5,7 +5,6 @@ import redis.clients.jedis.Jedis
 import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
 import ru.alexeyFedechkin.znatoki.studyRussianBot.WordManager
 import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.User
-import java.util.*
 
 /**
  *provide access to redis server
@@ -13,68 +12,10 @@ import java.util.*
 object Redis {
     private val logger = KotlinLogging.logger { }
     private val jedis: Jedis = Jedis(Config.redisHost, Config.redisPort)
-    /**
-     * key for get count of transmitted message
-     */
-    const val COUNT_OF_SENT_MESSAGE_KEY: String = "count_of_sent_message"
-    /**
-     * key for get count of received message
-     */
-    const val COUNT_OF_RECEIVED_MESSAGE_KEY: String = "count_of_received_message"
-    /**
-     * key postfix of user count of received keys
-     */
-    const val COUNT_OF_RECEIVED_MESSAGE_POSTFIX: String = "_count_of_received_message"
-    /**
-     * key postfix of user count transmitted keys
-     */
-    const val COUNT_OF_SENT_MESSAGE_POSTFIX: String = "_count_of_sent_message"
     private const val KEY_POSTFIX = "_key"
     private const val CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word"
     private const val CHECKED_WORD_POSTFIX = "_checked_word"
     private const val CHECKED_RULE_POSTFIX = "_checked_rule"
-
-    /**
-     * store data in redis about count of received messages
-     * @param chatId id of user
-     */
-    fun received(chatId: Long) {
-        val countOfReceivedMessageKey = chatId.toString() + COUNT_OF_RECEIVED_MESSAGE_POSTFIX
-        if (jedis.get(countOfReceivedMessageKey) == null) {
-            jedis.set(countOfReceivedMessageKey, "1")
-        } else {
-            jedis.set(countOfReceivedMessageKey, (Integer.parseInt(jedis.get(countOfReceivedMessageKey)) + 1).toString())
-        }
-        logger.info("set key \"" + countOfReceivedMessageKey + "\" value \"" + jedis.get(countOfReceivedMessageKey) + "\"")
-
-        if (jedis.get(COUNT_OF_RECEIVED_MESSAGE_KEY) == null) {
-            jedis.set(COUNT_OF_RECEIVED_MESSAGE_KEY, "1")
-        } else {
-            jedis.set(COUNT_OF_RECEIVED_MESSAGE_KEY, (Integer.parseInt(jedis.get(COUNT_OF_RECEIVED_MESSAGE_KEY)) + 1).toString())
-        }
-        logger.info("set key \"" + COUNT_OF_RECEIVED_MESSAGE_KEY + "\" value \"" + jedis.get(COUNT_OF_RECEIVED_MESSAGE_KEY) + "\"")
-    }
-
-    /**
-     * store data in redis about count of sent messages
-     * @param chatId id of user
-     */
-    fun sent(chatId: Long) {
-        val countOfSentMessageKey = chatId.toString() + COUNT_OF_SENT_MESSAGE_POSTFIX
-        if (jedis.get(countOfSentMessageKey) == null) {
-            jedis.set(countOfSentMessageKey, "1")
-        } else {
-            jedis.set(countOfSentMessageKey, (Integer.parseInt(jedis.get(countOfSentMessageKey)) + 1).toString())
-        }
-        logger.info("set key \"" + countOfSentMessageKey + "\" value \"" + jedis.get(countOfSentMessageKey) + "\"")
-
-        if (jedis.get(COUNT_OF_SENT_MESSAGE_KEY) == null) {
-            jedis.set(COUNT_OF_SENT_MESSAGE_KEY, "1")
-        } else {
-            jedis.set(COUNT_OF_SENT_MESSAGE_KEY, (Integer.parseInt(jedis.get(COUNT_OF_SENT_MESSAGE_KEY)) + 1).toString())
-        }
-        logger.info("set key \"" + COUNT_OF_SENT_MESSAGE_KEY + "\" value \"" + jedis.get(COUNT_OF_SENT_MESSAGE_KEY) + "\"")
-    }
 
     /**
      * store data about passing rule task
@@ -89,15 +30,8 @@ object Redis {
                 checkedCount++
             }
         }
-        if (Config.isTesting) {
-            if (checkedCount > 2) {
-                jedis.sadd(checkRuleKey, user.currRule!!.name)
-                logger.info("add value \"" + user.currRule!!.name + "\" to set by key \"" + checkRuleKey + "\"")
-            }
-        } else {
-            if (checkedCount >= user.currRule!!.words.size) {
-                jedis.sadd(checkRuleKey, user.currRule!!.name)
-            }
+        if (checkedCount >= user.currRule!!.words.size) {
+            jedis.sadd(checkRuleKey, user.currRule!!.name)
         }
     }
 
@@ -110,28 +44,6 @@ object Redis {
     fun isCheckRule(chatId: Long, rule: String): Boolean {
         val checkRuleKey = chatId.toString() + CHECKED_RULE_POSTFIX
         return jedis.sismember(checkRuleKey, rule)!!
-    }
-
-    /**
-     * get count of send message for user
-     * @param chatId id of user
-     * @return count of sen message
-     */
-    fun getCountOfSentMessage(chatId: Long): String {
-        logger.info("get count of message")
-        val countOfReceivedMessageKey = chatId.toString() + COUNT_OF_RECEIVED_MESSAGE_POSTFIX
-        return jedis.get(countOfReceivedMessageKey)
-    }
-
-    /**
-     * get count of received message for user
-     * @param chatId id of user
-     * @return count of received message
-     */
-    fun getCountOfReceivedMessage(chatId: Long): String {
-        logger.info("get count of received message")
-        val countOfSentMessageKey = chatId.toString() + COUNT_OF_SENT_MESSAGE_POSTFIX
-        return jedis.get(countOfSentMessageKey)
     }
 
     /**
@@ -211,59 +123,11 @@ object Redis {
     }
 
     /**
-     * delete value by key
-     * @param key key of value to delete
-     */
-    fun deleteKey(key: String) {
-        jedis.del(key)
-    }
-
-    /**
      * get value by giving key
      * @param key key for getting
      * @return String with value by giving key
      */
     fun getValue(key: String): String {
         return jedis.get(key)
-    }
-
-    fun setKey(key: String, value: String) {
-        jedis.set(key, value)
-    }
-
-    /**
-     * get set of redis keys without keys with activated code
-     *
-     * @return all redis keys set
-     */
-    fun getAllKeys(pattern: String): Set<String> {
-        val keys = HashSet<String>()
-        for (str in jedis.keys(pattern)) {
-            if (!str.endsWith(KEY_POSTFIX)) {
-                keys.add(str)
-            }
-        }
-        return keys
-    }
-
-    /**
-     * add data to list. using for store data about statistic
-     *
-     * @param key   key of list
-     * @param value value too add in list
-     */
-    @Synchronized
-    fun addToList(key: String, value: String) {
-        jedis.lpush(key, value)
-    }
-
-    /**
-     * get list by key
-     *
-     * @param key key of list
-     * @return list data
-     */
-    fun getListByKey(key: String): List<String> {
-        return jedis.lrange(key, 0, jedis.llen(key)!!)
     }
 }

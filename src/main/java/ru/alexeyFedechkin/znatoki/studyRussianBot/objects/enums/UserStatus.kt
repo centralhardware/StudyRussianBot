@@ -21,8 +21,4 @@ enum class UserStatus {
      * input activated key
      */
     WAIT_KEY,
-    /**
-     * input message to admins
-     */
-    WAIT_REPORT
 }

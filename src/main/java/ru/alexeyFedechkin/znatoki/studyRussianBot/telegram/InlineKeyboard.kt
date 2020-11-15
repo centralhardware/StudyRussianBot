@@ -36,12 +36,12 @@ class InlineKeyboard
             message = update.message.text
         }
         logger.info("send book keyboard rules")
-        val builder = InlineKeyboardBuilder.create(chatId)
+        val builder = InlineKeyboardBuilder.create(chatId.toString())
             .setText(Resource.getStringByKey("STR_42"))
         val userId: Long = if (update.hasCallbackQuery()) {
-            update.callbackQuery.from.id!!.toLong()
+            update.callbackQuery.from.id.toLong()
         } else {
-            update.message.from.id!!.toLong()
+            update.message.from.id.toLong()
         }
         if (!(Redis.checkRight(userId) || !Config.admins.contains(userId))) {
             for (i in 0..2) {
@@ -110,12 +110,12 @@ class InlineKeyboard
             message = update.message.text
         }
         logger.info("send inline keyboard rules")
-        val builder = InlineKeyboardBuilder.create(chatId)
+        val builder = InlineKeyboardBuilder.create(chatId.toString())
             .setText(Resource.getStringByKey("STR_8"))
         val userId: Long = if (update.hasCallbackQuery()) {
-            update.callbackQuery.from.id!!.toLong()
+            update.callbackQuery.from.id.toLong()
         } else {
-            update.message.from.id!!.toLong()
+            update.message.from.id.toLong()
         }
         if (!(Redis.checkRight(userId) || !Config.admins.contains(userId))) {
             for (i in 1..3) {
@@ -185,7 +185,7 @@ class InlineKeyboard
         if (Redis.checkRight(chatId) || Config.admins.contains(chatId)) {
             sender.send(Resource.getStringByKey("STR_44"), chatId)
         } else {
-            val builder = InlineKeyboardBuilder.create(chatId)
+            val builder = InlineKeyboardBuilder.create(chatId.toString())
                 .setText(Resource.getStringByKey("STR_28"))
                 .row()
                 .button(Resource.getStringByKey("STR_29"), "enter_key")
@@ -210,7 +210,7 @@ class InlineKeyboard
      */
     fun sendMenu(chatId: Long) {
         logger.info("send inline keyboard menu")
-        val builder = InlineKeyboardBuilder.create(chatId)
+        val builder = InlineKeyboardBuilder.create(chatId.toString())
             .setText(Resource.getStringByKey("STR_24"))
             .row()
             .button(Resource.getStringByKey("STR_23"), "testing")

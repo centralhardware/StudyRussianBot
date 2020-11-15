@@ -16,33 +16,6 @@ object Config {
      */
     val token: String = config.getString("BOT_TOKEN")
     /**
-     * bot testing username
-     */
-    val testUserName: String = config.getString("BOT_TESTING_USER_NAME")
-    /**
-     * bot testing token
-     */
-    val testToken: String = config.getString("BOT_TESTING_TOKEN")
-    /**
-     * host of proxy server
-     */
-    val proxyHost: String = config.getString("PROXY_HOST")
-    /**
-     * port of proxy server
-     */
-    val proxyPort: Int = config.getString("PROXY_PORT")
-        .toInt()
-    /**
-     * if true will be used test bot and debug message will by displayed
-     */
-    val isTesting: Boolean = config.getString("IS_TESTING")
-        .toBoolean()
-    /**
-     * is setting proxy option
-     */
-    val isUseProxy: Boolean = config.getString("IS_USE_PROXY")
-        .toBoolean()
-    /**
      * host of redis server
      */
     val redisHost: String = config.getString("REDIS_HOST")
@@ -60,7 +33,7 @@ object Config {
             .split(",".toRegex())
             .dropLastWhile { it.isEmpty() }
             .toTypedArray()
-        val admins = java.util.ArrayList<Long>()
+        val admins = ArrayList<Long>()
         for (id in adminsArr) {
             admins.add(java.lang.Long.valueOf(id))
         }
