@@ -121,13 +121,4 @@ object Redis {
         jedis.set(checkRightKey, key)
         logger.info("set right for key = \"$key\" and user = \"$user_id\"")
     }
-
-    /**
-     * get value by giving key
-     * @param key key for getting
-     * @return String with value by giving key
-     */
-    fun getValue(key: String): String {
-        return jedis.get(key)
-    }
 }

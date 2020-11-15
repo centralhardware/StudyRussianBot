@@ -15,8 +15,6 @@ import java.util.*
  * support type:
  * - text
  * - callback
- * - audio
- * - image
  * @property sender instance of sender class
  */
 class TelegramParser

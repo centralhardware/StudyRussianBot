@@ -1,6 +1,5 @@
 package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
 
-import mu.KotlinLogging
 import org.apache.commons.io.IOUtils
 import java.io.IOException
 import java.io.StringWriter
