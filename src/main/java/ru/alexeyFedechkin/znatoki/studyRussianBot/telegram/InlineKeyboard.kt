@@ -194,9 +194,6 @@ class InlineKeyboard
                 .button(Resource.getStringByKey("STR_41"), "menu")
                 .endRow()
                 .row()
-                .button(Resource.getStringByKey("STR_40"), "buy_key")
-                .endRow()
-                .row()
                 .button(Resource.getStringByKey("STR_26"), "help")
                 .endRow()
             sender.send(builder.build())
@@ -223,15 +220,6 @@ class InlineKeyboard
         if (!Redis.checkRight(chatId) && !Config.admins.contains(chatId)) {
             builder.row()
                 .button(Resource.getStringByKey("STR_36"), "login")
-                .endRow()
-        }
-        if (!Config.admins.contains(chatId)) {
-            builder.row()
-                .button(Resource.getStringByKey("STR_58"), "report")
-                .endRow()
-        } else {
-            builder.row()
-                .button(Resource.getStringByKey("STR_100"), "statistic")
                 .endRow()
         }
         sender.send(builder.build())

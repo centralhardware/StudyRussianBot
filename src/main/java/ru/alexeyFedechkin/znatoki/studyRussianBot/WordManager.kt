@@ -115,6 +115,8 @@ object WordManager {
         logger.info("init data")
     }
 
+    fun init(){};
+
     /**
      * get RuleDescription by id. linear search
      * @param id id of needed rule description
