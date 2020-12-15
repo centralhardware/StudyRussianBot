@@ -28,7 +28,7 @@ object Config {
      * List of admins id
      * separator - ","
      */
-    val admins: ArrayList<Long> = {
+    val admins: ArrayList<Long> = run {
         val adminsArr = config.getString("ADMIN_ID")
             .split(",".toRegex())
             .dropLastWhile { it.isEmpty() }
@@ -38,5 +38,5 @@ object Config {
             admins.add(java.lang.Long.valueOf(id))
         }
         admins
-    }.invoke()
+    }
 }
