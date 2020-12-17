@@ -112,7 +112,7 @@ class TelegramParser
                             }
 
                         }
-                        TESTING -> if (user.words[0].answer.toLowerCase() == message.toLowerCase()) {
+                        TESTING -> if (user.words[0].answer.equals(message, ignoreCase = true)) {
                             sender.send(Resource.getStringByKey("STR_3"), chatId)
                             user.words.removeAt(0)
                             if (user.words.isEmpty()) {
