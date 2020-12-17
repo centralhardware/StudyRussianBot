@@ -6,30 +6,29 @@ import java.util.*
  *provide access to application config file
  */
 object Config {
-    private val config = ResourceBundle.getBundle("config")
     /**
      * bot username
      */
-    val userName: String = config.getString("BOT_USER_NAME")
+    val userName: String = System.getenv("BOT_USER_NAME")
     /**
      * bot token
      */
-    val token: String = config.getString("BOT_TOKEN")
+    val token: String = System.getenv("BOT_TOKEN")
     /**
      * host of redis server
      */
-    val redisHost: String = config.getString("REDIS_HOST")
+    val redisHost: String = System.getenv("REDIS_HOST")
     /**
      * port of redis server
      */
-    val redisPort: Int = config.getString("REDIS_PORT")
+    val redisPort: Int = System.getenv("REDIS_PORT")
         .toInt()
     /**
      * List of admins id
      * separator - ","
      */
     val admins: ArrayList<Long> = run {
-        val adminsArr = config.getString("ADMIN_ID")
+        val adminsArr = System.getenv("ADMIN_ID")
             .split(",".toRegex())
             .dropLastWhile { it.isEmpty() }
             .toTypedArray()
