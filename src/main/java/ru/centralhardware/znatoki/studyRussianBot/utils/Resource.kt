@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
+package ru.centralhardware.znatoki.studyRussianBot.utils
 
 import org.apache.commons.io.IOUtils
 import java.io.IOException

@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.telegram
+package ru.centralhardware.znatoki.studyRussianBot.telegram
 
 import mu.KotlinLogging
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
@@ -6,12 +6,12 @@ import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.User
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.RSA
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
+import ru.centralhardware.znatoki.studyRussianBot.Config
+import ru.centralhardware.znatoki.studyRussianBot.objects.User
+import ru.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
+import ru.centralhardware.znatoki.studyRussianBot.utils.RSA
+import ru.centralhardware.znatoki.studyRussianBot.utils.Redis
+import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
 import kotlin.system.exitProcess
 
 

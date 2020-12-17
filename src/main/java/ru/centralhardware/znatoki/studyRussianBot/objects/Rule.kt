@@ -1,26 +1,26 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.objects
+package ru.centralhardware.znatoki.studyRussianBot.objects
 
-import ru.alexeyFedechkin.znatoki.studyRussianBot.WordManager
+import ru.centralhardware.znatoki.studyRussianBot.WordManager
 import java.util.*
 
 /**
  *data class that contain structure of rule
  */
 data class Rule(
-        /**
+    /**
          * name of rule
          */
         val name: String,
-        /**
+    /**
          * parent rule
          * used for generalized rules
          */
         var parent: Rule?,
-        /**
+    /**
          *section identifier for mapping with word
          */
         val section: String,
-        /**
+    /**
          *List of words
          */
         val words: ArrayList<Word>) {

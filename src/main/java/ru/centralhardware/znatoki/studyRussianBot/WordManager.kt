@@ -1,12 +1,12 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot
+package ru.centralhardware.znatoki.studyRussianBot
 
 import org.apache.log4j.Logger
 import org.json.JSONArray
 import org.json.JSONObject
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.Rule
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.RuleDescription
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.Word
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
+import ru.centralhardware.znatoki.studyRussianBot.objects.Rule
+import ru.centralhardware.znatoki.studyRussianBot.objects.RuleDescription
+import ru.centralhardware.znatoki.studyRussianBot.objects.Word
+import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
 import java.util.*
 
 /**

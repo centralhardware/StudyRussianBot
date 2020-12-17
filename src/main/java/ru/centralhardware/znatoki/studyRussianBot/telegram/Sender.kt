@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.telegram
+package ru.centralhardware.znatoki.studyRussianBot.telegram
 
 import mu.KotlinLogging
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage

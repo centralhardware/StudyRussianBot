@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot
+package ru.centralhardware.znatoki.studyRussianBot
 
 import java.util.*
 

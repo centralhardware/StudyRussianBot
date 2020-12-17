@@ -1,10 +1,10 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.objects
+package ru.centralhardware.znatoki.studyRussianBot.objects
 
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
-import ru.alexeyFedechkin.znatoki.studyRussianBot.WordManager
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
+import ru.centralhardware.znatoki.studyRussianBot.Config
+import ru.centralhardware.znatoki.studyRussianBot.WordManager
+import ru.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
+import ru.centralhardware.znatoki.studyRussianBot.utils.Redis
+import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
 import java.util.*
 
 /**
@@ -92,7 +92,9 @@ data class User(
             100
         }
         val builder = StringBuilder()
-        builder.append(Resource.getStringByKey("STR_12")).append("\n").append("\n").append("\n").append(Resource.getStringByKey("STR_15")).append(Redis.getCountOfCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_45")).append(Redis.getCountOfWrongCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_46")).append(rightPercent).append("%").append("\n").append(Resource.getStringByKey("STR_16")).append("\n")
+        builder.append(Resource.getStringByKey("STR_12")).append("\n").append("\n").append("\n").append(Resource.getStringByKey("STR_15")).append(
+            Redis.getCountOfCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_45")).append(Redis.getCountOfWrongCheckedWord(chatId)).append("\n").append(
+            Resource.getStringByKey("STR_46")).append(rightPercent).append("%").append("\n").append(Resource.getStringByKey("STR_16")).append("\n")
         for ((name) in WordManager.rules) {
             if (Redis.isCheckRule(chatId, name)) {
                 builder.append(" - ").append("\"").append(name).append("\"").append("\n")

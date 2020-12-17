@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.objects
+package ru.centralhardware.znatoki.studyRussianBot.objects
 
 /**
  *data class that contain structure of rule description

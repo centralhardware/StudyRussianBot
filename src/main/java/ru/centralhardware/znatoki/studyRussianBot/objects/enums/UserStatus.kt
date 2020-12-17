@@ -1,4 +1,4 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums
+package ru.centralhardware.znatoki.studyRussianBot.objects.enums
 
 /**
  *user status

@@ -1,10 +1,10 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.utils
+package ru.centralhardware.znatoki.studyRussianBot.utils
 
 import mu.KotlinLogging
 import redis.clients.jedis.Jedis
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
-import ru.alexeyFedechkin.znatoki.studyRussianBot.WordManager
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.User
+import ru.centralhardware.znatoki.studyRussianBot.Config
+import ru.centralhardware.znatoki.studyRussianBot.WordManager
+import ru.centralhardware.znatoki.studyRussianBot.objects.User
 
 /**
  *provide access to redis server

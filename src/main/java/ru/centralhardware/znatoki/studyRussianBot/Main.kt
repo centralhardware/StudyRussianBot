@@ -1,7 +1,7 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot
+package ru.centralhardware.znatoki.studyRussianBot
 
 import mu.KotlinLogging
-import ru.alexeyFedechkin.znatoki.studyRussianBot.telegram.TelegramBot
+import ru.centralhardware.znatoki.studyRussianBot.telegram.TelegramBot
 
 private val logger = KotlinLogging.logger { }
 /**

@@ -1,13 +1,13 @@
-package ru.alexeyFedechkin.znatoki.studyRussianBot.telegram
+package ru.centralhardware.znatoki.studyRussianBot.telegram
 
 import org.telegram.telegrambots.meta.api.objects.Update
-import ru.alexeyFedechkin.znatoki.studyRussianBot.Config
-import ru.alexeyFedechkin.znatoki.studyRussianBot.WordManager
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.User
-import ru.alexeyFedechkin.znatoki.studyRussianBot.objects.enums.UserStatus.*
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.RSA
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Redis
-import ru.alexeyFedechkin.znatoki.studyRussianBot.utils.Resource
+import ru.centralhardware.znatoki.studyRussianBot.Config
+import ru.centralhardware.znatoki.studyRussianBot.WordManager
+import ru.centralhardware.znatoki.studyRussianBot.objects.User
+import ru.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus.*
+import ru.centralhardware.znatoki.studyRussianBot.utils.RSA
+import ru.centralhardware.znatoki.studyRussianBot.utils.Redis
+import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
 import java.util.*
 
 /**
