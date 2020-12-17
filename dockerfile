@@ -14,5 +14,4 @@ FROM openjdk:15-alpine
 
 COPY --from=maven target/StudyRussian-jar-with-dependencies.jar .
 
-
 CMD ["java", "-jar", "StudyRussian-jar-with-dependencies.jar" ]
