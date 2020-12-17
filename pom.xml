@@ -60,6 +60,13 @@
             <artifactId>kotlin-logging</artifactId>
             <version>1.7.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -77,7 +84,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>ru.alexeyFedechkin.znatoki.studyRussianBot.MainKt</mainClass>
+                                    <mainClass>ru.centralhardware.znatoki.studyRussianBot.MainKt</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
