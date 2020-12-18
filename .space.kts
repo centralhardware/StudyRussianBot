@@ -5,7 +5,7 @@
 */
 
 job("execute test") {
-    container("ubuntu") {
+    container("maven:3.6-jdk-14") {
         shellScript {
             content = """
                 mvn test
