@@ -70,7 +70,7 @@ object WordManager {
         val words = ArrayList<Word>()
         for (i in 0 until wordArray.length()) {
             val word = wordArray.getJSONObject(i)
-            words.add(Word(word.getString("word"), word.getString("right_word"), word.getString("answer"), word.getString("section")))
+            words.add(Word(word.getString("right_word"), word.getString("word"), word.getString("answer"), word.getString("section")))
         }
         // parse rule.json
         for (r in rules) {
