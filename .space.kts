@@ -6,6 +6,10 @@
 
 job("execute test") {
     container("maven:3.6-jdk-14") {
+        resources {
+            cpu = 1.cpu
+            memory = 1024.mb
+        }
         shellScript {
             content = """
                 mvn test
