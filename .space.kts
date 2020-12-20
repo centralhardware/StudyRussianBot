@@ -29,18 +29,6 @@ job("Build and push Docker") {
             """
         }
     }
-    
-    container("openjdk:11") {
-        resources {
-            cpu = 372.mcpu
-            memory = 256.mb
-        }
-        kotlinScript { api -> 
-			api.space().chats.channels.messages.sendTextMessage(
-    			channelId = "3MVaBr2rDLSR",
-    			text = "build image registry.centralhardware.synology.me/studyrussianbot:7.${api.executionNumber()} ")
-    	}
-    }
 
     docker {     
 		build {
@@ -53,4 +41,16 @@ job("Build and push Docker") {
             tag = "7.\$JB_SPACE_EXECUTION_NUMBER"
         }
 	}
+
+    container("openjdk:11") {
+        resources {
+            cpu = 372.mcpu
+            memory = 256.mb
+        }
+        kotlinScript { api ->
+            api.space().chats.channels.messages.sendTextMessage(
+                channelId = "3MVaBr2rDLSR",
+                text = "build image registry.centralhardware.synology.me/studyrussianbot:7.${api.executionNumber()} ")
+        }
+    }
 }
