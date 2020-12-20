@@ -32,7 +32,7 @@ job("Build and push Docker") {
     
     container("openjdk:11") {
         resources {
-            cpu = 200.mcpu
+            cpu = 372.mcpu
             memory = 256.mb
         }
         kotlinScript { api -> 
