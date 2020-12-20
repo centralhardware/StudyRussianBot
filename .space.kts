@@ -4,7 +4,8 @@
 * For more info, see https://www.jetbrains.com/help/space/automation.html
 */
 
-job("execute test") {
+
+job("Build and push Docker") {
     container("maven:3.6-jdk-14") {
         resources {
             cpu = 1.cpu
@@ -16,9 +17,7 @@ job("execute test") {
             """
         }
     }
-}
-
-job("Build and push Docker") {
+    
     container("maven:3.6.3-openjdk-15") {
         resources {
             cpu = 1.cpu
@@ -28,6 +27,13 @@ job("Build and push Docker") {
             content = """
                 mvn package
             """
+        }
+    }
+    
+    container("openjdk:11") {
+        resources {
+            cpu = 200.mcpu
+            memory = 256.mb
         }
         kotlinScript { api -> 
 			api.space().chats.channels.messages.sendTextMessage(
