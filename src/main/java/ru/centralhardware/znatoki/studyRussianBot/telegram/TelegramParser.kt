@@ -61,6 +61,7 @@ class TelegramParser
             "/book" -> inlineKeyboard.sendBookInlineKeyBoard(update, 0)
             "/profile" -> sender.send(user!!.getProfile(), chatId)
             "/menu" -> inlineKeyboard.sendMenu(chatId!!)
+            "/ping" -> sender.send("pong", chatId)
             else -> {
                 when {
                     message.startsWith("/gen ") -> {
