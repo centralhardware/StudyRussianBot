@@ -11,6 +11,11 @@ RUN mvn package
 
 FROM openjdk:15-alpine
 
+RUN apk update && \
+    apk add --no-cache tzdata
+
+ENV TZ Asia/Novosibirsk
+
 COPY --from=maven target/StudyRussian-jar-with-dependencies.jar .
 
 CMD ["java", "-jar", "StudyRussian-jar-with-dependencies.jar" ]
