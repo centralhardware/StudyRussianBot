@@ -9,6 +9,6 @@ private val logger = KotlinLogging.logger { }
  */
 fun main() {
     WordManager.init()
-    TelegramBot().init()
+    TelegramBot.init()
     logger.info("telegram bot run")
 }
