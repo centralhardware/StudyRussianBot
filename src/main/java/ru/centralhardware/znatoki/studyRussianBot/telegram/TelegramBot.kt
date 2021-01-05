@@ -19,7 +19,7 @@ import kotlin.system.exitProcess
 /**
  *telegram bot class
  */
-class TelegramBot : TelegramLongPollingBot() {
+class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
     private val logger = KotlinLogging.logger { }
     private var telegramParser: TelegramParser? = null
     private var inlineKeyboard: InlineKeyboard
@@ -37,7 +37,7 @@ class TelegramBot : TelegramLongPollingBot() {
             val options = DefaultBotOptions()
             options.baseUrl = Config.TELEGRAM_API_BOT_URL
             val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
-            botsApi.registerBot(TelegramBot())
+            botsApi.registerBot(TelegramBot(options))
             logger.info("bot register")
         } catch (e: TelegramApiRequestException) {
             logger.warn("bot start fail", e)
