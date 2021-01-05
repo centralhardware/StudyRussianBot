@@ -20,7 +20,6 @@ import kotlin.system.exitProcess
  *telegram bot class
  */
 class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
-    private val logger = KotlinLogging.logger { }
     private var telegramParser: TelegramParser? = null
     private var inlineKeyboard: InlineKeyboard
     private var sender: Sender = Sender(this)
@@ -29,21 +28,26 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) 
         inlineKeyboard = InlineKeyboard(sender)
     }
 
-    /**
-     * init telegram bot and configure proxy
-     */
-    fun init() {
-        try {
-            val options = DefaultBotOptions()
-            options.baseUrl = Config.TELEGRAM_API_BOT_URL
-            val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
-            botsApi.registerBot(TelegramBot(options))
-            logger.info("bot register")
-        } catch (e: TelegramApiRequestException) {
-            logger.warn("bot start fail", e)
-            exitProcess(20)
+    companion object{
+        private val logger = KotlinLogging.logger { }
+
+        /**
+         * init telegram bot and configure proxy
+         */
+        fun init() {
+            try {
+                val options = DefaultBotOptions()
+                options.baseUrl = Config.TELEGRAM_API_BOT_URL
+                val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
+                botsApi.registerBot(TelegramBot(options))
+                logger.info("bot register")
+            } catch (e: TelegramApiRequestException) {
+                logger.warn("bot start fail", e)
+                exitProcess(20)
+            }
         }
     }
+
 
     /**
      * method by which the library telegram sends
