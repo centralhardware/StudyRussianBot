@@ -1,6 +1,7 @@
 package ru.centralhardware.znatoki.studyRussianBot.telegram
 
 import mu.KotlinLogging
+import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
@@ -33,6 +34,8 @@ class TelegramBot : TelegramLongPollingBot() {
      */
     fun init() {
         try {
+            val options = DefaultBotOptions()
+            options.baseUrl = Config.TELEGRAM_API_BOT_URL
             val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
             botsApi.registerBot(TelegramBot())
             logger.info("bot register")

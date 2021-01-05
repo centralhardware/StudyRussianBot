@@ -7,6 +7,10 @@ import java.util.*
  */
 object Config {
     /**
+     * if you don't want to use local telegram api server, set to [org.telegram.telegrambots.meta.ApiConstants.BASE_URL]
+     */
+    val TELEGRAM_API_BOT_URL = System.getenv("TELEGRAM_API_BOT_URL")
+    /**
      * bot username
      */
     val userName: String = System.getenv("BOT_USER_NAME")
