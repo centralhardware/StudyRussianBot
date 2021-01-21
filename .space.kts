@@ -38,7 +38,7 @@ job("Build and push Docker") {
         }
         
         push("registry.centralhardware.synology.me/studyrussianbot") {
-            tag = "7.\$JB_SPACE_EXECUTION_NUMBER"
+            tag = "\$JB_SPACE_EXECUTION_NUMBER"
         }
 	}
 
@@ -50,7 +50,7 @@ job("Build and push Docker") {
         kotlinScript { api ->
             api.space().chats.channels.messages.sendTextMessage(
                 channelId = "3MVaBr2rDLSR",
-                text = "build image registry.centralhardware.synology.me/studyrussianbot:7.${api.executionNumber()} ")
+                text = "build image registry.centralhardware.synology.me/studyrussianbot:${api.executionNumber()} ")
         }
     }
 }
