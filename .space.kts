@@ -25,7 +25,7 @@ job("Build and push Docker") {
         }
         shellScript {
             content = """
-                mvn package
+                mvn package  -DskipTests
             """
         }
     }
@@ -34,7 +34,7 @@ job("Build and push Docker") {
 		build {
             context = "./"
             labels["build"] = "centralhardware.jetbrains.space"
-            file = "dockerfile"
+            file = "Dockerfile"
         }
         
         push("registry.centralhardware.synology.me/studyrussianbot") {
