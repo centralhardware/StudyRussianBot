@@ -1,4 +1,4 @@
-FROM maven:3.6-jdk-14 as maven
+FROM maven:3.6.3-openjdk-15 as maven
 
 COPY ./pom.xml ./pom.xml
 
@@ -9,7 +9,7 @@ COPY ./src ./src
 RUN mvn package
 
 
-FROM openjdk:15-alpine
+FROM openjdk:16-alpine
 
 RUN apk update && \
     apk add --no-cache tzdata
