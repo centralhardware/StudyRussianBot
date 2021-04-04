@@ -39,9 +39,9 @@ class InlineKeyboard
         val builder = InlineKeyboardBuilder.create(chatId.toString())
             .setText(Resource.getStringByKey("STR_42"))
         val userId: Long = if (update.hasCallbackQuery()) {
-            update.callbackQuery.from.id.toLong()
+            update.callbackQuery.from.id
         } else {
-            update.message.from.id.toLong()
+            update.message.from.id
         }
         if (!(Redis.checkRight(userId) || !Config.admins.contains(userId))) {
             for (i in 0..2) {
@@ -113,9 +113,9 @@ class InlineKeyboard
         val builder = InlineKeyboardBuilder.create(chatId.toString())
             .setText(Resource.getStringByKey("STR_8"))
         val userId: Long = if (update.hasCallbackQuery()) {
-            update.callbackQuery.from.id.toLong()
+            update.callbackQuery.from.id
         } else {
-            update.message.from.id.toLong()
+            update.message.from.id
         }
         if (!(Redis.checkRight(userId) || !Config.admins.contains(userId))) {
             for (i in 1..3) {
