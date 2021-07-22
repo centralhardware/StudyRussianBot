@@ -13,6 +13,7 @@ import ru.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
 import ru.centralhardware.znatoki.studyRussianBot.utils.RSA
 import ru.centralhardware.znatoki.studyRussianBot.utils.Redis
 import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
+import java.util.*
 import kotlin.system.exitProcess
 
 
@@ -83,9 +84,9 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) 
                 when {
                     !telegramParser!!.users.containsKey(update.message.chatId) ->
                         telegramParser!!.users[update.message.chatId] = User(update.message.chatId)
-                    update.message.text.toLowerCase() == "ping" ->
+                    update.message.text.lowercase() == "ping" ->
                         sender.send("pong", update.message.chatId!!)
-                    update.message.text.toLowerCase() == "pong" ->
+                    update.message.text.lowercase() == "pong" ->
                         sender.send("ping", update.message.chatId!!)
                 }
                 telegramParser!!.parseText(update)

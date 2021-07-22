@@ -6,7 +6,7 @@
 
 
 job("Build and push Docker") {
-    container("maven:3.6.3-openjdk-15") {
+    container("maven:3.6.3-openjdk-16") {
         resources {
             cpu = 1.cpu
             memory = 1024.mb
@@ -18,7 +18,7 @@ job("Build and push Docker") {
         }
     }
     
-    container("maven:3.6.3-openjdk-15") {
+    container("maven:3.6.3-openjdk-16") {
         resources {
             cpu = 1.cpu
             memory = 1024.mb
