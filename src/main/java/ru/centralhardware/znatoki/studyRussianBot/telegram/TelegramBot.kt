@@ -13,7 +13,6 @@ import ru.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
 import ru.centralhardware.znatoki.studyRussianBot.utils.RSA
 import ru.centralhardware.znatoki.studyRussianBot.utils.Redis
 import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
-import java.util.*
 import kotlin.system.exitProcess
 
 
@@ -105,6 +104,7 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) 
                     }
                 }
             }
+            else -> {}
         }
     }
 

@@ -135,6 +135,7 @@ class TelegramParser
                             user.wrongWords.add(temp)
                             sender.send(user.words[0].name, chatId)
                         }
+                        else -> {}
                     }
                 }
             }

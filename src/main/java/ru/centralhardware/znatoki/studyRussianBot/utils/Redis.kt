@@ -43,7 +43,7 @@ object Redis {
      */
     fun isCheckRule(chatId: Long, rule: String): Boolean {
         val checkRuleKey = chatId.toString() + CHECKED_RULE_POSTFIX
-        return jedis.sismember(checkRuleKey, rule)!!
+        return jedis.sismember(checkRuleKey, rule)
     }
 
     /**
@@ -54,7 +54,7 @@ object Redis {
     fun getCountOfCheckedWord(chatId: Long): Long {
         logger.info("get count of checked word")
         val checkWordKey = chatId.toString() + CHECKED_WORD_POSTFIX
-        return jedis.scard(checkWordKey)!!
+        return jedis.scard(checkWordKey)
     }
 
     /**
@@ -66,7 +66,7 @@ object Redis {
     fun getCountOfWrongCheckedWord(chatId: Long): Long {
         logger.info("get count of wrong checked word")
         val checkWordKey = chatId.toString() + CHECKED_WRONG_WORD_POSTFIX
-        return jedis.scard(checkWordKey)!!
+        return jedis.scard(checkWordKey)
     }
 
     /**
@@ -92,33 +92,33 @@ object Redis {
 
     /**
      * check license status
-     * @param user_id id of user
+     * @param userId id of user
      * @return true if user don't have demo access
      */
-    fun checkRight(user_id: Long): Boolean {
-        if (Config.admins.contains(user_id)) {
-            logger.info("user \"$user_id\" have admin permission")
+    fun checkRight(userId: Long): Boolean {
+        if (Config.admins.contains(userId)) {
+            logger.info("user \"$userId\" have admin permission")
             return true
         }
-        val checkRightKey = user_id.toString() + KEY_POSTFIX
+        val checkRightKey = userId.toString() + KEY_POSTFIX
         val key = jedis.get(checkRightKey)
         return if (key != null) {
-            logger.info("right for user = \"$user_id\" valid")
+            logger.info("right for user = \"$userId\" valid")
             true
         } else {
-            logger.info("right for user = \"$user_id\" don't valid")
+            logger.info("right for user = \"$userId\" don't valid")
             false
         }
     }
 
     /**
      * set activated code
-     * @param user_id id of user
+     * @param userId id of user
      * @param key activated code
      */
-    fun setRight(user_id: Long, key: String) {
-        val checkRightKey = user_id.toString() + KEY_POSTFIX
+    fun setRight(userId: Long, key: String) {
+        val checkRightKey = userId.toString() + KEY_POSTFIX
         jedis.set(checkRightKey, key)
-        logger.info("set right for key = \"$key\" and user = \"$user_id\"")
+        logger.info("set right for key = \"$key\" and user = \"$userId\"")
     }
 }

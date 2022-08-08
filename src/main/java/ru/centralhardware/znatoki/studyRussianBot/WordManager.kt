@@ -107,7 +107,7 @@ object WordManager {
         // set pageNumbers for rule description
         count = 1
         for (ruleDescription in ruleDescriptions) {
-            ruleDescription.pageNumber = ((count / Rule.pageCountRule))
+            ruleDescription.pageNumber = (count / Rule.pageCountRule)
             count++
         }
         logger.info("init data")
