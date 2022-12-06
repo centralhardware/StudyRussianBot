@@ -1,8 +1,6 @@
 package ru.centralhardware.znatoki.studyRussianBot.utils
 
-import org.apache.commons.io.IOUtils
-import java.io.IOException
-import java.io.StringWriter
+import java.io.File
 import java.util.*
 
 /**
@@ -21,16 +19,11 @@ object Resource {
     }
 
     /**
-     * get string from resource folder file
-     * @param fileName name of file to search
-     * @return string from file that placed in resource folder
+     * get string from file
+     * @param path path to file
+     * @return string from file
      */
-    @Throws(IOException::class)
-    fun getStringFromResources(fileName: String): String {
-        val classLoader = ClassLoader.getSystemClassLoader()
-        val inputStream = classLoader.getResourceAsStream(fileName)
-        val writer = StringWriter()
-        IOUtils.copy(Objects.requireNonNull(inputStream), writer)
-        return writer.toString()
+    fun loadFromPath(path: String): String {
+        return File(path).readText();
     }
 }

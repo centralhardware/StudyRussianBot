@@ -35,8 +35,8 @@ object WordManager {
      */
     init {
         // get Strings from files
-        val wordString = Resource.getStringFromResources("word.json")
-        val ruleString = Resource.getStringFromResources("rule.json")
+        val wordString = Resource.loadFromPath(Config.wordPath)
+        val ruleString = Resource.loadFromPath(Config.rulePath)
         // parse rule.json
         val ruleObject = JSONObject(ruleString)
         val ruleData = ruleObject.getJSONObject("data")

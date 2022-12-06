@@ -25,6 +25,14 @@ object Config {
     val redisPort: Int = System.getenv("REDIS_PORT")
         .toInt()
     /**
+     * path to file rule.json
+     */
+    val rulePath: String = System.getenv("RULE_PATH")
+    /**
+     * path to file word.json
+     */
+    val wordPath: String = System.getenv("WORD_PATH")
+    /**
      * List of admins id
      * separator - ","
      */
