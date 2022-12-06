@@ -1,10 +1,8 @@
 package ru.centralhardware.znatoki.studyRussianBot
 
 import org.apache.log4j.Logger
-import org.json.JSONArray
 import org.json.JSONObject
 import ru.centralhardware.znatoki.studyRussianBot.objects.Rule
-import ru.centralhardware.znatoki.studyRussianBot.objects.RuleDescription
 import ru.centralhardware.znatoki.studyRussianBot.objects.Word
 import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
 import java.util.*
@@ -18,17 +16,12 @@ object WordManager {
      * List of rules
      */
     val rules: ArrayList<Rule> = ArrayList<Rule>()
-    /**
-     * List of rule description
-     */
-    val ruleDescriptions: ArrayList<RuleDescription> = ArrayList<RuleDescription>()
 
     /**
      * parseText all data file and generate collections of object
      * parsing file:
      * - word.json: all words
      * - rule.json: rule signature
-     * - ruleDesc.json: description of rule
      * word structure:
      * word:[]
      * rule structure:
@@ -39,17 +32,11 @@ object WordManager {
      * }
      * parent is id of parent rule. -1 if parent rule is null. rule which is parent have not own rules.
      * parent rule gets rules from child
-     * ruleDesc structure:
-     * "$id":{
-     * "name":"",
-     * "description": "",
-     * }
      */
     init {
         // get Strings from files
         val wordString = Resource.getStringFromResources("word.json")
         val ruleString = Resource.getStringFromResources("rule.json")
-        val ruleDescriptionString = Resource.getStringFromResources("ruleDesc.json")
         // parse rule.json
         val ruleObject = JSONObject(ruleString)
         val ruleData = ruleObject.getJSONObject("data")
@@ -98,36 +85,10 @@ object WordManager {
         for (rule in rules) {
             logger.info("in rule \"" + rule.name + "\" added " + rule.words.size + "  words")
         }
-        // parse ruleDesc.json
-        val ruleDescriptionArray = JSONArray(ruleDescriptionString)
-        for (ruleDesc in ruleDescriptionArray) {
-            val ruleDescription = ruleDesc as JSONObject
-            ruleDescriptions.add(RuleDescription(ruleDescription.getString("name"), ruleDescription.getString("description"), ruleDescription.getInt("id")))
-        }
-        // set pageNumbers for rule description
-        count = 1
-        for (ruleDescription in ruleDescriptions) {
-            ruleDescription.pageNumber = (count / Rule.pageCountRule)
-            count++
-        }
         logger.info("init data")
     }
 
     fun init(){}
-
-    /**
-     * get RuleDescription by id. linear search
-     * @param id id of needed rule description
-     * @return RuleDescription find by giving id
-     */
-    fun getRuleDescriptionById(id: Int): RuleDescription? {
-        for (ruleDescription in ruleDescriptions) {
-            if (ruleDescription.id == id) {
-                return ruleDescription
-            }
-        }
-        return null
-    }
 
     /**
      * get Rule by name. linear search

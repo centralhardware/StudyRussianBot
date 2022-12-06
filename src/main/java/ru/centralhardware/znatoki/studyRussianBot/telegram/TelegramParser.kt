@@ -58,7 +58,6 @@ class TelegramParser
             }
             "/help" -> sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
             "/rules" -> inlineKeyboard.sendRuleInlineKeyboard(update, 0)
-            "/book" -> inlineKeyboard.sendBookInlineKeyBoard(update, 0)
             "/profile" -> sender.send(user!!.getProfile(), chatId)
             "/menu" -> inlineKeyboard.sendMenu(chatId!!)
             "/ping" -> sender.send("pong", chatId)
@@ -153,9 +152,7 @@ class TelegramParser
      * - menu - show menu
      * - enter_key - set status to wait_key and waiting input of activated code. only for demo access
      * - login - send login inline menu. only for demo access.
-     * - book - show rule help. for demo aviable only tree rule description
      * - to_$pageNumber - show page of rule
-     * - book_to_#pageNumber - show page of rule description
      * @param update received message
      */
     fun parsCallback(update: Update) {
@@ -195,27 +192,12 @@ class TelegramParser
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 inlineKeyboard.sendLoginInfo(chatId!!)
             }
-            "book" -> {
-                sender.delete(chatId, update.callbackQuery.message.messageId)
-                inlineKeyboard.sendBookInlineKeyBoard(update, 0)
-            }
             else -> {
                 when {
                     callback.startsWith("to_") -> {
                         if (user!!.status !== WAIT_COUNT_OF_WORD && user!!.status !== TESTING) {
                             inlineKeyboard.sendRuleInlineKeyboard(update, callback.replace("to_", "").toInt())
                         }
-                    }
-                    callback.startsWith("book_to_") ->
-                        inlineKeyboard.sendBookInlineKeyBoard(update, callback.replace("book_to_", "").toInt())
-                    callback.startsWith("book") && !callback.startsWith("book_to_") -> {
-                        sender.send(WordManager.getRuleDescriptionById(Integer.parseInt(callback.replace("book", "")))!!.description, chatId)
-                        val builder = InlineKeyboardBuilder.create(chatId.toString())
-                            .setText(Resource.getStringByKey("STR_18"))
-                            .row()
-                            .button("↑", "book")
-                            .endRow()
-                        sender.send(builder.build())
                     }
                     user!!.status === NONE -> {
                         for (rule in WordManager.rules) {
