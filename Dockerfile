@@ -9,7 +9,7 @@ COPY ./src ./src
 RUN mvn package
 
 
-FROM openjdk:18-alpine
+FROM openjdk:19-alpine
 
 RUN apk update && \
     apk add --no-cache tzdata
