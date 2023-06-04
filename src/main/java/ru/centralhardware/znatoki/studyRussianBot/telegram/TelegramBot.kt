@@ -19,7 +19,7 @@ import kotlin.system.exitProcess
 /**
  *telegram bot class
  */
-class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
+class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options, Config.token) {
     private var telegramParser: TelegramParser? = null
     private var inlineKeyboard: InlineKeyboard
     private var sender: Sender = Sender(this)
@@ -116,11 +116,4 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) 
         return Config.userName
     }
 
-    /**
-     * get bot token
-     * @return bot token
-     */
-    override fun getBotToken(): String {
-        return Config.token
-    }
 }

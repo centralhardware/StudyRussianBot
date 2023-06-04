@@ -1,4 +1,4 @@
-FROM maven:3.8.6-openjdk-18 as maven
+FROM maven:3.9.1-amazoncorretto-20 as maven
 
 COPY ./pom.xml ./pom.xml
 
@@ -9,7 +9,7 @@ COPY ./src ./src
 RUN mvn package
 
 
-FROM openjdk:19-alpine
+FROM bitnami/java:20
 
 RUN apk update && \
     apk add --no-cache tzdata
