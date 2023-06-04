@@ -11,10 +11,8 @@ RUN mvn package
 
 FROM bitnami/java:20
 
-RUN apk update && \
-    apk add --no-cache tzdata
-
-ENV TZ Asia/Novosibirsk
+RUN apt update && \
+    apt install tzdata
 
 COPY --from=maven target/StudyRussian-jar-with-dependencies.jar .
 
