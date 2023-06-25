@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
+import ru.centralhardware.znatoki.studyRussianBot.Clickhouse
 import ru.centralhardware.znatoki.studyRussianBot.Config
 import ru.centralhardware.znatoki.studyRussianBot.objects.User
 import ru.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
@@ -49,6 +50,8 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options, 
     }
 
 
+    private val clickhouse = Clickhouse();
+
     /**
      * method by which the library telegram sends
      * the received messages for processing by the server part
@@ -56,6 +59,8 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options, 
      * @param update received message
      */
     override fun onUpdateReceived(update: Update) {
+        clickhouse.insert(update)
+
         if (telegramParser == null) telegramParser = TelegramParser(sender)
 
         val chatId: Long = if (update.hasCallbackQuery()) {
