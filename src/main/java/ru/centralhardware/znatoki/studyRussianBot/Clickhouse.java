@@ -35,7 +35,7 @@ public class Clickhouse {
             ClickHouseRequest.Mutation request =  client
                     .read(server)
                     .write()
-                    .table("letMeGoogleThatForYouStatistic")
+                    .table("study_russian")
                     .format(ClickHouseFormat.RowBinary);
 
             ClickHouseConfig config = request.getConfig();
