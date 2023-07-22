@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
-import ru.centralhardware.znatoki.studyRussianBot.Clickhouse
+import ru.centralhardware.znatoki.studyRussianBot.Clickhouse.Clickhouse
 import ru.centralhardware.znatoki.studyRussianBot.Config
 import ru.centralhardware.znatoki.studyRussianBot.objects.User
 import ru.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
