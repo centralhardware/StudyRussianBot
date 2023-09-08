@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public interface StatisticMapper {
 
     @Insert("""
-            INSERT INTO default.study_russian (
+            INSERT INTO study_russian (
                 date_time,
                 chat_id,
                 username,
