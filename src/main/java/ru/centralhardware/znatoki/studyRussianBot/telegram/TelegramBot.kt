@@ -1,5 +1,6 @@
 package ru.centralhardware.znatoki.studyRussianBot.telegram
 
+import me.centralhardware.telegram.bot.common.ClickhouseRuben
 import mu.KotlinLogging
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
@@ -7,7 +8,6 @@ import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
-import ru.centralhardware.znatoki.studyRussianBot.Clickhouse.Clickhouse
 import ru.centralhardware.znatoki.studyRussianBot.Config
 import ru.centralhardware.znatoki.studyRussianBot.objects.User
 import ru.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
@@ -49,8 +49,31 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options, 
         }
     }
 
+    private fun getText(update: Update): String {
+        if (update.hasMessage()) {
+            return update.message.text
+        } else if (update.hasCallbackQuery()) {
+            return update.callbackQuery.data
+        } else if (update.hasInlineQuery()) {
+            return update.inlineQuery.query
+        }
 
-    private val clickhouse = Clickhouse();
+        return ""
+    }
+
+    private fun getFrom(update: Update): org.telegram.telegrambots.meta.api.objects.User? {
+        if (update.hasMessage()) {
+            return update.message.from
+        } else if (update.hasCallbackQuery()) {
+            return update.callbackQuery.from
+        } else if (update.hasInlineQuery()) {
+            return update.inlineQuery.from
+        }
+
+        return null
+    }
+
+    private val clickhouse = ClickhouseRuben();
 
     /**
      * method by which the library telegram sends
@@ -59,7 +82,7 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options, 
      * @param update received message
      */
     override fun onUpdateReceived(update: Update) {
-        clickhouse.insert(update)
+        clickhouse.log(getText(update), update.hasInlineQuery(), getFrom(update), "StudyRussianBot")
 
         if (telegramParser == null) telegramParser = TelegramParser(sender)
 

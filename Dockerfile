@@ -1,4 +1,4 @@
-FROM maven:3.9.1-amazoncorretto-20 as maven
+FROM maven:3.9.4-amazoncorretto-21 as maven
 
 COPY ./pom.xml ./pom.xml
 
@@ -8,8 +8,7 @@ COPY ./src ./src
 
 RUN mvn package
 
-
-FROM bitnami/java:20
+FROM openjdk:21-slim
 
 RUN apt update && \
     apt install tzdata

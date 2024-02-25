@@ -10,10 +10,17 @@
     <packaging>jar</packaging>
 
     <properties>
-        <kotlin.version>1.8.21</kotlin.version>
-        <maven.compiler.source>20</maven.compiler.source>
-        <maven.compiler.target>20</maven.compiler.target>
+        <kotlin.version>1.9.22</kotlin.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.telegram/telegrambots -->
@@ -83,6 +90,11 @@
             <artifactId>mybatis</artifactId>
             <version>3.5.13</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.centralhardware</groupId>
+            <artifactId>telegram-bot-commons</artifactId>
+            <version>0bb7ca6a4b</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -131,7 +143,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <jvmTarget>19</jvmTarget>
+                    <jvmTarget>21</jvmTarget>
                 </configuration>
             </plugin>
         </plugins>
