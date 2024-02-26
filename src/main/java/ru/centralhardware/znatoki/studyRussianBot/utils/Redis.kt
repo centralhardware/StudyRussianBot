@@ -38,17 +38,14 @@ object Redis {
      * @param rule name of rule
      * @return true if rule was passing
      */
-    suspend fun isCheckRule(chatId: Long, rule: String): Boolean = redis.sismember("$chatId $CHECKED_RULE_POSTFIX", rule) == 1L
+    suspend fun isCheckRule(chatId: Long, rule: String): Boolean = redis.sismember("$chatId$CHECKED_RULE_POSTFIX", rule) == 1L
 
     /**
      * get count of checked word
      * @param chatId id of user
      * @return count of checked word
      */
-    suspend fun getCountOfCheckedWord(chatId: Long): Long {
-        logger.info("get count of checked word")
-        return redis.scard("$chatId $CHECKED_WORD_POSTFIX")
-    }
+    suspend fun getCountOfCheckedWord(chatId: Long): Long = redis.scard("$chatId$CHECKED_WORD_POSTFIX")
 
     /**
      * get count of wrong checked word
@@ -56,20 +53,20 @@ object Redis {
      * @param chatId id of user
      * @return count of checked word
      */
-    suspend fun getCountOfWrongCheckedWord(chatId: Long): Long = redis.scard("$chatId $CHECKED_WRONG_WORD_POSTFIX")
+    suspend fun getCountOfWrongCheckedWord(chatId: Long): Long = redis.scard("$chatId$CHECKED_WRONG_WORD_POSTFIX")
 
     /**
      * note that the word was answered correctly for the given user
      * @param user user that check word
      */
-    suspend fun checkWord(user: User) = redis.sadd("${user.chatId} $CHECKED_WORD_POSTFIX", user.words[0].name)
+    suspend fun checkWord(user: User) = redis.sadd("${user.chatId}$CHECKED_WORD_POSTFIX", user.words[0].name)
 
     /**
      * note that the word was not answered correctly for the given user
      *
      * @param user user that check word
      */
-    suspend fun checkWrongWord(user: User) = redis.sadd("${user.chatId} $CHECKED_WRONG_WORD_POSTFIX", user.words[0].name)
+    suspend fun checkWrongWord(user: User) = redis.sadd("${user.chatId}$CHECKED_WRONG_WORD_POSTFIX", user.words[0].name)
 
     /**
      * check license status
@@ -80,7 +77,7 @@ object Redis {
         if (Config.admins.contains(userId)) {
             return true
         }
-        return redis.get("$userId $KEY_POSTFIX") == null
+        return redis.get("$userId$KEY_POSTFIX") == null
     }
 
     /**
@@ -88,5 +85,5 @@ object Redis {
      * @param userId id of user
      * @param key activated code
      */
-    suspend fun setRight(userId: Long, key: String) = redis.set("$userId $KEY_POSTFIX", key)
+    suspend fun setRight(userId: Long, key: String) = redis.set("$userId$KEY_POSTFIX", key)
 }
