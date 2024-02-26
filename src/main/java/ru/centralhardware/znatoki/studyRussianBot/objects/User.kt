@@ -82,7 +82,7 @@ data class User(
      *
      * @return string with profile data
      */
-    fun getProfile(): String {
+    suspend fun getProfile(): String {
         val rightPercent: Int
         val wright = Redis.getCountOfCheckedWord(chatId).toDouble()
         val all = Redis.getCountOfWrongCheckedWord(chatId).toDouble() + Redis.getCountOfCheckedWord(chatId).toDouble()

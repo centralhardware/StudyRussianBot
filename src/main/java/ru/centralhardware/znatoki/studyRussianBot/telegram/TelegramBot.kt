@@ -1,8 +1,8 @@
 package ru.centralhardware.znatoki.studyRussianBot.telegram
 
+import kotlinx.coroutines.runBlocking
 import me.centralhardware.telegram.bot.common.ClickhouseRuben
-import mu.KotlinLogging
-import org.telegram.telegrambots.bots.DefaultBotOptions
+import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
@@ -20,7 +20,7 @@ import kotlin.system.exitProcess
 /**
  *telegram bot class
  */
-class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options, Config.token) {
+class TelegramBot : TelegramLongPollingBot(Config.token) {
     private var telegramParser: TelegramParser? = null
     private var inlineKeyboard: InlineKeyboard
     private var sender: Sender = Sender(this)
@@ -30,47 +30,20 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options, 
     }
 
     companion object{
-        private val logger = KotlinLogging.logger { }
+        private val logger = LoggerFactory.getLogger(TelegramBot::class.java)
 
         /**
          * init telegram bot and configure proxy
          */
         fun init() {
             try {
-                val options = DefaultBotOptions()
-                options.baseUrl = Config.TELEGRAM_API_BOT_URL
-                val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
-                botsApi.registerBot(TelegramBot(options))
+                TelegramBotsApi(DefaultBotSession::class.java).registerBot(TelegramBot())
                 logger.info("bot register")
             } catch (e: TelegramApiRequestException) {
                 logger.warn("bot start fail", e)
                 exitProcess(20)
             }
         }
-    }
-
-    private fun getText(update: Update): String {
-        if (update.hasMessage()) {
-            return update.message.text
-        } else if (update.hasCallbackQuery()) {
-            return update.callbackQuery.data
-        } else if (update.hasInlineQuery()) {
-            return update.inlineQuery.query
-        }
-
-        return ""
-    }
-
-    private fun getFrom(update: Update): org.telegram.telegrambots.meta.api.objects.User? {
-        if (update.hasMessage()) {
-            return update.message.from
-        } else if (update.hasCallbackQuery()) {
-            return update.callbackQuery.from
-        } else if (update.hasInlineQuery()) {
-            return update.inlineQuery.from
-        }
-
-        return null
     }
 
     private val clickhouse = ClickhouseRuben();
@@ -82,6 +55,10 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options, 
      * @param update received message
      */
     override fun onUpdateReceived(update: Update) {
+        runBlocking { process(update) }
+    }
+
+    private suspend fun process(update: Update){
         clickhouse.log(update,"StudyRussianBot")
 
         if (telegramParser == null) telegramParser = TelegramParser(sender)

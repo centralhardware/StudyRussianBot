@@ -28,7 +28,6 @@ object RSA {
      */
     fun validateKey(userName: String, key: String): Boolean {
         val s = userName + SOLID
-        if (Base64.getEncoder().encodeToString( MessageDigest.getInstance("SHA-256").digest(s.toByteArray(StandardCharsets.UTF_8))) == key) return true
-        return false
+        return Base64.getEncoder().encodeToString( MessageDigest.getInstance("SHA-256").digest(s.toByteArray(StandardCharsets.UTF_8))) == key
     }
 }

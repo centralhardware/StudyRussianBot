@@ -1,6 +1,6 @@
 package ru.centralhardware.znatoki.studyRussianBot.telegram
 
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException
  *@property telegramBot instance of telegram bot
  */
 class Sender(private val telegramBot: TelegramBot) {
-    private val logger = KotlinLogging.logger { }
+    private val logger = LoggerFactory.getLogger(Sender::class.java)
 
     /**
      * send message to telegram user

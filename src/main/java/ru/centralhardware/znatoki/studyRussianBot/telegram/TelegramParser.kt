@@ -42,7 +42,7 @@ class TelegramParser
      * if answer is wrong send "неправильно" and send next word. current word moves to the end of the word queue
      * @param update received message
      */
-    fun parseText(update: Update) {
+    suspend fun parseText(update: Update) {
         val message = update.message.text
         val chatId = update.message.chatId
         val user = users[chatId]
@@ -155,7 +155,7 @@ class TelegramParser
      * - to_$pageNumber - show page of rule
      * @param update received message
      */
-    fun parsCallback(update: Update) {
+    suspend fun parsCallback(update: Update) {
         val callback = update.callbackQuery.data
         val chatId = update.callbackQuery.message.chatId
         val user = users[chatId]

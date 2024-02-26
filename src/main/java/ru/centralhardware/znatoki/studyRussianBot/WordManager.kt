@@ -1,7 +1,7 @@
 package ru.centralhardware.znatoki.studyRussianBot
 
-import org.apache.log4j.Logger
 import org.json.JSONObject
+import org.slf4j.LoggerFactory
 import ru.centralhardware.znatoki.studyRussianBot.objects.Rule
 import ru.centralhardware.znatoki.studyRussianBot.objects.Word
 import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
@@ -11,7 +11,7 @@ import java.util.*
  *object contains rule and rule description collection
  */
 object WordManager {
-    private val logger = Logger.getLogger(WordManager::class.java)
+    private val logger = LoggerFactory.getLogger(WordManager::class.java)
     /**
      * List of rules
      */
@@ -41,50 +41,43 @@ object WordManager {
         val ruleObject = JSONObject(ruleString)
         val ruleData = ruleObject.getJSONObject("data")
         for (i in 1 until ruleObject.getInt("count")) {
-            val `object` = ruleData.getJSONObject(i.toString())
-            rules.add(Rule(`object`.getString("name"), null, `object`.getString("section"), ArrayList()))
-        }
-        // set parent
-        for (i in 1 until ruleObject.getInt("count")) {
-            val `object` = ruleData.getJSONObject(i.toString())
-            if (`object`.getInt("parent") != -1) {
-                rules[i -1].parent = rules[`object`.getInt("parent") -1]
+            ruleData.getJSONObject(i.toString()).let {
+                rules.add(Rule(it.getString("name"), null, it.getString("section"), ArrayList()))
+                // set parent
+                if (it.getInt("parent") != -1){
+                    rules[i -1].parent = rules[it.getInt("parent") -1]
+                }
             }
         }
+
         // parse word.json
         val wordObject = JSONObject(wordString)
         val wordArray = wordObject.getJSONArray("word")
         val words = ArrayList<Word>()
-        for (i in 0 until wordArray.length()) {
-            val word = wordArray.getJSONObject(i)
-            words.add(Word(word.getString("right_word"), word.getString("word"), word.getString("answer"), word.getString("section")))
+
+        wordArray.map { it as JSONObject }.forEach {
+            words.add(Word(it.getString("right_word"), it.getString("word"), it.getString("answer"), it.getString("section")))
         }
-        // parse rule.json
-        for (r in rules) {
-            if (r.section == "all") {
-                r.words.addAll(words)
+
+        var count = 1
+        rules.forEach{
+            // parse rule.json
+            if (it.section == "all") {
+                it.words.addAll(words)
             }
-            for (word in words) {
-                if (r.section == word.section) {
-                    r.words.add(word)
+            words.forEach{ word ->
+                if (it.section == word.section) {
+                    it.words.add(word)
                 }
             }
-        }
-        // set word to child rule from parent
-        for (rule in rules) {
-            if (rule.parent != null) {
-                rule.parent!!.words.addAll(rule.words)
-            }
-        }
-        // set pageNumbers for rule
-        var count = 1
-        for (rule in rules) {
-            rule.pageNumber = count / Rule.pageCountRule
+            // set word to child rule from parent
+            it.parent?.let { it.words.addAll(it.words) }
+            // set pageNumbers for rule
+            it.pageNumber = count / Rule.pageCountRule
             count++
         }
-        for (rule in rules) {
-            logger.info("in rule \"" + rule.name + "\" added " + rule.words.size + "  words")
-        }
+
+        rules.forEach{ logger.info("in rule \"" + it.name + "\" added " + it.words.size + "  words") }
         logger.info("init data")
     }
 
@@ -95,12 +88,5 @@ object WordManager {
      * @param rule name of rule
      * @return rule find by giving name
      */
-    fun getRuleByName(rule: String): Rule? {
-        for (r in rules) {
-            if (r.name == rule) {
-                return r
-            }
-        }
-        return null
-    }
+    fun getRuleByName(rule: String): Rule? = rules.firstOrNull { it.name == rule }
 }

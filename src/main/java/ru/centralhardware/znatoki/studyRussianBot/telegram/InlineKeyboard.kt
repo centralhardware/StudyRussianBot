@@ -1,6 +1,6 @@
 package ru.centralhardware.znatoki.studyRussianBot.telegram
 
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.meta.api.objects.Update
 import ru.centralhardware.znatoki.studyRussianBot.Config
 import ru.centralhardware.znatoki.studyRussianBot.WordManager
@@ -18,7 +18,7 @@ class InlineKeyboard
  *
  * @param sender instance of telegram bot
  */(private val sender: Sender) {
-    private val logger = KotlinLogging.logger { }
+    private val logger = LoggerFactory.getLogger(InlineKeyboard::class.java)
 
     /**
      * send the user a message from the rule selection menu
@@ -26,7 +26,7 @@ class InlineKeyboard
      * @param update object with received message
      * @param pageNumber number of page to select
      */
-    fun sendRuleInlineKeyboard(update: Update, pageNumber: Int) {
+    suspend fun sendRuleInlineKeyboard(update: Update, pageNumber: Int) {
         val chatId: Long
         var message = ""
         if (update.hasCallbackQuery()) {
@@ -107,7 +107,7 @@ class InlineKeyboard
      * don't send for user who have full or admin access
      * @param chatId id of user
      */
-    fun sendLoginInfo(chatId: Long) {
+    suspend fun sendLoginInfo(chatId: Long) {
         if (Redis.checkRight(chatId) || Config.admins.contains(chatId)) {
             sender.send(Resource.getStringByKey("STR_44"), chatId)
         } else {
@@ -131,7 +131,7 @@ class InlineKeyboard
      * for user who have demo access will show button with text "get full access"
      * @param chatId id of user
      */
-    fun sendMenu(chatId: Long) {
+    suspend fun sendMenu(chatId: Long) {
         logger.info("send inline keyboard menu")
         val builder = InlineKeyboardBuilder.create(chatId.toString())
             .setText(Resource.getStringByKey("STR_24"))

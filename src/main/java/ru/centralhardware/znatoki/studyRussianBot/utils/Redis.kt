@@ -1,7 +1,8 @@
 package ru.centralhardware.znatoki.studyRussianBot.utils
 
-import mu.KotlinLogging
-import redis.clients.jedis.Jedis
+import io.github.crackthecodeabhi.kreds.connection.Endpoint
+import io.github.crackthecodeabhi.kreds.connection.newClient
+import org.slf4j.LoggerFactory
 import ru.centralhardware.znatoki.studyRussianBot.Config
 import ru.centralhardware.znatoki.studyRussianBot.WordManager
 import ru.centralhardware.znatoki.studyRussianBot.objects.User
@@ -10,8 +11,8 @@ import ru.centralhardware.znatoki.studyRussianBot.objects.User
  *provide access to redis server
  */
 object Redis {
-    private val logger = KotlinLogging.logger { }
-    private val jedis: Jedis = Jedis(Config.redisHost, Config.redisPort)
+    private val logger = LoggerFactory.getLogger(Redis.javaClass)
+    private val redis = newClient(Endpoint.from(Config.redisUrl))
     private const val KEY_POSTFIX = "_key"
     private const val CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word"
     private const val CHECKED_WORD_POSTFIX = "_checked_word"
@@ -21,17 +22,13 @@ object Redis {
      * store data about passing rule task
      * @param user user that pass rule
      */
-    fun checkRule(user: User) {
-        val checkWordKey = user.chatId.toString() + CHECKED_WORD_POSTFIX
-        val checkRuleKey = user.chatId.toString() + CHECKED_RULE_POSTFIX
-        var checkedCount = 0
-        for (word in WordManager.getRuleByName(user.currRule!!.name)!!.words) {
-            if (jedis.sismember(checkWordKey, word.name)) {
-                checkedCount++
-            }
-        }
+    suspend fun checkRule(user: User) {
+        val checkWordKey = "${user.chatId} $CHECKED_WORD_POSTFIX"
+        val checkRuleKey = "${user.chatId} $CHECKED_RULE_POSTFIX"
+        var checkedCount = WordManager.getRuleByName(user.currRule!!.name)!!.words.count { redis.sismember(checkWordKey, it.name) == 1L }
+
         if (checkedCount >= user.currRule!!.words.size) {
-            jedis.sadd(checkRuleKey, user.currRule!!.name)
+            redis.sadd(checkRuleKey, user.currRule!!.name)
         }
     }
 
@@ -41,20 +38,16 @@ object Redis {
      * @param rule name of rule
      * @return true if rule was passing
      */
-    fun isCheckRule(chatId: Long, rule: String): Boolean {
-        val checkRuleKey = chatId.toString() + CHECKED_RULE_POSTFIX
-        return jedis.sismember(checkRuleKey, rule)
-    }
+    suspend fun isCheckRule(chatId: Long, rule: String): Boolean = redis.sismember("$chatId $CHECKED_RULE_POSTFIX", rule) == 1L
 
     /**
      * get count of checked word
      * @param chatId id of user
      * @return count of checked word
      */
-    fun getCountOfCheckedWord(chatId: Long): Long {
+    suspend fun getCountOfCheckedWord(chatId: Long): Long {
         logger.info("get count of checked word")
-        val checkWordKey = chatId.toString() + CHECKED_WORD_POSTFIX
-        return jedis.scard(checkWordKey)
+        return redis.scard("$chatId $CHECKED_WORD_POSTFIX")
     }
 
     /**
@@ -63,52 +56,31 @@ object Redis {
      * @param chatId id of user
      * @return count of checked word
      */
-    fun getCountOfWrongCheckedWord(chatId: Long): Long {
-        logger.info("get count of wrong checked word")
-        val checkWordKey = chatId.toString() + CHECKED_WRONG_WORD_POSTFIX
-        return jedis.scard(checkWordKey)
-    }
+    suspend fun getCountOfWrongCheckedWord(chatId: Long): Long = redis.scard("$chatId $CHECKED_WRONG_WORD_POSTFIX")
 
     /**
      * note that the word was answered correctly for the given user
      * @param user user that check word
      */
-    fun checkWord(user: User) {
-        val checkWordKey = user.chatId.toString() + CHECKED_WORD_POSTFIX
-        jedis.sadd(checkWordKey, user.words[0].name)
-        logger.info("add value \"" + user.words[0].name + "\" to set by key \"" + checkWordKey + "\"")
-    }
+    suspend fun checkWord(user: User) = redis.sadd("${user.chatId} $CHECKED_WORD_POSTFIX", user.words[0].name)
 
     /**
      * note that the word was not answered correctly for the given user
      *
      * @param user user that check word
      */
-    fun checkWrongWord(user: User) {
-        val checkWordKey = user.chatId.toString() + CHECKED_WRONG_WORD_POSTFIX
-        jedis.sadd(checkWordKey, user.words[0].name)
-        logger.info("add value \"" + user.words[0].name + "\" to set by key \"" + checkWordKey + "\"")
-    }
+    suspend fun checkWrongWord(user: User) = redis.sadd("${user.chatId} $CHECKED_WRONG_WORD_POSTFIX", user.words[0].name)
 
     /**
      * check license status
      * @param userId id of user
      * @return true if user don't have demo access
      */
-    fun checkRight(userId: Long): Boolean {
+    suspend fun checkRight(userId: Long): Boolean {
         if (Config.admins.contains(userId)) {
-            logger.info("user \"$userId\" have admin permission")
             return true
         }
-        val checkRightKey = userId.toString() + KEY_POSTFIX
-        val key = jedis.get(checkRightKey)
-        return if (key != null) {
-            logger.info("right for user = \"$userId\" valid")
-            true
-        } else {
-            logger.info("right for user = \"$userId\" don't valid")
-            false
-        }
+        return redis.get("$userId $KEY_POSTFIX") == null
     }
 
     /**
@@ -116,9 +88,5 @@ object Redis {
      * @param userId id of user
      * @param key activated code
      */
-    fun setRight(userId: Long, key: String) {
-        val checkRightKey = userId.toString() + KEY_POSTFIX
-        jedis.set(checkRightKey, key)
-        logger.info("set right for key = \"$key\" and user = \"$userId\"")
-    }
+    suspend fun setRight(userId: Long, key: String) = redis.set("$userId $KEY_POSTFIX", key)
 }

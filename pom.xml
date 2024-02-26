@@ -35,34 +35,15 @@
             <artifactId>json</artifactId>
             <version>20220320</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
         <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>4.4.1</version>
+            <groupId>io.github.crackthecodeabhi</groupId>
+            <artifactId>kreds</artifactId>
+            <version>0.9.1</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.30</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.30</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/io.github.microutils/kotlin-logging -->
-        <dependency>
-            <groupId>io.github.microutils</groupId>
-            <artifactId>kotlin-logging</artifactId>
-            <version>1.11.5</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
@@ -94,6 +75,21 @@
             <groupId>com.github.centralhardware</groupId>
             <artifactId>telegram-bot-commons</artifactId>
             <version>f16cc7bfe8</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.12</version>
         </dependency>
     </dependencies>
 
