@@ -1,18 +1,13 @@
-FROM maven:3.9.4-amazoncorretto-21 as maven
+FROM gradle:jdk21-graal as gradle
 
-COPY ./pom.xml ./pom.xml
+COPY ./ ./
 
-RUN mvn dependency:go-offline -B
+RUN gradle fatJar
 
-COPY ./src ./src
+FROM findepi/graalvm:java21
 
-RUN mvn package
+WORKDIR /znatokiBot
 
-FROM openjdk:21-slim
+COPY --from=gradle /home/gradle/build/libs/StudyRussianBot-1.0-SNAPSHOT-standalone.jar .
 
-RUN apt update && \
-    apt install tzdata
-
-COPY --from=maven target/StudyRussian-jar-with-dependencies.jar .
-
-CMD ["java", "-jar", "StudyRussian-jar-with-dependencies.jar" ]
+CMD ["java", "-jar", "StudyRussianBot-1.0-SNAPSHOT-standalone.jar"]
