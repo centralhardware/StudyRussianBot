@@ -1,12 +1,12 @@
-package ru.centralhardware.znatoki.studyRussianBot.telegram
+package me.centralhardware.znatoki.studyRussianBot.telegram
 
 import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.meta.api.objects.Update
-import ru.centralhardware.znatoki.studyRussianBot.Config
-import ru.centralhardware.znatoki.studyRussianBot.WordManager
-import ru.centralhardware.znatoki.studyRussianBot.objects.Rule
-import ru.centralhardware.znatoki.studyRussianBot.utils.Redis
-import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
+import me.centralhardware.znatoki.studyRussianBot.Config
+import me.centralhardware.znatoki.studyRussianBot.WordManager
+import me.centralhardware.znatoki.studyRussianBot.objects.Rule
+import me.centralhardware.znatoki.studyRussianBot.utils.Redis
+import me.centralhardware.znatoki.studyRussianBot.utils.Resource
 
 /**
  * send inlineKeyboardMarkup

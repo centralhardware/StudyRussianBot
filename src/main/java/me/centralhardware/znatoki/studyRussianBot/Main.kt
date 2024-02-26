@@ -1,7 +1,7 @@
-package ru.centralhardware.znatoki.studyRussianBot
+package me.centralhardware.znatoki.studyRussianBot
 
 import org.slf4j.LoggerFactory
-import ru.centralhardware.znatoki.studyRussianBot.telegram.TelegramBot
+import me.centralhardware.znatoki.studyRussianBot.telegram.TelegramBot
 
 /**
  * init telegram ApiContext and telegram bot, statistic

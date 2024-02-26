@@ -1,4 +1,4 @@
-package ru.centralhardware.znatoki.studyRussianBot.telegram
+package me.centralhardware.znatoki.studyRussianBot.telegram
 
 import kotlinx.coroutines.runBlocking
 import me.centralhardware.telegram.bot.common.ClickhouseRuben
@@ -8,12 +8,12 @@ import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
-import ru.centralhardware.znatoki.studyRussianBot.Config
-import ru.centralhardware.znatoki.studyRussianBot.objects.User
-import ru.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
-import ru.centralhardware.znatoki.studyRussianBot.utils.RSA
-import ru.centralhardware.znatoki.studyRussianBot.utils.Redis
-import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
+import me.centralhardware.znatoki.studyRussianBot.Config
+import me.centralhardware.znatoki.studyRussianBot.objects.User
+import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
+import me.centralhardware.znatoki.studyRussianBot.utils.RSA
+import me.centralhardware.znatoki.studyRussianBot.utils.Redis
+import me.centralhardware.znatoki.studyRussianBot.utils.Resource
 import kotlin.system.exitProcess
 
 

@@ -1,4 +1,4 @@
-package ru.centralhardware.znatoki.studyRussianBot.objects.enums
+package me.centralhardware.znatoki.studyRussianBot.objects.enums
 
 /**
  *user status

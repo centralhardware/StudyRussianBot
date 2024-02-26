@@ -1,4 +1,4 @@
-package ru.centralhardware.znatoki.studyRussianBot.utils
+package me.centralhardware.znatoki.studyRussianBot.utils
 
 import org.junit.Assert.assertTrue
 import org.junit.Test

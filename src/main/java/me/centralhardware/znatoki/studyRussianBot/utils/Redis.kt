@@ -1,11 +1,11 @@
-package ru.centralhardware.znatoki.studyRussianBot.utils
+package me.centralhardware.znatoki.studyRussianBot.utils
 
 import io.github.crackthecodeabhi.kreds.connection.Endpoint
 import io.github.crackthecodeabhi.kreds.connection.newClient
 import org.slf4j.LoggerFactory
-import ru.centralhardware.znatoki.studyRussianBot.Config
-import ru.centralhardware.znatoki.studyRussianBot.WordManager
-import ru.centralhardware.znatoki.studyRussianBot.objects.User
+import me.centralhardware.znatoki.studyRussianBot.Config
+import me.centralhardware.znatoki.studyRussianBot.WordManager
+import me.centralhardware.znatoki.studyRussianBot.objects.User
 
 /**
  *provide access to redis server

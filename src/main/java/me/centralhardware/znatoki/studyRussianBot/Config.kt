@@ -1,4 +1,4 @@
-package ru.centralhardware.znatoki.studyRussianBot
+package me.centralhardware.znatoki.studyRussianBot
 
 /**
  *provide access to application config file

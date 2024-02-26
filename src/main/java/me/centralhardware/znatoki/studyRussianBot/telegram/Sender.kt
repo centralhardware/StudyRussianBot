@@ -1,4 +1,4 @@
-package ru.centralhardware.znatoki.studyRussianBot.telegram
+package me.centralhardware.znatoki.studyRussianBot.telegram
 
 import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage

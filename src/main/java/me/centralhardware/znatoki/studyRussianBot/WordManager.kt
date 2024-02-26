@@ -1,10 +1,10 @@
-package ru.centralhardware.znatoki.studyRussianBot
+package me.centralhardware.znatoki.studyRussianBot
 
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
-import ru.centralhardware.znatoki.studyRussianBot.objects.Rule
-import ru.centralhardware.znatoki.studyRussianBot.objects.Word
-import ru.centralhardware.znatoki.studyRussianBot.utils.Resource
+import me.centralhardware.znatoki.studyRussianBot.objects.Rule
+import me.centralhardware.znatoki.studyRussianBot.objects.Word
+import me.centralhardware.znatoki.studyRussianBot.utils.Resource
 import java.util.*
 
 /**

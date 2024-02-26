@@ -1,4 +1,4 @@
-package ru.centralhardware.znatoki.studyRussianBot.objects
+package me.centralhardware.znatoki.studyRussianBot.objects
 
 /**
  *date class containing the structure of the word used for testing
