@@ -82,7 +82,7 @@ class TelegramBot(options: DefaultBotOptions) : TelegramLongPollingBot(options, 
      * @param update received message
      */
     override fun onUpdateReceived(update: Update) {
-        clickhouse.log(getText(update), update.hasInlineQuery(), getFrom(update), "StudyRussianBot")
+        clickhouse.log(update,"StudyRussianBot")
 
         if (telegramParser == null) telegramParser = TelegramParser(sender)
 
