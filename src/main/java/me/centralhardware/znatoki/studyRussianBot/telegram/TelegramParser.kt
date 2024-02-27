@@ -22,7 +22,7 @@ class TelegramParser
  * set telegramBot and create InlineKeyboard
  * @param sender object for sending message
  */(private val sender: Sender) {
-    private var inlineKeyboard: InlineKeyboard = InlineKeyboard(sender)
+    private var keyboards: InlineKeyboard = InlineKeyboard(sender)
 
     val users: HashMap<Long, User> = HashMap<Long, User>()
 
@@ -51,16 +51,15 @@ class TelegramParser
                 user!!.reset()
                 sender.send(Resource.getStringByKey("START_MESSAGE"), update.message.chatId)
                 if (Redis.checkRight(chatId)) {
-                    inlineKeyboard.sendMenu(chatId!!)
+                    keyboards.sendMenu(chatId!!)
                 } else {
-                    inlineKeyboard.sendLoginInfo(chatId!!)
+                    keyboards.sendLoginInfo(chatId!!)
                 }
             }
             "/help" -> sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
-            "/rules" -> inlineKeyboard.sendRuleInlineKeyboard(update, 0)
+            "/rules" -> keyboards.sendRuleInlineKeyboard(update, 0)
             "/profile" -> sender.send(user!!.getProfile(), chatId)
-            "/menu" -> inlineKeyboard.sendMenu(chatId!!)
-            "/ping" -> sender.send("pong", chatId)
+            "/menu" -> keyboards.sendMenu(chatId!!)
             else -> {
                 when {
                     message.startsWith("/gen ") -> {
@@ -119,7 +118,7 @@ class TelegramParser
                                 sender.send(Resource.getStringByKey("STR_4"), chatId)
                                 sender.send(user.getTestingResult(), chatId)
                                 Redis.checkRule(user)
-                                inlineKeyboard.sendMenu(chatId!!)
+                                keyboards.sendMenu(chatId!!)
                                 user.reset()
                                 return
                             }
@@ -163,13 +162,13 @@ class TelegramParser
             "reset_testing" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 user!!.reset()
-                inlineKeyboard.sendMenu(chatId!!)
+                keyboards.sendMenu(chatId!!)
             }
             "noreset_testing" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 sender.send(user!!.words[0].name, chatId)
             }
-            "testing" -> inlineKeyboard.sendRuleInlineKeyboard(update, 0)
+            "testing" -> keyboards.sendRuleInlineKeyboard(update, 0)
             "profile" -> sender.send(user!!.getProfile(), chatId)
             "help" -> if (Redis.checkRight(chatId) || Config.admins.contains(chatId)) {
                 sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
@@ -178,7 +177,7 @@ class TelegramParser
             }
             "menu" -> if (user!!.status !== TESTING && user!!.status !== WAIT_COUNT_OF_WORD) {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
-                inlineKeyboard.sendMenu(chatId!!)
+                keyboards.sendMenu(chatId!!)
             }
             "enter_key" -> {
                 if (update.callbackQuery.from.userName == null){
@@ -190,35 +189,35 @@ class TelegramParser
             }
             "login" -> {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
-                inlineKeyboard.sendLoginInfo(chatId!!)
+                keyboards.sendLoginInfo(chatId!!)
             }
             else -> {
                 when {
                     callback.startsWith("to_") -> {
                         if (user!!.status !== WAIT_COUNT_OF_WORD && user!!.status !== TESTING) {
-                            inlineKeyboard.sendRuleInlineKeyboard(update, callback.replace("to_", "").toInt())
+                            keyboards.sendRuleInlineKeyboard(update, callback.replace("to_", "").toInt())
                         }
                     }
                     user!!.status === NONE -> {
-                        for (rule in WordManager.rules) {
-                            if (rule.section == callback) {
-                                user!!.status = WAIT_COUNT_OF_WORD
-                                user.currRule = rule
-                                sender.send(Resource.getStringByKey("STR_6") + rule.name, chatId)
-                                sender.send(Resource.getStringByKey("STR_7"), chatId)
-                                return
-                            }
+                        WordManager.rules.filter { it.section == callback }.forEach {
+                            user!!.status = WAIT_COUNT_OF_WORD
+                            user.currRule = it
+                            sender.send("${Resource.getStringByKey("STR_6")}${it.name}", chatId)
+                            sender.send(Resource.getStringByKey("STR_7"), chatId)
+                            return
                         }
+
                     }
                     user!!.status != NONE -> {
                         sender.delete(chatId, update.callbackQuery.message.messageId)
-                        val builder = InlineKeyboardBuilder.create(chatId.toString())
-                            .setText(Resource.getStringByKey("STR_9"))
-                            .row()
-                            .button(Resource.getStringByKey("YES"), "reset_testing")
-                            .button(Resource.getStringByKey("NO"), "noreset_testing")
-                            .endRow()
-                        sender.send(builder.build())
+                        sender.send(inlineKeyboard {
+                            text(Resource.getStringByKey("STR_9"))
+                            chatId(chatId)
+                            row {
+                                btn(Resource.getStringByKey("YES"), "reset_testing")
+                                btn(Resource.getStringByKey("NO"), "noreset_testing")
+                            }
+                        }.build())
                     }
                 }
             }

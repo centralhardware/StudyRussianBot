@@ -1,5 +1,6 @@
 package me.centralhardware.znatoki.studyRussianBot.telegram
 
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.meta.api.objects.Update
 import me.centralhardware.znatoki.studyRussianBot.Config
@@ -35,71 +36,55 @@ class InlineKeyboard
             chatId = update.message.chatId!!
             message = update.message.text
         }
+
         logger.info("send inline keyboard rules")
-        val builder = InlineKeyboardBuilder.create(chatId.toString())
-            .setText(Resource.getStringByKey("STR_8"))
-        val userId: Long = if (update.hasCallbackQuery()) {
-            update.callbackQuery.from.id
-        } else {
-            update.message.from.id
-        }
-        if (!(Redis.checkRight(userId) || !Config.admins.contains(userId))) {
-            for (i in 1..3) {
-                val rule = WordManager.rules[i]
-                builder.row()
-                if (Redis.isCheckRule(chatId, rule.name)) {
-                    builder.button("✅" + rule.name, rule.section)
-                } else {
-                    builder.button(rule.name, rule.section)
-                }
-                builder.endRow()
-            }
-            builder.row()
-                .button(Resource.getStringByKey("STR_24"), "menu")
-                .endRow()
-            sender.delete(chatId, update.callbackQuery.message.messageId)
-            sender.send(builder.build())
-        } else {
-            for (rule in WordManager.rules) {
-                if (rule.pageNumber == pageNumber) {
-                    builder.row()
-                    if (Redis.isCheckRule(chatId, rule.name)) {
-                        builder.button("✅" + rule.name, rule.section)
-                    } else {
-                        builder.button(rule.name, rule.section)
+        kotlin.runCatching { sender.delete(chatId, update.callbackQuery.message.messageId) }
+        sender.send(inlineKeyboard {
+            text(Resource.getStringByKey("STR_8"))
+            chatId(chatId)
+            if (runBlocking { !Redis.checkRight(chatId) } || !Config.admins.contains(chatId)) {
+                for (i in 1..3) {
+                    val rule = WordManager.rules[i]
+
+                    row {
+                        if (runBlocking { Redis.isCheckRule(chatId, rule.name) }) {
+                            btn("✅" + rule.name, rule.section)
+                        } else {
+                            btn(rule.name, rule.section)
+                        }
                     }
-                    builder.endRow()
+                    row { btn(Resource.getStringByKey("STR_24"), "menu") }
+                }
+            } else {
+                WordManager.rules.filter { it.pageNumber == pageNumber }.forEach {
+                    row {
+                        if (runBlocking { Redis.isCheckRule(chatId, it.name) }) {
+                            btn("✅" + it.name, it.section)
+                        } else {
+                            btn(it.name, it.section)
+                        }
+                    }
+                }
+                when{
+                    pageNumber == 0 && message != "/rules" -> {
+
+                        row {
+                            btn(Resource.getStringByKey("STR_17"), "to_1")
+                            btn(Resource.getStringByKey("STR_24"), "menu")
+                        }
+                    }
+                    pageNumber < Rule.maxRulePage -> row {
+                        btn(Resource.getStringByKey("STR_18") + " - " + pageNumber, "to_" + (pageNumber - 1))
+                        btn(Resource.getStringByKey("STR_17") + " - " + (pageNumber + 2), "to_" + (pageNumber + 1))
+                        btn(Resource.getStringByKey("STR_24"), "menu")
+                    }
+                    pageNumber == Rule.maxRulePage -> row {
+                        btn(Resource.getStringByKey("STR_18"), "to_" + (pageNumber - 1))
+                        btn(Resource.getStringByKey("STR_24"), "menu")
+                    }
                 }
             }
-            // add buttons to got to other pages
-            if (pageNumber == 0) {
-                builder.row()
-                    .button(Resource.getStringByKey("STR_17"), "to_1")
-                    .button(Resource.getStringByKey("STR_24"), "menu")
-                    .endRow()
-                if (message != "/rules") {
-                    sender.delete(chatId, update.callbackQuery.message.messageId)
-                    sender.send(builder.build())
-                }
-            } else if (pageNumber < Rule.maxRulePage) {
-                builder.row()
-                    .button(Resource.getStringByKey("STR_18") + " - " + pageNumber, "to_" + (pageNumber - 1))
-                    .button(Resource.getStringByKey("STR_17") + " - " + (pageNumber + 2), "to_" + (pageNumber + 1))
-                    .button(Resource.getStringByKey("STR_24"), "menu")
-                    .endRow()
-                sender.delete(chatId, update.callbackQuery.message.messageId)
-                sender.send(builder.build())
-                return
-            } else if (pageNumber == Rule.maxRulePage) {
-                builder.row()
-                    .button(Resource.getStringByKey("STR_18"), "to_" + (pageNumber - 1))
-                    .button(Resource.getStringByKey("STR_24"), "menu")
-                    .endRow()
-                sender.delete(chatId, update.callbackQuery.message.messageId)
-                sender.send(builder.build())
-                return
-            }
-        }
+        }.build())
     }
 
     /**
@@ -111,18 +96,13 @@ class InlineKeyboard
         if (Redis.checkRight(chatId) || Config.admins.contains(chatId)) {
             sender.send(Resource.getStringByKey("STR_44"), chatId)
         } else {
-            val builder = InlineKeyboardBuilder.create(chatId.toString())
-                .setText(Resource.getStringByKey("STR_28"))
-                .row()
-                .button(Resource.getStringByKey("STR_29"), "enter_key")
-                .endRow()
-                .row()
-                .button(Resource.getStringByKey("STR_41"), "menu")
-                .endRow()
-                .row()
-                .button(Resource.getStringByKey("STR_26"), "help")
-                .endRow()
-            sender.send(builder.build())
+            sender.send(inlineKeyboard {
+                text(Resource.getStringByKey("STR_28"))
+                chatId(chatId)
+                row { btn(Resource.getStringByKey("STR_29"), "enter_key") }
+                row { btn(Resource.getStringByKey("STR_41"), "menu") }
+                row { btn(Resource.getStringByKey("STR_26"), "help") }
+            }.build())
         }
     }
 
@@ -133,18 +113,21 @@ class InlineKeyboard
      */
     suspend fun sendMenu(chatId: Long) {
         logger.info("send inline keyboard menu")
-        val builder = InlineKeyboardBuilder.create(chatId.toString())
-            .setText(Resource.getStringByKey("STR_24"))
-            .row()
-            .button(Resource.getStringByKey("STR_23"), "testing")
-            .button(Resource.getStringByKey("STR_25"), "profile")
-            .button(Resource.getStringByKey("STR_26"), "help")
-            .endRow()
-        if (!Redis.checkRight(chatId) && !Config.admins.contains(chatId)) {
-            builder.row()
-                .button(Resource.getStringByKey("STR_36"), "login")
-                .endRow()
-        }
-        sender.send(builder.build())
+
+        sender.send(inlineKeyboard {
+            text(Resource.getStringByKey("STR_24"))
+            chatId(chatId)
+            row {
+                btn(Resource.getStringByKey("STR_23"), "testing")
+                btn(Resource.getStringByKey("STR_25"), "profile")
+                btn(Resource.getStringByKey("STR_26"), "help")
+            }
+
+            val hasNotRight = runBlocking { !Redis.checkRight(chatId) }
+
+            if (hasNotRight && !Config.admins.contains(chatId)) {
+                row { btn(Resource.getStringByKey("STR_36"), "login") }
+            }
+        }.build())
     }
 }

@@ -112,15 +112,15 @@ class TelegramBot : TelegramLongPollingBot(Config.token) {
         }
         when (telegramParser!!.users[chatId]!!.status) {
             UserStatus.WAIT_KEY -> {
-                if (!update.hasCallbackQuery()) {
-                    if (RSA.validateKey(update.message.from.userName, update.message.text)) {
-                        telegramParser!!.users[chatId]!!.status = UserStatus.NONE
-                        Redis.setRight(chatId, update.message.text)
-                        sender.send(Resource.getStringByKey("STR_19"), chatId)
-                        inlineKeyboard.sendMenu(chatId)
-                    } else {
-                        sender.send(Resource.getStringByKey("STR_21"), chatId)
-                    }
+                if (update.hasCallbackQuery()) return
+
+                if (RSA.validateKey(update.message.from.userName, update.message.text)) {
+                    telegramParser!!.users[chatId]!!.status = UserStatus.NONE
+                    Redis.setRight(chatId, update.message.text)
+                    sender.send(Resource.getStringByKey("STR_19"), chatId)
+                    inlineKeyboard.sendMenu(chatId)
+                } else {
+                    sender.send(Resource.getStringByKey("STR_21"), chatId)
                 }
             }
 

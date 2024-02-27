@@ -39,17 +39,9 @@ data class Rule(
          *count of pages
          */
         val maxRulePage: Int by lazy {
-            var max = 0
-            for (rule in WordManager.rules) {
-                if (rule.pageNumber > max) {
-                    max = rule.pageNumber
-                }
-            }
-            max
+            WordManager.rules.maxBy { it.pageNumber }.pageNumber
         }
     }
-
-    private val random = Random()
 
     /**
      * get Collection with giving count of word
@@ -58,10 +50,6 @@ data class Rule(
      * @return Collection of word
      */
     fun getWord(count: Int): Collection<Word> {
-        val wordSet = HashSet<Word>()
-        while (wordSet.size < count) {
-            wordSet.add(words[random.nextInt(words.size)])
-        }
-        return ArrayList(wordSet)
+        return words.shuffled().take(count)
     }
 }

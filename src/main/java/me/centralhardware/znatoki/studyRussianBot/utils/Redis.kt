@@ -11,7 +11,6 @@ import me.centralhardware.znatoki.studyRussianBot.objects.User
  *provide access to redis server
  */
 object Redis {
-    private val logger = LoggerFactory.getLogger(Redis.javaClass)
     private val redis = newClient(Endpoint.from(Config.redisUrl))
     private const val KEY_POSTFIX = "_key"
     private const val CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word"

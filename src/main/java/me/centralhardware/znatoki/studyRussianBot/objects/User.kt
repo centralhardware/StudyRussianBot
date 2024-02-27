@@ -90,28 +90,28 @@ data class User(
         } else {
             100
         }
-        val builder = StringBuilder()
-        builder.append(Resource.getStringByKey("STR_12")).append("\n").append("\n").append("\n")
-            .append(Resource.getStringByKey("STR_15")).append(
-            Redis.getCountOfCheckedWord(chatId)
-        ).append("\n").append(Resource.getStringByKey("STR_45")).append(Redis.getCountOfWrongCheckedWord(chatId))
-            .append("\n").append(
-            Resource.getStringByKey("STR_46")
-        ).append(rightPercent).append("%").append("\n").append(Resource.getStringByKey("STR_16")).append("\n")
 
-        WordManager.rules.map { it.name }
-            .filter { Redis.isCheckRule(chatId, it) }
-            .forEach { builder.append(" - ").append("\"").append(it).append("\"").append("\n") }
+        return buildString {
+            append("${Resource.getStringByKey("STR_12")}\n\n\n")
+            append("${Resource.getStringByKey("STR_15")}${Redis.getCountOfCheckedWord(chatId)}\n")
+            append("${Resource.getStringByKey("STR_45")}${Redis.getCountOfWrongCheckedWord(chatId)}\n")
+            append("${Resource.getStringByKey("STR_46")}${rightPercent}%\n")
+            append("${Resource.getStringByKey("STR_16")}\n")
 
-        when {
-            Config.admins.contains(chatId) -> builder.append(Resource.getStringByKey("STR_35"))
-                .append(Resource.getStringByKey("STR_37"))
+            WordManager.rules.map { it.name }
+                .filter { Redis.isCheckRule(chatId, it) }
+                .forEach { append(" - \"$it\"\n") }
 
-            Redis.checkRight(chatId) -> builder.append(Resource.getStringByKey("STR_35"))
-                .append(Resource.getStringByKey("STR_38"))
 
-            else -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_39"))
+            when {
+                Config.admins.contains(chatId) -> append(Resource.getStringByKey("STR_35"))
+                    .append(Resource.getStringByKey("STR_37"))
+
+                Redis.checkRight(chatId) -> append(Resource.getStringByKey("STR_35"))
+                    .append(Resource.getStringByKey("STR_38"))
+
+                else -> append("${Resource.getStringByKey("STR_35")}${Resource.getStringByKey("STR_39")}")
+            }
         }
-        return builder.toString()
     }
 }

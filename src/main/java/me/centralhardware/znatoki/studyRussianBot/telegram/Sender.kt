@@ -24,11 +24,9 @@ class Sender(private val telegramBot: TelegramBot) {
             chatId(chatId.toString()).
             text(message).
             build()
-        try {
-            telegramBot.execute(msg)
-        } catch (e: TelegramApiException) {
-            logger.warn("fail to send message", e)
-        }
+
+        runCatching { telegramBot.execute(msg) }
+            .onFailure { logger.warn("", it) }
     }
 
     /**
@@ -37,11 +35,9 @@ class Sender(private val telegramBot: TelegramBot) {
      */
     fun send(sendMessage: SendMessage) {
         logger.info("send message: " + sendMessage.text)
-        try {
-            telegramBot.execute(sendMessage)
-        } catch (e: TelegramApiException) {
-            logger.warn("fail to send message", e)
-        }
+
+        runCatching { telegramBot.execute(sendMessage) }
+            .onFailure { logger.warn("", it) }
     }
 
 
@@ -57,11 +53,8 @@ class Sender(private val telegramBot: TelegramBot) {
                                 chatId(chatId.toString()).
                                 messageId(messageId!!).
                                 build()
-        try {
-            telegramBot.execute(deleteMessage)
-        } catch (e: TelegramApiException) {
-            logger.info("delete fail $chatId - $messageId")
-        }
 
+        runCatching { telegramBot.execute(deleteMessage) }
+            .onFailure { logger.warn("", it) }
     }
 }
