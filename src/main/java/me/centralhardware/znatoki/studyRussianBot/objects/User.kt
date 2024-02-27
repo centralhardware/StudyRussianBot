@@ -12,27 +12,32 @@ import java.util.*
  *
  */
 data class User(
-        /**
-         * id of telegram user
-         */
-        val chatId: Long) {
+    /**
+     * id of telegram user
+     */
+    val chatId: Long
+) {
     /**
      * current rule that user passes in this time
      */
     var currRule: Rule? = null
+
     /**
      *status of user
      * @see UserStatus
      */
     var status: UserStatus? = null
+
     /**
      *a collection of words to be given to the user
      */
     var words: ArrayList<Word>
+
     /**
      *a collection of words that made a mistake
      */
     var wrongWords: ArrayList<Word>
+
     /**
      *entered count of word in testing
      */
@@ -59,22 +64,16 @@ data class User(
      * @return result string
      */
     fun getTestingResult(): String {
-        val builder = StringBuilder()
-        builder.append(Resource.getStringByKey("STR_10")).append(count).append("\n")
-        builder.append(Resource.getStringByKey("STR_11")).append("\n")
-        val result = HashMap<String, Int>()
-        for ((wrightName) in wrongWords) {
-            if (!result.containsKey(wrightName)) {
-                result[wrightName] = 1
-            } else {
-                result[wrightName] = result[wrightName]!! + 1
-            }
+        val result = wrongWords
+            .map { it.name }
+            .groupingBy { it }
+            .eachCount()
+        return buildString {
+            append("${Resource.getStringByKey("STR_10")}$count\n")
+            append("${Resource.getStringByKey("STR_11")}\n")
+            result.forEach { (k, v) -> append("$k - $v\n") }
+            append("всего ${result.size}  слов\n")
         }
-        for (key in result.keys) {
-            builder.append(key).append(" - ").append(result[key]).append("\n")
-        }
-        builder.append("всего ").append(result.size).append(" слов").append("\n")
-        return builder.toString()
     }
 
     /**
@@ -92,17 +91,25 @@ data class User(
             100
         }
         val builder = StringBuilder()
-        builder.append(Resource.getStringByKey("STR_12")).append("\n").append("\n").append("\n").append(Resource.getStringByKey("STR_15")).append(
-            Redis.getCountOfCheckedWord(chatId)).append("\n").append(Resource.getStringByKey("STR_45")).append(Redis.getCountOfWrongCheckedWord(chatId)).append("\n").append(
-            Resource.getStringByKey("STR_46")).append(rightPercent).append("%").append("\n").append(Resource.getStringByKey("STR_16")).append("\n")
-        for ((name) in WordManager.rules) {
-            if (Redis.isCheckRule(chatId, name)) {
-                builder.append(" - ").append("\"").append(name).append("\"").append("\n")
-            }
-        }
+        builder.append(Resource.getStringByKey("STR_12")).append("\n").append("\n").append("\n")
+            .append(Resource.getStringByKey("STR_15")).append(
+            Redis.getCountOfCheckedWord(chatId)
+        ).append("\n").append(Resource.getStringByKey("STR_45")).append(Redis.getCountOfWrongCheckedWord(chatId))
+            .append("\n").append(
+            Resource.getStringByKey("STR_46")
+        ).append(rightPercent).append("%").append("\n").append(Resource.getStringByKey("STR_16")).append("\n")
+
+        WordManager.rules.map { it.name }
+            .filter { Redis.isCheckRule(chatId, it) }
+            .forEach { builder.append(" - ").append("\"").append(it).append("\"").append("\n") }
+
         when {
-            Config.admins.contains(chatId) -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_37"))
-            Redis.checkRight(chatId) -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_38"))
+            Config.admins.contains(chatId) -> builder.append(Resource.getStringByKey("STR_35"))
+                .append(Resource.getStringByKey("STR_37"))
+
+            Redis.checkRight(chatId) -> builder.append(Resource.getStringByKey("STR_35"))
+                .append(Resource.getStringByKey("STR_38"))
+
             else -> builder.append(Resource.getStringByKey("STR_35")).append(Resource.getStringByKey("STR_39"))
         }
         return builder.toString()
