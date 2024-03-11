@@ -3,27 +3,26 @@ package me.centralhardware.znatoki.studyRussianBot.telegram
 import kotlinx.coroutines.runBlocking
 import me.centralhardware.telegram.bot.common.ClickhouseRuben
 import org.slf4j.LoggerFactory
-import org.telegram.telegrambots.bots.TelegramLongPollingBot
-import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
 import me.centralhardware.znatoki.studyRussianBot.Config
 import me.centralhardware.znatoki.studyRussianBot.objects.User
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
 import me.centralhardware.znatoki.studyRussianBot.utils.RSA
 import me.centralhardware.znatoki.studyRussianBot.utils.Redis
 import me.centralhardware.znatoki.studyRussianBot.utils.Resource
+import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication
+import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer
 import kotlin.system.exitProcess
 
 
 /**
  *telegram bot class
  */
-class TelegramBot : TelegramLongPollingBot(Config.token) {
+class TelegramBot : LongPollingSingleThreadUpdateConsumer {
     private var telegramParser: TelegramParser? = null
     private var inlineKeyboard: InlineKeyboard
-    private var sender: Sender = Sender(this)
+    private var sender: Sender = Sender()
 
     init {
         inlineKeyboard = InlineKeyboard(sender)
@@ -37,7 +36,8 @@ class TelegramBot : TelegramLongPollingBot(Config.token) {
          */
         fun init() {
             try {
-                TelegramBotsApi(DefaultBotSession::class.java).registerBot(TelegramBot())
+                val application = TelegramBotsLongPollingApplication()
+                application.registerBot(Config.token, TelegramBot())
                 logger.info("bot register")
             } catch (e: TelegramApiRequestException) {
                 logger.warn("bot start fail", e)
@@ -54,7 +54,7 @@ class TelegramBot : TelegramLongPollingBot(Config.token) {
      * logging input message.
      * @param update received message
      */
-    override fun onUpdateReceived(update: Update) {
+    override fun consume(update: Update){
         runBlocking {
             try {
                 process(update)
@@ -127,13 +127,4 @@ class TelegramBot : TelegramLongPollingBot(Config.token) {
             else -> {}
         }
     }
-
-    /**
-     * get bot user name
-     * @return bot username
-     */
-    override fun getBotUsername(): String {
-        return Config.userName
-    }
-
 }

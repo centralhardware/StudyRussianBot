@@ -11,7 +11,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.telegram:telegrambots:6.9.7.1")
+    implementation("org.telegram:telegrambots-longpolling:7.0.0-rc0")
+    implementation("org.telegram:telegrambots-client:7.0.0-rc0")
     implementation("org.json:json:20220320")
     implementation("com.github.centralhardware:telegram-bot-commons:fb2bb2a86b")
 //    implementation("dev.inmo:tgbotapi:10.1.0")

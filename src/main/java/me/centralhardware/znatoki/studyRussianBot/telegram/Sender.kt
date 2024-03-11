@@ -1,16 +1,18 @@
 package me.centralhardware.znatoki.studyRussianBot.telegram
 
+import me.centralhardware.znatoki.studyRussianBot.Config
 import org.slf4j.LoggerFactory
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
 /**
  *telegram message sender
  *@property telegramBot instance of telegram bot
  */
-class Sender(private val telegramBot: TelegramBot) {
+class Sender {
     private val logger = LoggerFactory.getLogger(Sender::class.java)
+    private val client = OkHttpTelegramClient(Config.token)
 
     /**
      * send message to telegram user
@@ -25,7 +27,7 @@ class Sender(private val telegramBot: TelegramBot) {
             text(message).
             build()
 
-        runCatching { telegramBot.execute(msg) }
+        runCatching { client.execute(msg) }
             .onFailure { logger.warn("", it) }
     }
 
@@ -36,7 +38,7 @@ class Sender(private val telegramBot: TelegramBot) {
     fun send(sendMessage: SendMessage) {
         logger.info("send message: " + sendMessage.text)
 
-        runCatching { telegramBot.execute(sendMessage) }
+        runCatching { client.execute(sendMessage) }
             .onFailure { logger.warn("", it) }
     }
 
@@ -54,7 +56,7 @@ class Sender(private val telegramBot: TelegramBot) {
                                 messageId(messageId!!).
                                 build()
 
-        runCatching { telegramBot.execute(deleteMessage) }
+        runCatching { client.execute(deleteMessage) }
             .onFailure { logger.warn("", it) }
     }
 }
