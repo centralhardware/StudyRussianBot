@@ -42,7 +42,7 @@ class InlineKeyboard
         sender.send(inlineKeyboard {
             text(Resource.getStringByKey("STR_8"))
             chatId(chatId)
-            if (runBlocking { !Redis.checkRight(chatId) } || !Config.admins.contains(chatId)) {
+            if (runBlocking { !Redis.checkRight(chatId) } && !Config.admins.contains(chatId)) {
                 for (i in 1..3) {
                     val rule = WordManager.rules[i]
 
@@ -53,8 +53,8 @@ class InlineKeyboard
                             btn(rule.name, rule.section)
                         }
                     }
-                    row { btn(Resource.getStringByKey("STR_24"), "menu") }
                 }
+                row { btn(Resource.getStringByKey("STR_24"), "menu") }
             } else {
                 WordManager.rules.filter { it.pageNumber == pageNumber }.forEach {
                     row {
