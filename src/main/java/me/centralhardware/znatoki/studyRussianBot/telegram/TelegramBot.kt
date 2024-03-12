@@ -100,12 +100,6 @@ class TelegramBot : LongPollingSingleThreadUpdateConsumer {
                 when {
                     !telegramParser!!.users.containsKey(update.message.chatId) ->
                         telegramParser!!.users[update.message.chatId] = User(update.message.chatId)
-
-                    update.message.text.lowercase() == "ping" ->
-                        sender.send("pong", update.message.chatId!!)
-
-                    update.message.text.lowercase() == "pong" ->
-                        sender.send("ping", update.message.chatId!!)
                 }
                 telegramParser!!.parseText(update)
             }

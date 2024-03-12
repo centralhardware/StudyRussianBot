@@ -76,7 +76,7 @@ object Redis {
         if (Config.admins.contains(userId)) {
             return true
         }
-        return redis.get("$userId$KEY_POSTFIX") == null
+        return redis.get("$userId$KEY_POSTFIX") != null
     }
 
     /**
