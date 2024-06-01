@@ -3,13 +3,14 @@ package me.centralhardware.znatoki.studyRussianBot.telegram
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow
 import kotlin.properties.Delegates
 
 class InlineKeyboardDsl {
 
     private lateinit var text: String
     private var chatId by Delegates.notNull<Long>()
-    private val keyboard: MutableList<List<InlineKeyboardButton>> = mutableListOf()
+    private val keyboard: MutableList<InlineKeyboardRow> = mutableListOf()
 
     fun text(text: String) {
         this.text = text
@@ -20,7 +21,7 @@ class InlineKeyboardDsl {
     }
 
     fun row(initializer: Row.() -> Unit) {
-        keyboard.add(Row().apply(initializer).btns)
+        keyboard.add(Row().apply(initializer).row)
     }
 
     fun build(): SendMessage {
@@ -40,10 +41,10 @@ fun inlineKeyboard(initializer: InlineKeyboardDsl.() -> Unit): InlineKeyboardDsl
 
 class Row {
 
-    val btns: MutableList<InlineKeyboardButton> = mutableListOf()
+    val row: InlineKeyboardRow = InlineKeyboardRow()
 
     fun btn(text: String, callbackData: String) {
-        btns.add(InlineKeyboardButton.builder().text(text).callbackData(callbackData).build())
+        row.add(InlineKeyboardButton.builder().text(text).callbackData(callbackData).build())
     }
 
 }

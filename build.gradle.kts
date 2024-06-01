@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.0.0"
 }
 
 group = "me.centralhardware"
@@ -11,16 +11,16 @@ repositories {
 }
 
 dependencies {
-    implementation("org.telegram:telegrambots-longpolling:7.0.0-rc0")
-    implementation("org.telegram:telegrambots-client:7.0.0-rc0")
-    implementation("org.json:json:20220320")
-    implementation("com.github.centralhardware:telegram-bot-commons:fb2bb2a86b")
+    implementation("org.telegram:telegrambots-longpolling:7.2.1")
+    implementation("org.telegram:telegrambots-client:7.2.1")
+    implementation("org.json:json:20240303")
+    implementation("com.github.centralhardware:telegram-bot-commons:2a55dd22e2")
 //    implementation("dev.inmo:tgbotapi:10.1.0")
     implementation("org.slf4j:slf4j-api:2.0.12")
     implementation("ch.qos.logback:logback-classic:1.5.0")
     implementation("ch.qos.logback:logback-core:1.5.0")
     implementation("io.github.crackthecodeabhi:kreds:0.9.1")
-    implementation("com.clickhouse:clickhouse-jdbc:0.6.0")
+    implementation("com.clickhouse:clickhouse-jdbc:0.6.0-patch4")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("com.github.seratch:kotliquery:1.9.0")

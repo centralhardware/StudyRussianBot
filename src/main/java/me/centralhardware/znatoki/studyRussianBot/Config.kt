@@ -4,11 +4,6 @@ package me.centralhardware.znatoki.studyRussianBot
  *provide access to application config file
  */
 object Config {
-    val TELEGRAM_API_BOT_URL: String = System.getenv("TELEGRAM_API_BOT_URL")
-    /**
-     * bot username
-     */
-    val userName: String = System.getenv("BOT_USER_NAME")
     /**
      * bot token
      */
