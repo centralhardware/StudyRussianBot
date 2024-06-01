@@ -71,7 +71,7 @@ object WordManager {
                 }
             }
             // set word to child rule from parent
-            it.parent?.let { it.words.addAll(it.words) }
+            it.parent?.let { parent -> parent.words.addAll(it.words) }
             // set pageNumbers for rule
             it.pageNumber = count / Rule.pageCountRule
             count++
