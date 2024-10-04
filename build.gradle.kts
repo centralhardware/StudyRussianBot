@@ -14,8 +14,6 @@ dependencies {
     implementation("org.telegram:telegrambots-longpolling:7.2.1")
     implementation("org.telegram:telegrambots-client:7.2.1")
     implementation("org.json:json:20240303")
-    implementation("com.github.centralhardware:telegram-bot-commons:2a55dd22e2")
-//    implementation("dev.inmo:tgbotapi:10.1.0")
     implementation("org.slf4j:slf4j-api:2.0.12")
     implementation("ch.qos.logback:logback-classic:1.5.0")
     implementation("ch.qos.logback:logback-core:1.5.0")

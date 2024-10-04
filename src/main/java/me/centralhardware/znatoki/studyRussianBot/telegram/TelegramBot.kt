@@ -1,7 +1,6 @@
 package me.centralhardware.znatoki.studyRussianBot.telegram
 
 import kotlinx.coroutines.runBlocking
-import me.centralhardware.telegram.bot.common.ClickhouseRuben
 import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
@@ -46,8 +45,6 @@ class TelegramBot : LongPollingSingleThreadUpdateConsumer {
         }
     }
 
-    private val clickhouse = ClickhouseRuben();
-
     /**
      * method by which the library telegram sends
      * the received messages for processing by the server part
@@ -65,8 +62,6 @@ class TelegramBot : LongPollingSingleThreadUpdateConsumer {
     }
 
     private suspend fun process(update: Update) {
-        clickhouse.log(update, "StudyRussianBot")
-
         if (telegramParser == null) telegramParser = TelegramParser(sender)
 
         val chatId: Long = if (update.hasCallbackQuery()) {
