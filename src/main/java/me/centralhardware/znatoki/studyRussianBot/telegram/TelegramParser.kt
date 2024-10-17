@@ -1,11 +1,9 @@
 package me.centralhardware.znatoki.studyRussianBot.telegram
 
 import org.telegram.telegrambots.meta.api.objects.Update
-import me.centralhardware.znatoki.studyRussianBot.Config
 import me.centralhardware.znatoki.studyRussianBot.WordManager
 import me.centralhardware.znatoki.studyRussianBot.objects.User
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus.*
-import me.centralhardware.znatoki.studyRussianBot.utils.RSA
 import me.centralhardware.znatoki.studyRussianBot.utils.Redis
 import me.centralhardware.znatoki.studyRussianBot.utils.Resource
 import java.util.*
@@ -25,7 +23,6 @@ class TelegramParser
     private var keyboards: InlineKeyboard = InlineKeyboard(sender)
 
     val users: HashMap<Long, User> = HashMap<Long, User>()
-
     /**
      * parse text message
      * support command
@@ -34,8 +31,6 @@ class TelegramParser
      * - /rules: show choose rule inline menu
      * - /profile: show profile data
      * - /menu: show menu
-     * - /gen: generate activated code. Param: userName. only for admin
-     * - /ver: verify activated code. Param: key userName. only for admin
      * if message have not command: next action depending on status
      * - WAIT_COUNT_OF_WORD: start testing with giving count of word
      * - TESTING: message is answer on word with missing later. if answer is wright - send next word or result
@@ -50,11 +45,7 @@ class TelegramParser
             "/start" -> {
                 user!!.reset()
                 sender.send(Resource.getStringByKey("START_MESSAGE"), update.message.chatId)
-                if (Redis.checkRight(chatId)) {
-                    keyboards.sendMenu(chatId!!)
-                } else {
-                    keyboards.sendLoginInfo(chatId!!)
-                }
+                keyboards.sendMenu(chatId!!)
             }
             "/help" -> sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
             "/rules" -> keyboards.sendRuleInlineKeyboard(update, 0)
@@ -62,30 +53,6 @@ class TelegramParser
             "/menu" -> keyboards.sendMenu(chatId!!)
             else -> {
                 when {
-                    message.startsWith("/gen ") -> {
-                        if (Config.admins.contains(chatId)) {
-                            if (message.replace("/gen ", "").isEmpty()) {
-                                sender.send(Resource.getStringByKey("STR_31"), chatId)
-                                return
-                            }
-                            sender.send(RSA.generateKey(message.replace("/gen ", "")), chatId)
-                        } else {
-                            sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
-                        }
-                    }
-                    message.startsWith("/ver ") -> {
-                        val args = message.replace("/ver ", "")
-                            .split(" ".toRegex())
-                            .dropLastWhile { it.isEmpty() }
-                            .toTypedArray()
-                        val key = args[0]
-                        val msg = args[1]
-                        if (Config.admins.contains(chatId)) {
-                            sender.send(RSA.validateKey(msg, key).toString(), chatId!!)
-                        } else {
-                            sender.send(Resource.getStringByKey("STR_47"), update.message.chatId)
-                        }
-                    }
                     message.startsWith("/") -> sender.send(Resource.getStringByKey("STR_101"), chatId)
                     else -> when (user!!.status) {
                         WAIT_COUNT_OF_WORD -> {
@@ -149,8 +116,6 @@ class TelegramParser
      * - profile - show profile data
      * - help - show help message.
      * - menu - show menu
-     * - enter_key - set status to wait_key and waiting input of activated code. only for demo access
-     * - login - send login inline menu. only for demo access.
      * - to_$pageNumber - show page of rule
      * @param update received message
      */
@@ -170,26 +135,10 @@ class TelegramParser
             }
             "testing" -> keyboards.sendRuleInlineKeyboard(update, 0)
             "profile" -> sender.send(user!!.getProfile(), chatId)
-            "help" -> if (Redis.checkRight(chatId) || Config.admins.contains(chatId)) {
-                sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
-            } else {
-                sender.send(Resource.getStringByKey("STR_32"), chatId)
-            }
+            "help" -> sender.send(Resource.getStringByKey("HELP_MESSAGE"), chatId)
             "menu" -> if (user!!.status !== TESTING && user!!.status !== WAIT_COUNT_OF_WORD) {
                 sender.delete(chatId, update.callbackQuery.message.messageId)
                 keyboards.sendMenu(chatId!!)
-            }
-            "enter_key" -> {
-                if (update.callbackQuery.from.userName == null){
-                    sender.send("вы должны иметь заполненое имя пользователя", chatId)
-                } else {
-                    sender.send(Resource.getStringByKey("STR_22"), chatId)
-                    user!!.status = WAIT_KEY
-                }
-            }
-            "login" -> {
-                sender.delete(chatId, update.callbackQuery.message.messageId)
-                keyboards.sendLoginInfo(chatId!!)
             }
             else -> {
                 when {

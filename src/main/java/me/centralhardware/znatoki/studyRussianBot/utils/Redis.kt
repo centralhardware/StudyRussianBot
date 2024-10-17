@@ -12,7 +12,6 @@ import me.centralhardware.znatoki.studyRussianBot.objects.User
  */
 object Redis {
     private val redis = newClient(Endpoint.from(Config.redisUrl))
-    private const val KEY_POSTFIX = "_key"
     private const val CHECKED_WRONG_WORD_POSTFIX = "_checked_wrong_word"
     private const val CHECKED_WORD_POSTFIX = "_checked_word"
     private const val CHECKED_RULE_POSTFIX = "_checked_rule"
@@ -67,22 +66,4 @@ object Redis {
      */
     suspend fun checkWrongWord(user: User) = redis.sadd("${user.chatId}$CHECKED_WRONG_WORD_POSTFIX", user.words[0].name)
 
-    /**
-     * check license status
-     * @param userId id of user
-     * @return true if user don't have demo access
-     */
-    suspend fun checkRight(userId: Long): Boolean {
-        if (Config.admins.contains(userId)) {
-            return true
-        }
-        return redis.get("$userId$KEY_POSTFIX") != null
-    }
-
-    /**
-     * set activated code
-     * @param userId id of user
-     * @param key activated code
-     */
-    suspend fun setRight(userId: Long, key: String) = redis.set("$userId$KEY_POSTFIX", key)
 }

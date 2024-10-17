@@ -1,11 +1,9 @@
 package me.centralhardware.znatoki.studyRussianBot.objects
 
-import me.centralhardware.znatoki.studyRussianBot.Config
 import me.centralhardware.znatoki.studyRussianBot.WordManager
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
 import me.centralhardware.znatoki.studyRussianBot.utils.Redis
 import me.centralhardware.znatoki.studyRussianBot.utils.Resource
-import java.util.*
 
 /**
  * data class contain structure  of rule used for testing
@@ -91,27 +89,17 @@ data class User(
             100
         }
 
-        return buildString {
-            append("${Resource.getStringByKey("STR_12")}\n\n\n")
-            append("${Resource.getStringByKey("STR_15")}${Redis.getCountOfCheckedWord(chatId)}\n")
-            append("${Resource.getStringByKey("STR_45")}${Redis.getCountOfWrongCheckedWord(chatId)}\n")
-            append("${Resource.getStringByKey("STR_46")}${rightPercent}%\n")
-            append("${Resource.getStringByKey("STR_16")}\n")
-
-            WordManager.rules.map { it.name }
-                .filter { Redis.isCheckRule(chatId, it) }
-                .forEach { append(" - \"$it\"\n") }
+        return """
+            ${Resource.getStringByKey("STR_12")}
 
 
-            when {
-                Config.admins.contains(chatId) -> append(Resource.getStringByKey("STR_35"))
-                    .append(Resource.getStringByKey("STR_37"))
-
-                Redis.checkRight(chatId) -> append(Resource.getStringByKey("STR_35"))
-                    .append(Resource.getStringByKey("STR_38"))
-
-                else -> append("${Resource.getStringByKey("STR_35")}${Resource.getStringByKey("STR_39")}")
-            }
-        }
+            ${Resource.getStringByKey("STR_15")}${Redis.getCountOfCheckedWord(chatId)}
+            ${Resource.getStringByKey("STR_45")}${Redis.getCountOfWrongCheckedWord(chatId)}
+            ${Resource.getStringByKey("STR_46")}${rightPercent}%
+            ${Resource.getStringByKey("STR_16")}
+            ${WordManager.rules.map { it.name }
+            .filter { Redis.isCheckRule(chatId, it) }
+            .joinToString("\n")}
+        """.trimIndent()
     }
 }

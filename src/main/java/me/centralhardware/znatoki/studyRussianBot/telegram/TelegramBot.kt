@@ -1,17 +1,13 @@
 package me.centralhardware.znatoki.studyRussianBot.telegram
 
 import kotlinx.coroutines.runBlocking
-import org.slf4j.LoggerFactory
-import org.telegram.telegrambots.meta.api.objects.Update
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import me.centralhardware.znatoki.studyRussianBot.Config
 import me.centralhardware.znatoki.studyRussianBot.objects.User
-import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
-import me.centralhardware.znatoki.studyRussianBot.utils.RSA
-import me.centralhardware.znatoki.studyRussianBot.utils.Redis
-import me.centralhardware.znatoki.studyRussianBot.utils.Resource
+import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer
+import org.telegram.telegrambots.meta.api.objects.Update
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException
 import kotlin.system.exitProcess
 
 
@@ -64,11 +60,6 @@ class TelegramBot : LongPollingSingleThreadUpdateConsumer {
     private suspend fun process(update: Update) {
         if (telegramParser == null) telegramParser = TelegramParser(sender)
 
-        val chatId: Long = if (update.hasCallbackQuery()) {
-            update.callbackQuery.message.chatId!!
-        } else {
-            update.message.chatId!!
-        }
         when {
             update.hasCallbackQuery() -> {
                 logger.info(
@@ -98,22 +89,6 @@ class TelegramBot : LongPollingSingleThreadUpdateConsumer {
                 }
                 telegramParser!!.parseText(update)
             }
-        }
-        when (telegramParser!!.users[chatId]!!.status) {
-            UserStatus.WAIT_KEY -> {
-                if (update.hasCallbackQuery()) return
-
-                if (RSA.validateKey(update.message.from.userName, update.message.text)) {
-                    telegramParser!!.users[chatId]!!.status = UserStatus.NONE
-                    Redis.setRight(chatId, update.message.text)
-                    sender.send(Resource.getStringByKey("STR_19"), chatId)
-                    inlineKeyboard.sendMenu(chatId)
-                } else {
-                    sender.send(Resource.getStringByKey("STR_21"), chatId)
-                }
-            }
-
-            else -> {}
         }
     }
 }

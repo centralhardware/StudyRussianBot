@@ -20,12 +20,5 @@ object Config {
      * path to file word.json
      */
     val wordPath: String = System.getenv("WORD_PATH")
-    /**
-     * List of admins id
-     * separator - ","
-     */
-    val admins: List<Long> = System.getenv("ADMIN_ID")
-        .split(",".toRegex())
-        .filter { it.isNotEmpty() }
-        .map { it.toLong() }
+
 }
