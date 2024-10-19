@@ -1,20 +1,15 @@
 package me.centralhardware.znatoki.studyRussianBot
 
-import org.json.JSONObject
-import org.slf4j.LoggerFactory
+import dev.inmo.kslog.common.KSLog
+import dev.inmo.kslog.common.info
 import me.centralhardware.znatoki.studyRussianBot.objects.Rule
 import me.centralhardware.znatoki.studyRussianBot.objects.Word
 import me.centralhardware.znatoki.studyRussianBot.utils.Resource
+import org.json.JSONObject
 import java.util.*
 
-/**
- *object contains rule and rule description collection
- */
 object WordManager {
-    private val logger = LoggerFactory.getLogger(WordManager::class.java)
-    /**
-     * List of rules
-     */
+
     val rules: ArrayList<Rule> = ArrayList<Rule>()
 
     /**
@@ -77,8 +72,8 @@ object WordManager {
             count++
         }
 
-        rules.forEach{ logger.info("in rule \"" + it.name + "\" added " + it.words.size + "  words") }
-        logger.info("init data")
+        rules.forEach{ KSLog.info("in rule \"" + it.name + "\" added " + it.words.size + "  words") }
+        KSLog.info("init data")
     }
 
     fun init(){}

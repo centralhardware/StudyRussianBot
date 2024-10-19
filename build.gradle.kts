@@ -7,15 +7,14 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
+    maven("https://nexus.inmo.dev/repository/maven-releases/")
 }
 
 dependencies {
-    implementation("org.telegram:telegrambots-longpolling:7.10.0")
-    implementation("org.telegram:telegrambots-client:7.10.0")
+    implementation("dev.inmo:tgbotapi:18.2.2-branch_18.2.2-build2465")
+    implementation("com.github.centralhardware:telegram-bot-commons:1e503cc156")
     implementation("org.json:json:20240303")
-    implementation("org.slf4j:slf4j-api:2.0.16")
-    implementation("ch.qos.logback:logback-classic:1.5.11")
-    implementation("ch.qos.logback:logback-core:1.5.11")
     implementation("io.github.crackthecodeabhi:kreds:0.9.1")
 }
 

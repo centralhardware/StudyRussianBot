@@ -1,11 +1,12 @@
 package me.centralhardware.znatoki.studyRussianBot.utils
 
+import dev.inmo.tgbotapi.types.chat.User
 import io.github.crackthecodeabhi.kreds.connection.Endpoint
 import io.github.crackthecodeabhi.kreds.connection.newClient
-import org.slf4j.LoggerFactory
 import me.centralhardware.znatoki.studyRussianBot.Config
 import me.centralhardware.znatoki.studyRussianBot.WordManager
-import me.centralhardware.znatoki.studyRussianBot.objects.User
+import me.centralhardware.znatoki.studyRussianBot.objects.TelegramUser
+import me.centralhardware.znatoki.studyRussianBot.rowId
 
 /**
  *provide access to redis server
@@ -20,7 +21,7 @@ object Redis {
      * store data about passing rule task
      * @param user user that pass rule
      */
-    suspend fun checkRule(user: User) {
+    suspend fun checkRule(user: TelegramUser) {
         val checkWordKey = "${user.chatId} $CHECKED_WORD_POSTFIX"
         val checkRuleKey = "${user.chatId} $CHECKED_RULE_POSTFIX"
         var checkedCount = WordManager.getRuleByName(user.currRule!!.name)!!.words.count { redis.sismember(checkWordKey, it.name) == 1L }
@@ -30,13 +31,8 @@ object Redis {
         }
     }
 
-    /**
-     * check on passing rule
-     * @param chatId id of user
-     * @param rule name of rule
-     * @return true if rule was passing
-     */
-    suspend fun isCheckRule(chatId: Long, rule: String): Boolean = redis.sismember("$chatId$CHECKED_RULE_POSTFIX", rule) == 1L
+    suspend fun isCheckRule(chatId: Long, rule: String): Boolean
+    = redis.sismember("$chatId$CHECKED_RULE_POSTFIX", rule) == 1L
 
     /**
      * get count of checked word
@@ -57,13 +53,13 @@ object Redis {
      * note that the word was answered correctly for the given user
      * @param user user that check word
      */
-    suspend fun checkWord(user: User) = redis.sadd("${user.chatId}$CHECKED_WORD_POSTFIX", user.words[0].name)
+    suspend fun checkWord(user: TelegramUser) = redis.sadd("${user.chatId}$CHECKED_WORD_POSTFIX", user.words[0].name)
 
     /**
      * note that the word was not answered correctly for the given user
      *
      * @param user user that check word
      */
-    suspend fun checkWrongWord(user: User) = redis.sadd("${user.chatId}$CHECKED_WRONG_WORD_POSTFIX", user.words[0].name)
+    suspend fun checkWrongWord(user: TelegramUser) = redis.sadd("${user.chatId}$CHECKED_WRONG_WORD_POSTFIX", user.words[0].name)
 
 }

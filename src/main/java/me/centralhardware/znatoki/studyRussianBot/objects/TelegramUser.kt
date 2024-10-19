@@ -3,13 +3,12 @@ package me.centralhardware.znatoki.studyRussianBot.objects
 import me.centralhardware.znatoki.studyRussianBot.WordManager
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
 import me.centralhardware.znatoki.studyRussianBot.utils.Redis
-import me.centralhardware.znatoki.studyRussianBot.utils.Resource
 
 /**
  * data class contain structure  of rule used for testing
  *
  */
-data class User(
+data class TelegramUser(
     /**
      * id of telegram user
      */
@@ -20,10 +19,6 @@ data class User(
      */
     var currRule: Rule? = null
 
-    /**
-     *status of user
-     * @see UserStatus
-     */
     var status: UserStatus? = null
 
     /**
@@ -67,8 +62,8 @@ data class User(
             .groupingBy { it }
             .eachCount()
         return buildString {
-            append("${Resource.getStringByKey("STR_10")}$count\n")
-            append("${Resource.getStringByKey("STR_11")}\n")
+            append("всего слов в тестировании$count\n")
+            append("слова, в которых допущены ошибки\n")
             result.forEach { (k, v) -> append("$k - $v\n") }
             append("всего ${result.size}  слов\n")
         }
@@ -90,13 +85,13 @@ data class User(
         }
 
         return """
-            ${Resource.getStringByKey("STR_12")}
+            Профиль:
 
 
-            ${Resource.getStringByKey("STR_15")}${Redis.getCountOfCheckedWord(chatId)}
-            ${Resource.getStringByKey("STR_45")}${Redis.getCountOfWrongCheckedWord(chatId)}
-            ${Resource.getStringByKey("STR_46")}${rightPercent}%
-            ${Resource.getStringByKey("STR_16")}
+            слов отвечено правильно: ${Redis.getCountOfCheckedWord(chatId)}
+            слов отвечено неправильно ${Redis.getCountOfWrongCheckedWord(chatId)}
+            процент правильных ответов ${rightPercent}%
+            пройденные правила:
             ${WordManager.rules.map { it.name }
             .filter { Redis.isCheckRule(chatId, it) }
             .joinToString("\n")}
