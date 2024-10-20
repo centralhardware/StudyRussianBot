@@ -11,9 +11,11 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onUnhandledCommand
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onUnhandledDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.message
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
@@ -24,14 +26,13 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 import dev.inmo.tgbotapi.utils.row
 import me.centralhardware.znatoki.studyRussianBot.objects.TelegramUser
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus.*
-import me.centralhardware.znatoki.studyRussianBot.telegram.InlineKeyboard
-import me.centralhardware.znatoki.studyRussianBot.utils.Redis
+import me.centralhardware.znatoki.studyRussianBot.InlineKeyboard
+import me.centralhardware.znatoki.studyRussianBot.Redis
 
 val users: MutableMap<Chat, TelegramUser> = mutableMapOf()
 
 @OptIn(RiskFeature::class)
 suspend fun main() {
-    WordManager.init()
     AppConfig.init("studyRussianBot")
     longPolling {
         setMyCommands(
@@ -108,31 +109,31 @@ suspend fun main() {
                 send(it.from, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
             }
         }
-        onDataCallbackQuery(Regex("to_\\d+\n")) {
+        onDataCallbackQuery(Regex("to_\\d+")) {
             val user = getUser(it.from)
             if (user.status !== WAIT_COUNT_OF_WORD && user.status !== TESTING) {
                 editMessageReplyMarkup(it.from, it.message!!.messageId,
                     replyMarkup = InlineKeyboard.getRules(it.data.replace("to_", "").toInt(), it.from))
             }
         }
-        onDataCallbackQuery {
+        onUnhandledDataCallbackQuery() {
             val user = getUser(it.from)
             when {
                 user.status === NONE -> {
-                    WordManager.rules.filter { rule -> rule.section ==  it.data }.forEach { rule ->
+                    WordMapper.getRuleById(it.data.toInt())?.let { rule ->
                         getUser(it.from).status = WAIT_COUNT_OF_WORD
                         getUser(it.from).currRule = rule
                         sendTextMessage(it.from, "вы выбрали правило: ${rule.name}")
                         sendTextMessage(it.from, "введите количество слов для тестирования")
-                        return@onDataCallbackQuery
+                        return@onUnhandledDataCallbackQuery
                     }
                 }
                 user.status !== NONE -> {
                     deleteMessage(it.from.id, it.message!!.messageId)
                     send(it.from, "хотите завершить задание?", replyMarkup = inlineKeyboard{
                         row {
-                            dataInlineButton("да", "reset_testing")
-                            dataInlineButton("нет", "noreset_testing")
+                            dataButton("да", "reset_testing")
+                            dataButton("нет", "noreset_testing")
                         }
                     })
                 }
@@ -172,16 +173,16 @@ suspend fun main() {
                         if (user.words.isEmpty()) {
                             sendTextMessage(it.chat, "вы завершили прохождение правила")
                             sendTextMessage(it.chat, user.getTestingResult())
-                            Redis.checkRule(user)
+                            Redis.markRuleAsComplete(user)
                             send(it.chat, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
                             user.reset()
                             return@onText
                         }
                         sendTextMessage(it.chat, user.words[0].name)
-                        Redis.checkWord(user)
+                        Redis.markWordAsRight(user)
                     } else {
                         sendTextMessage(it.chat, "неправильно")
-                        Redis.checkWrongWord(user)
+                        Redis.markWordAsWrong(user)
                         val temp = user.words[0]
                         user.words.removeAt(0)
                         user.words.add(temp)
