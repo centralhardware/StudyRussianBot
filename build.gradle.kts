@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.inmo:tgbotapi:18.2.2-branch_18.2.2-build2465")
+    implementation("dev.inmo:tgbotapi:18.2.2-branch_18.2.2-build2469")
     implementation("com.github.centralhardware:telegram-bot-commons:1e503cc156")
     implementation("org.json:json:20240303")
     implementation("io.github.crackthecodeabhi:kreds:0.9.1")
