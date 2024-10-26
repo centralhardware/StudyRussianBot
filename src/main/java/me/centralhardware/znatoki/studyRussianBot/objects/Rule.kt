@@ -15,6 +15,6 @@ val ruleMapper = { row: Row ->
         row.int("id"),
         row.string("name"),
         WordMapper.getRuleById(row.int("parent")),
-        WordMapper.getWords(row.int("id"))
+        WordMapper.getWords(row.int("id")),
     )
 }

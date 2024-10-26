@@ -12,15 +12,17 @@ object WordMapper {
         sessionOf(
             System.getenv("POSTGRES_URL"),
             System.getenv("POSTGRES_USERNAME"),
-            System.getenv("POSTGRES_PASSWORD")
+            System.getenv("POSTGRES_PASSWORD"),
         )
 
     fun getRules() =
         session.run(
-            queryOf("""
+            queryOf(
+                    """
             SELECT * 
             FROM rules
-        """)
+        """
+                )
                 .map(ruleMapper)
                 .asList
         )
@@ -34,7 +36,7 @@ object WordMapper {
             WHERE id = :id
             LIMIT 1
         """,
-                    mapOf("id" to id)
+                    mapOf("id" to id),
                 )
                 .map(ruleMapper)
                 .asSingle
@@ -50,7 +52,7 @@ object WordMapper {
         LIMIT 7
         OFFSET :pageNumber * 7
     """,
-                    mapOf("pageNumber" to pageNumber)
+                    mapOf("pageNumber" to pageNumber),
                 )
                 .map(ruleMapper)
                 .asList
@@ -69,7 +71,7 @@ object WordMapper {
                 END
            )
         """,
-                    mapOf("ruleId" to ruleId)
+                    mapOf("ruleId" to ruleId),
                 )
                 .map(wordMapper)
                 .asList

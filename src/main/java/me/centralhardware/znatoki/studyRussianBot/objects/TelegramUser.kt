@@ -51,7 +51,7 @@ data class TelegramUser(val chatId: Long) {
             WordMapper.getRules().map { it.name }
             .filter { Redis.isCheckRule(chatId, it) }
             .joinToString("\n")}
-        """.trimIndent(
-        )
+        """
+            .trimIndent()
     }
 }

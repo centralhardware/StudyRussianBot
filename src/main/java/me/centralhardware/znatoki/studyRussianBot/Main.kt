@@ -37,14 +37,14 @@ suspend fun main() {
                 BotCommand("help", "Справка"),
                 BotCommand("rules", "Показать меню выбора правил"),
                 BotCommand("profile", "Вывести данные профиля"),
-                BotCommand("menu", "показать меню")
+                BotCommand("menu", "показать меню"),
             )
             onCommand("start") {
                 getUser(it.from).reset()
                 send(
                     it.chat,
                     text = "Здравствуйте, это бот для тренировки правил русского языка",
-                    replyMarkup = InlineKeyboard.getMenu()
+                    replyMarkup = InlineKeyboard.getMenu(),
                 )
             }
             onCommand("help") {
@@ -58,8 +58,8 @@ suspend fun main() {
                  - /profile: показать информацию об профиле.
                  - /menu: показать меню.
                  Автор - @centralhardware
-            """.trimIndent(
-                    )
+            """
+                        .trimIndent(),
                 )
             }
             onCommand("rules") {
@@ -96,8 +96,8 @@ suspend fun main() {
                  - /profile: показать информацию об профиле.
                  - /menu: показать меню.
                  Автор - @centralhardware
-            """.trimIndent(
-                    )
+            """
+                        .trimIndent(),
                 )
             }
             onDataCallbackQuery("menu") {
@@ -114,7 +114,7 @@ suspend fun main() {
                         it.from,
                         it.message!!.messageId,
                         replyMarkup =
-                            InlineKeyboard.getRules(it.data.replace("to_", "").toInt(), it.from)
+                            InlineKeyboard.getRules(it.data.replace("to_", "").toInt(), it.from),
                     )
                 }
             }
@@ -141,7 +141,7 @@ suspend fun main() {
                                         dataButton("да", "reset_testing")
                                         dataButton("нет", "noreset_testing")
                                     }
-                                }
+                                },
                         )
                     }
                 }
