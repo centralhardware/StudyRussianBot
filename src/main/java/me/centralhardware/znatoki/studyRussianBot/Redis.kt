@@ -13,7 +13,10 @@ object Redis {
     suspend fun markRuleAsComplete(user: TelegramUser) {
         val checkWordKey = "${user.chatId} $CHECKED_WORD_POSTFIX"
         val checkRuleKey = "${user.chatId} $CHECKED_RULE_POSTFIX"
-        val checkedCount = WordMapper.getWords(user.currRule!!.id).count { redis.sismember(checkWordKey, it.name) == 1L }
+        val checkedCount =
+            WordMapper.getWords(user.currRule!!.id).count {
+                redis.sismember(checkWordKey, it.name) == 1L
+            }
 
         if (checkedCount >= user.currRule!!.words.size) {
             redis.sadd(checkRuleKey, user.currRule!!.name)
@@ -23,8 +26,7 @@ object Redis {
     suspend fun isCheckRule(chatId: Long, rule: String): Boolean =
         redis.sismember("$chatId$CHECKED_RULE_POSTFIX", rule) == 1L
 
-    suspend fun getRightCount(chatId: Long): Long =
-        redis.scard("$chatId$CHECKED_WORD_POSTFIX")
+    suspend fun getRightCount(chatId: Long): Long = redis.scard("$chatId$CHECKED_WORD_POSTFIX")
 
     suspend fun getWrongCount(chatId: Long): Long =
         redis.scard("$chatId$CHECKED_WRONG_WORD_POSTFIX")
@@ -34,5 +36,4 @@ object Redis {
 
     suspend fun markWordAsWrong(user: TelegramUser) =
         redis.sadd("${user.chatId}$CHECKED_WRONG_WORD_POSTFIX", user.words[0].name)
-
 }

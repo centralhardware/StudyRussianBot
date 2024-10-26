@@ -1,12 +1,10 @@
 package me.centralhardware.znatoki.studyRussianBot.objects
 
+import me.centralhardware.znatoki.studyRussianBot.Redis
 import me.centralhardware.znatoki.studyRussianBot.WordMapper
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
-import me.centralhardware.znatoki.studyRussianBot.Redis
 
-data class TelegramUser(
-    val chatId: Long
-) {
+data class TelegramUser(val chatId: Long) {
     var currRule: Rule? = null
     var status: UserStatus = UserStatus.NONE
     var words: MutableList<Word> = mutableListOf()
@@ -21,10 +19,7 @@ data class TelegramUser(
     }
 
     fun getTestingResult(): String {
-        val result = wrongWords
-            .map { it.name }
-            .groupingBy { it }
-            .eachCount()
+        val result = wrongWords.map { it.name }.groupingBy { it }.eachCount()
         return buildString {
             append("всего слов в тестировании$count\n")
             append("слова, в которых допущены ошибки\n")
@@ -37,11 +32,12 @@ data class TelegramUser(
         val rightPercent: Int
         val wright = Redis.getRightCount(chatId).toDouble()
         val all = Redis.getWrongCount(chatId).toDouble() + Redis.getRightCount(chatId).toDouble()
-        rightPercent = if (all != 0.0 && wright < all) {
-            (wright / all * 100).toInt()
-        } else {
-            100
-        }
+        rightPercent =
+            if (all != 0.0 && wright < all) {
+                (wright / all * 100).toInt()
+            } else {
+                100
+            }
 
         return """
             Профиль:
@@ -55,6 +51,7 @@ data class TelegramUser(
             WordMapper.getRules().map { it.name }
             .filter { Redis.isCheckRule(chatId, it) }
             .joinToString("\n")}
-        """.trimIndent()
+        """.trimIndent(
+        )
     }
 }

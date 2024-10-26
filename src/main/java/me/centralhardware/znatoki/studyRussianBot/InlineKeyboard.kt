@@ -26,17 +26,17 @@ object InlineKeyboard {
                     dataButton("меню", "menu")
                 }
             }
-
-            pageNumber < 4 -> row {
-                dataButton("назад - $pageNumber", "to_${pageNumber - 1}")
-                dataButton("следующая-${pageNumber + 2}", "to_${pageNumber + 1}")
-                dataButton("меню", "menu")
-            }
-
-            pageNumber == 4 -> row {
-                dataButton("назад", "to_${pageNumber - 1}")
-                dataButton("меню", "menu")
-            }
+            pageNumber < 4 ->
+                row {
+                    dataButton("назад - $pageNumber", "to_${pageNumber - 1}")
+                    dataButton("следующая-${pageNumber + 2}", "to_${pageNumber + 1}")
+                    dataButton("меню", "menu")
+                }
+            pageNumber == 4 ->
+                row {
+                    dataButton("назад", "to_${pageNumber - 1}")
+                    dataButton("меню", "menu")
+                }
         }
     }
 
