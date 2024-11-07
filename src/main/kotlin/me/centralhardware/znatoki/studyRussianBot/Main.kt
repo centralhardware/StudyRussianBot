@@ -80,7 +80,8 @@ suspend fun main() {
             }
             onUnhandledCommand {
                 Trace.save("unhanldedCommand", mapOf("command" to it.text!!))
-                sendTextMessage(it.chat, "команда не распознана") }
+                sendTextMessage(it.chat, "команда не распознана")
+            }
             onDataCallbackQuery("reset_testing") {
                 Trace.save("resetTestingCallback", mapOf())
                 deleteMessage(it.from.id, it.message!!.messageId)
@@ -96,8 +97,7 @@ suspend fun main() {
                 Trace.save("testingCallback", mapOf())
                 send(it.from, text = "правила", replyMarkup = InlineKeyboard.getRules(0, it.from))
             }
-            onDataCallbackQuery("profile")
-            {
+            onDataCallbackQuery("profile") {
                 Trace.save("profileCallback", mapOf())
                 sendTextMessage(it.from, getUser(it.from).getProfile())
             }
