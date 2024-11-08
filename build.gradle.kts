@@ -3,7 +3,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     kotlin("jvm") version "2.0.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("com.ncorti.ktfmt.gradle") version "0.21.0"
 }
 
 group = "me.centralhardware"
@@ -38,8 +37,4 @@ tasks {
             attributes(mapOf("Main-Class" to "me.centralhardware.znatoki.studyRussianBot.MainKt"))
         }
     }
-}
-
-ktfmt {
-    kotlinLangStyle()
 }
