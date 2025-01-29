@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.inmo:tgbotapi:23.1.1")
+    implementation("dev.inmo:tgbotapi:23.1.2")
     implementation("com.github.centralhardware:telegram-bot-commons:34c054a4a1")
     implementation("org.json:json:20250107")
     implementation("io.github.crackthecodeabhi:kreds:0.9.1")
