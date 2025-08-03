@@ -2,7 +2,6 @@ package me.centralhardware.znatoki.studyRussianBot
 
 import dev.inmo.micro_utils.common.Warning
 import dev.inmo.tgbotapi.AppConfig
-import dev.inmo.tgbotapi.Trace
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.deleteMessage
 import dev.inmo.tgbotapi.extensions.api.edit.reply_markup.editMessageReplyMarkup
@@ -51,7 +50,6 @@ suspend fun main() {
                 )
             }
             onCommand("help") {
-                Trace.save("helpCommand", mapOf())
                 sendTextMessage(
                     it.chat,
                     """
@@ -67,42 +65,33 @@ suspend fun main() {
                 )
             }
             onCommand("rules") {
-                Trace.save("rulesCommand", mapOf())
                 send(it.chat, text = "правила", replyMarkup = InlineKeyboard.getRules(0, it.from!!))
             }
             onCommand("profile") {
-                Trace.save("profileCommand", mapOf())
                 sendTextMessage(it.chat, getUser(it.from).getProfile())
             }
             onCommand("menu") {
-                Trace.save("menuCommand", mapOf())
                 send(it.chat, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
             }
             onUnhandledCommand {
-                Trace.save("unhanldedCommand", mapOf("command" to it.text!!))
                 sendTextMessage(it.chat, "команда не распознана")
             }
             onDataCallbackQuery("reset_testing") {
-                Trace.save("resetTestingCallback", mapOf())
                 deleteMessage(it.from.id, it.message!!.messageId)
                 getUser(it.from).reset()
                 send(it.from, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
             }
             onDataCallbackQuery("noreset_testing") {
-                Trace.save("noresetTestingCallback", mapOf())
                 deleteMessage(it.from.id, it.message!!.messageId)
                 sendTextMessage(it.from, getUser(it.from).words[0].name)
             }
             onDataCallbackQuery("testing") {
-                Trace.save("testingCallback", mapOf())
                 send(it.from, text = "правила", replyMarkup = InlineKeyboard.getRules(0, it.from))
             }
             onDataCallbackQuery("profile") {
-                Trace.save("profileCallback", mapOf())
                 sendTextMessage(it.from, getUser(it.from).getProfile())
             }
             onDataCallbackQuery("help") {
-                Trace.save("helpCallback", mapOf())
                 sendTextMessage(
                     it.from,
                     """
@@ -118,7 +107,6 @@ suspend fun main() {
                 )
             }
             onDataCallbackQuery("menu") {
-                Trace.save("menuCallback", mapOf())
                 val user = getUser(it.from)
                 if (user.status !== TESTING && user.status !== WAIT_COUNT_OF_WORD) {
                     deleteMessage(it.from.id, it.message!!.messageId)
@@ -192,12 +180,10 @@ suspend fun main() {
                     }
                     TESTING -> {
                         val user = getUser(it.from)
-                        Trace.save("answer", mapOf())
                         if (user.words[0].answer.equals(text, ignoreCase = true)) {
                             sendTextMessage(it.chat, "правильно")
                             user.words.removeAt(0)
                             if (user.words.isEmpty()) {
-                                Trace.save("complete", mapOf())
                                 sendTextMessage(it.chat, "вы завершили прохождение правила")
                                 sendTextMessage(it.chat, user.getTestingResult())
                                 Redis.markRuleAsComplete(user)

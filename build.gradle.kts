@@ -1,6 +1,5 @@
 plugins {
     kotlin("jvm") version "2.2.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
     application
 }
 
@@ -18,7 +17,7 @@ repositories {
 
 dependencies {
     implementation("dev.inmo:tgbotapi:27.1.0")
-    implementation("com.github.centralhardware:ktgbotapi-commons:063599df7c")
+    implementation("com.github.centralhardware:ktgbotapi-commons:beafbfc9a8")
     implementation("org.json:json:20250517")
     implementation("io.github.crackthecodeabhi:kreds:0.9.1")
     implementation("org.postgresql:postgresql:42.7.7")
