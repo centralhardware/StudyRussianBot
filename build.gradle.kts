@@ -16,7 +16,7 @@ val ktgbotapiVersion = "30.0.2"
 dependencies {
     implementation("dev.inmo:tgbotapi:$ktgbotapiVersion")
     implementation("com.github.centralhardware:ktgbotapi-commons:$ktgbotapiVersion")
-    implementation("org.json:json:20250517")
+    implementation("org.json:json:20251224")
     implementation("io.github.crackthecodeabhi:kreds:0.9.1")
     implementation("org.postgresql:postgresql:42.7.8")
     implementation("com.github.seratch:kotliquery:1.9.1")
