@@ -18,7 +18,7 @@ dependencies {
     implementation("com.github.centralhardware:ktgbotapi-commons:$ktgbotapiVersion")
     implementation("org.json:json:20251224")
     implementation("io.github.crackthecodeabhi:kreds:0.9.1")
-    implementation("org.postgresql:postgresql:42.7.8")
+    implementation("org.postgresql:postgresql:42.7.9")
     implementation("com.github.seratch:kotliquery:1.9.1")
 }
 
