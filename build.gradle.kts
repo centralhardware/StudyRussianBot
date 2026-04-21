@@ -11,7 +11,7 @@ repositories {
     maven("https://jitpack.io")
 }
 
-val ktgbotapiVersion = "32.0.0"
+val ktgbotapiVersion = "33.0.0"
 
 dependencies {
     implementation("dev.inmo:tgbotapi:$ktgbotapiVersion")
