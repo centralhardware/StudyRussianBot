@@ -32,8 +32,7 @@ val users: MutableMap<Chat, TelegramUser> = mutableMapOf()
 
 @OptIn(RiskFeature::class, Warning::class, PreviewFeature::class)
 suspend fun main() {
-    AppConfig.init("studyRussianBot")
-    longPolling {
+    longPolling ("studyRussianBot") {
             setMyCommands(
                 BotCommand("start", "Стартовая команда. Сбрасывает текущее тестирование"),
                 BotCommand("help", "Справка"),
