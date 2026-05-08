@@ -25,6 +25,8 @@ import dev.inmo.tgbotapi.types.chat.User
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import dev.inmo.tgbotapi.utils.RiskFeature
 import dev.inmo.tgbotapi.utils.row
+import me.centralhardware.telegram.middleware.clickHouseLogging
+import me.centralhardware.telegram.middleware.clickHouseRequestIdContext
 import me.centralhardware.znatoki.studyRussianBot.objects.TelegramUser
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus.*
 
@@ -33,7 +35,12 @@ val users: MutableMap<Chat, TelegramUser> = mutableMapOf()
 @OptIn(RiskFeature::class, Warning::class, PreviewFeature::class)
 suspend fun main() {
     AppConfig.init("studyRussianBot")
-    longPolling {
+    longPolling (
+        middlewares = {
+            addMiddleware { clickHouseLogging(botName = "StudyRussianBot") }
+        },
+        subcontextInitialAction = clickHouseRequestIdContext()
+    ) {
             setMyCommands(
                 BotCommand("start", "Стартовая команда. Сбрасывает текущее тестирование"),
                 BotCommand("help", "Справка"),
