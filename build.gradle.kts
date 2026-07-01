@@ -11,11 +11,11 @@ repositories {
     maven("https://jitpack.io")
 }
 
-val ktgbotapiVersion = "34.0.0"
+val ktgbotapiVersion = "35.0.0"
 
 dependencies {
     implementation("dev.inmo:tgbotapi:$ktgbotapiVersion")
-    implementation("com.github.centralhardware:ktgbotapi-commons:eb3d7671")
+    implementation("com.github.centralhardware:ktgbotapi-commons:3b24b76e")
     implementation("org.json:json:20260522")
     implementation("io.github.crackthecodeabhi:kreds:0.9.1")
     implementation("org.postgresql:postgresql:42.7.12")
