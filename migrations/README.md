@@ -17,19 +17,14 @@ docker run --rm -v "$PWD/migrations/postgres:/flyway/sql" flyway/flyway \
 
 ## Where the seed data comes from
 
-`data/rule.json` and `data/word.json` are the resources the bot shipped with
-until commit `d025a2b` ("switch to postgres") moved rules and words into the
-database. `generate_rules_words_seed.py` turns them back into
-`postgres/V2__seed_rules_words.sql`, so the seed can be regenerated instead of
-hand-edited:
+`V2` was generated from `src/main/resources/rule.json` and `word.json`, the
+resources the bot shipped with until commit `d025a2b` ("switch to postgres")
+moved rules and words into the database — recover them from `d025a2b^` if the
+seed ever has to be rebuilt from scratch.
 
-```sh
-python3 migrations/generate_rules_words_seed.py
-```
-
-Two entries in `word.json` name a section no rule declares: `r17м` is a
-Cyrillic-м typo for `r17` and gets remapped, while the single `15` entry also
-has a broken `answer` field and is dropped — 1825 words in, 1824 out.
+Two entries in `word.json` named a section no rule declares: `r17м` is a
+Cyrillic-м typo for `r17` and was remapped, while the single `15` entry also
+had a broken `answer` field and was dropped — 1825 words in, 1824 in `V2`.
 
 ## Existing user progress
 
