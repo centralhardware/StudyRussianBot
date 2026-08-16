@@ -27,11 +27,25 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 import dev.inmo.tgbotapi.utils.row
 import me.centralhardware.znatoki.studyRussianBot.objects.TelegramUser
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus.*
+import org.flywaydb.core.Flyway
 
 val users: MutableMap<Chat, TelegramUser> = mutableMapOf()
 
+private fun migrate() {
+    Flyway.configure()
+        .dataSource(
+            System.getenv("POSTGRES_URL"),
+            System.getenv("POSTGRES_USERNAME"),
+            System.getenv("POSTGRES_PASSWORD"),
+        )
+        .load()
+        .migrate()
+}
+
 @OptIn(RiskFeature::class, Warning::class, PreviewFeature::class)
 suspend fun main() {
+    migrate()
+
     longPolling ("studyRussianBot") {
             setMyCommands(
                 BotCommand("start", "Стартовая команда. Сбрасывает текущее тестирование"),
