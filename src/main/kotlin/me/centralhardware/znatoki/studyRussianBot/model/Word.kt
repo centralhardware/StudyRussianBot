@@ -1,4 +1,4 @@
-package me.centralhardware.znatoki.studyRussianBot.objects
+package me.centralhardware.znatoki.studyRussianBot.model
 
 import kotliquery.Row
 

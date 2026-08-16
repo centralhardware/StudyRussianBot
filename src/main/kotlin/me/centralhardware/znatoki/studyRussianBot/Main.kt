@@ -27,11 +27,25 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 import dev.inmo.tgbotapi.utils.row
 import me.centralhardware.znatoki.studyRussianBot.objects.TelegramUser
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus.*
+import org.flywaydb.core.Flyway
 
 val users: MutableMap<Chat, TelegramUser> = mutableMapOf()
 
+private fun migrate() {
+    Flyway.configure()
+        .dataSource(
+            System.getenv("POSTGRES_URL"),
+            System.getenv("POSTGRES_USERNAME"),
+            System.getenv("POSTGRES_PASSWORD"),
+        )
+        .load()
+        .migrate()
+}
+
 @OptIn(RiskFeature::class, Warning::class, PreviewFeature::class)
 suspend fun main() {
+    migrate()
+
     longPolling ("studyRussianBot") {
             setMyCommands(
                 BotCommand("start", "Стартовая команда. Сбрасывает текущее тестирование"),
@@ -185,16 +199,16 @@ suspend fun main() {
                             if (user.words.isEmpty()) {
                                 sendTextMessage(it.chat, "вы завершили прохождение правила")
                                 sendTextMessage(it.chat, user.getTestingResult())
-                                Redis.markRuleAsComplete(user)
+                                Progress.markRuleAsComplete(user)
                                 send(it.chat, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
                                 user.reset()
                                 return@onText
                             }
                             sendTextMessage(it.chat, user.words[0].name)
-                            Redis.markWordAsRight(user)
+                            Progress.markWordAsRight(user)
                         } else {
                             sendTextMessage(it.chat, "неправильно")
-                            Redis.markWordAsWrong(user)
+                            Progress.markWordAsWrong(user)
                             val temp = user.words[0]
                             user.words.removeAt(0)
                             user.words.add(temp)

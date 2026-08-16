@@ -1,0 +1,4 @@
+-- Per-user progress carried over from the Redis store the bot used before
+-- Progress.kt: 17 951 right words, 5 818 wrong ones and 49 completed rules
+-- across 56 chats. The INSERTs were dropped once this had been applied; the
+-- version stays so Flyway's history keeps its place.

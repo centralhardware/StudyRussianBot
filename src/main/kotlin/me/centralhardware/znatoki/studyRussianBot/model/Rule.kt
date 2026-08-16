@@ -1,7 +1,7 @@
-package me.centralhardware.znatoki.studyRussianBot.objects
+package me.centralhardware.znatoki.studyRussianBot.model
 
 import kotliquery.Row
-import me.centralhardware.znatoki.studyRussianBot.WordMapper
+import me.centralhardware.znatoki.studyRussianBot.DatabaseService
 
 data class Rule(val id: Int, val name: String, var parent: Rule?, val words: List<Word>) {
 
@@ -14,7 +14,7 @@ val ruleMapper = { row: Row ->
     Rule(
         row.int("id"),
         row.string("name"),
-        WordMapper.getRuleById(row.int("parent")),
-        WordMapper.getWords(row.int("id")),
+        DatabaseService.getRuleById(row.int("parent")),
+        DatabaseService.getWords(row.int("id")),
     )
 }
