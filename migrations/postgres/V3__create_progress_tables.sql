@@ -1,7 +1,5 @@
--- Tables backing Progress.kt. Apply once, before starting the new build:
---   psql "$PG_URL" -v ON_ERROR_STOP=1 -f migration/schema.sql
---
--- Each table is a set: one row per (user, word/rule), no duplicates.
+-- Per-user progress, previously three Redis sets per chat. Each table is a
+-- set: one row per (user, word/rule), duplicates dropped by the primary key.
 
 CREATE TABLE IF NOT EXISTS checked_word (
     chat_id BIGINT NOT NULL,
