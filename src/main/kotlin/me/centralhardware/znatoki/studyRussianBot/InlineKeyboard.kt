@@ -4,14 +4,13 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.types.chat.User
 import dev.inmo.tgbotapi.utils.row
-import kotlinx.coroutines.runBlocking
 
 object InlineKeyboard {
 
     fun getRules(pageNumber: Int, user: User) = inlineKeyboard {
         WordMapper.getRulePage(pageNumber).forEach {
             row {
-                if (runBlocking { Redis.isCheckRule(user.rowId(), it.name) }) {
+                if (Progress.isCheckRule(user.rowId(), it.name)) {
                     dataButton("✅" + it.name, it.id.toString())
                 } else {
                     dataButton(it.name, it.id.toString())

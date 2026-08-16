@@ -1,6 +1,6 @@
 package me.centralhardware.znatoki.studyRussianBot.objects
 
-import me.centralhardware.znatoki.studyRussianBot.Redis
+import me.centralhardware.znatoki.studyRussianBot.Progress
 import me.centralhardware.znatoki.studyRussianBot.WordMapper
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus
 
@@ -28,10 +28,10 @@ data class TelegramUser(val chatId: Long) {
         }
     }
 
-    suspend fun getProfile(): String {
+    fun getProfile(): String {
         val rightPercent: Int
-        val wright = Redis.getRightCount(chatId).toDouble()
-        val all = Redis.getWrongCount(chatId).toDouble() + Redis.getRightCount(chatId).toDouble()
+        val wright = Progress.getRightCount(chatId).toDouble()
+        val all = Progress.getWrongCount(chatId).toDouble() + Progress.getRightCount(chatId).toDouble()
         rightPercent =
             if (all != 0.0 && wright < all) {
                 (wright / all * 100).toInt()
@@ -43,13 +43,13 @@ data class TelegramUser(val chatId: Long) {
             Профиль:
 
 
-            слов отвечено правильно: ${Redis.getRightCount(chatId)}
-            слов отвечено неправильно ${Redis.getWrongCount(chatId)}
+            слов отвечено правильно: ${Progress.getRightCount(chatId)}
+            слов отвечено неправильно ${Progress.getWrongCount(chatId)}
             процент правильных ответов ${rightPercent}%
             пройденные правила:
             ${
             WordMapper.getRules().map { it.name }
-            .filter { Redis.isCheckRule(chatId, it) }
+            .filter { Progress.isCheckRule(chatId, it) }
             .joinToString("\n")}
         """
             .trimIndent()

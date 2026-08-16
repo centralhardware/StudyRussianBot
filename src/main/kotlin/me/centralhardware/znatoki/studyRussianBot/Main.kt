@@ -185,16 +185,16 @@ suspend fun main() {
                             if (user.words.isEmpty()) {
                                 sendTextMessage(it.chat, "вы завершили прохождение правила")
                                 sendTextMessage(it.chat, user.getTestingResult())
-                                Redis.markRuleAsComplete(user)
+                                Progress.markRuleAsComplete(user)
                                 send(it.chat, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
                                 user.reset()
                                 return@onText
                             }
                             sendTextMessage(it.chat, user.words[0].name)
-                            Redis.markWordAsRight(user)
+                            Progress.markWordAsRight(user)
                         } else {
                             sendTextMessage(it.chat, "неправильно")
-                            Redis.markWordAsWrong(user)
+                            Progress.markWordAsWrong(user)
                             val temp = user.words[0]
                             user.words.removeAt(0)
                             user.words.add(temp)
