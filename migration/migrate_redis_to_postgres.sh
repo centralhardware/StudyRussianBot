@@ -4,8 +4,8 @@
 # tables used by Progress.kt. Redis is only read, and every row is inserted
 # with ON CONFLICT DO NOTHING, so the script is safe to re-run.
 #
-# Requires redis-cli and psql. Run it after the new version has started once
-# (that is what creates the tables), while the bot is stopped.
+# Requires redis-cli and psql. Apply migration/schema.sql first, and run this
+# while the bot is stopped.
 #
 #   REDIS_URL=redis://10.168.0.77:6379 \
 #   PG_URL=postgres://user:pass@host:5432/znatoki_rus \

@@ -6,45 +6,6 @@ import me.centralhardware.znatoki.studyRussianBot.objects.TelegramUser
 object Progress {
     private val session = WordMapper.session
 
-    init {
-        session.run(
-            queryOf(
-                    """
-            CREATE TABLE IF NOT EXISTS checked_word (
-                chat_id BIGINT NOT NULL,
-                word    TEXT   NOT NULL,
-                PRIMARY KEY (chat_id, word)
-            )
-        """
-                )
-                .asExecute
-        )
-        session.run(
-            queryOf(
-                    """
-            CREATE TABLE IF NOT EXISTS checked_wrong_word (
-                chat_id BIGINT NOT NULL,
-                word    TEXT   NOT NULL,
-                PRIMARY KEY (chat_id, word)
-            )
-        """
-                )
-                .asExecute
-        )
-        session.run(
-            queryOf(
-                    """
-            CREATE TABLE IF NOT EXISTS checked_rule (
-                chat_id BIGINT NOT NULL,
-                rule    TEXT   NOT NULL,
-                PRIMARY KEY (chat_id, rule)
-            )
-        """
-                )
-                .asExecute
-        )
-    }
-
     fun markRuleAsComplete(user: TelegramUser) {
         val checkedCount =
             WordMapper.getWords(user.currRule!!.id).count { isWordChecked(user.chatId, it.name) }
