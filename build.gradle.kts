@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.centralhardware:ktgbotapi-commons:5100234f")
+    implementation("com.github.centralhardware:ktgbotapi-commons:07ee206f")
     implementation("org.postgresql:postgresql:42.7.13")
     implementation("org.flywaydb:flyway-core:13.3.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:13.3.0")
@@ -31,6 +31,8 @@ jib {
     }
     container {
         mainClass = "me.centralhardware.znatoki.studyRussianBot.MainKt"
+        // /health, served by ktgbotapi-commons
+        ports = listOf("8081")
         jvmFlags = listOf("-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0")
         creationTime = "USE_CURRENT_TIMESTAMP"
         labels = mapOf(
