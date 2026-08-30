@@ -31,6 +31,8 @@ jib {
     }
     container {
         mainClass = "me.centralhardware.znatoki.studyRussianBot.MainKt"
+        // /health, served by ktgbotapi-commons
+        ports = listOf("8081")
         jvmFlags = listOf("-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0")
         creationTime = "USE_CURRENT_TIMESTAMP"
         labels = mapOf(
