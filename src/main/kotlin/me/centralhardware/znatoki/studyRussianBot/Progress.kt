@@ -1,91 +1,64 @@
 package me.centralhardware.znatoki.studyRussianBot
 
 import kotliquery.queryOf
-import me.centralhardware.znatoki.studyRussianBot.objects.TelegramUser
+import me.centralhardware.znatoki.studyRussianBot.objects.Rule
+import me.centralhardware.znatoki.studyRussianBot.objects.Word
 
 object Progress {
-    private val session = WordMapper.session
 
-    fun markRuleAsComplete(user: TelegramUser) {
-        val checkedCount =
-            WordMapper.getWords(user.currRule!!.id).count { isWordChecked(user.chatId, it.name) }
-
-        if (checkedCount >= user.currRule!!.words.size) {
-            session.run(
-                queryOf(
-                        """
+    /** Marks [rule] complete once every one of its words has been answered right. */
+    suspend fun markRuleAsComplete(chatId: Long, rule: Rule) = Db.query {
+        it.run(
+            queryOf(
+                    """
                 INSERT INTO checked_rule (chat_id, rule)
-                VALUES (:chatId, :rule)
+                SELECT :chatId, :rule
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM words w
+                    WHERE (:ruleId = $ALL_WORDS_RULE OR w.ruleid = :ruleId)
+                      AND NOT EXISTS (
+                          SELECT 1 FROM checked_word c
+                          WHERE c.chat_id = :chatId AND c.word = w.word
+                      )
+                )
                 ON CONFLICT DO NOTHING
             """,
-                        mapOf("chatId" to user.chatId, "rule" to user.currRule!!.name),
-                    )
-                    .asUpdate
-            )
-        }
+                    mapOf("chatId" to chatId, "rule" to rule.name, "ruleId" to rule.id),
+                )
+                .asUpdate
+        )
     }
 
-    fun isCheckRule(chatId: Long, rule: String): Boolean =
-        session.run(
-            queryOf(
-                    """
-            SELECT 1
-            FROM checked_rule
-            WHERE chat_id = :chatId AND rule = :rule
-            LIMIT 1
-        """,
-                    mapOf("chatId" to chatId, "rule" to rule),
-                )
-                .map { true }
-                .asSingle
-        ) ?: false
+    /** Names of the rules this user has completed, in one query. */
+    suspend fun checkedRules(chatId: Long): Set<String> = Db.query {
+        it.run(
+            queryOf("SELECT rule FROM checked_rule WHERE chat_id = :chatId", mapOf("chatId" to chatId))
+                .map { r -> r.string("rule") }
+                .asList
+        ).toSet()
+    }
 
-    fun getRightCount(chatId: Long): Long = count("checked_word", chatId)
+    suspend fun getRightCount(chatId: Long): Long = count("checked_word", chatId)
 
-    fun getWrongCount(chatId: Long): Long = count("checked_wrong_word", chatId)
+    suspend fun getWrongCount(chatId: Long): Long = count("checked_wrong_word", chatId)
 
-    fun markWordAsRight(user: TelegramUser) = markWord("checked_word", user)
+    suspend fun markWordAsRight(chatId: Long, word: Word) = markWord("checked_word", chatId, word)
 
-    fun markWordAsWrong(user: TelegramUser) = markWord("checked_wrong_word", user)
+    suspend fun markWordAsWrong(chatId: Long, word: Word) = markWord("checked_wrong_word", chatId, word)
 
-    private fun isWordChecked(chatId: Long, word: String): Boolean =
-        session.run(
-            queryOf(
-                    """
-            SELECT 1
-            FROM checked_word
-            WHERE chat_id = :chatId AND word = :word
-            LIMIT 1
-        """,
-                    mapOf("chatId" to chatId, "word" to word),
-                )
-                .map { true }
-                .asSingle
-        ) ?: false
-
-    private fun count(table: String, chatId: Long): Long =
-        session.run(
-            queryOf(
-                    """
-            SELECT count(*) AS cnt
-            FROM $table
-            WHERE chat_id = :chatId
-        """,
-                    mapOf("chatId" to chatId),
-                )
-                .map { it.long("cnt") }
+    private suspend fun count(table: String, chatId: Long): Long = Db.query {
+        it.run(
+            queryOf("SELECT count(*) AS cnt FROM $table WHERE chat_id = :chatId", mapOf("chatId" to chatId))
+                .map { r -> r.long("cnt") }
                 .asSingle
         ) ?: 0L
+    }
 
-    private fun markWord(table: String, user: TelegramUser) {
-        session.run(
+    private suspend fun markWord(table: String, chatId: Long, word: Word) = Db.query {
+        it.run(
             queryOf(
-                    """
-            INSERT INTO $table (chat_id, word)
-            VALUES (:chatId, :word)
-            ON CONFLICT DO NOTHING
-        """,
-                    mapOf("chatId" to user.chatId, "word" to user.words[0].name),
+                    "INSERT INTO $table (chat_id, word) VALUES (:chatId, :word) ON CONFLICT DO NOTHING",
+                    mapOf("chatId" to chatId, "word" to word.name),
                 )
                 .asUpdate
         )

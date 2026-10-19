@@ -17,6 +17,11 @@ dependencies {
     implementation("org.flywaydb:flyway-core:13.10.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:13.10.0")
     implementation("com.github.seratch:kotliquery:1.9.1")
+    implementation("com.zaxxer:HikariCP:7.1.0")
+
+    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:6.1.3")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.1.3")
 }
 
 tasks.test {
