@@ -1,7 +1,7 @@
 package me.centralhardware.znatoki.studyRussianBot
 
 import dev.inmo.micro_utils.common.Warning
-import dev.inmo.tgbotapi.AppConfig
+import dev.inmo.tgbotapi.extensions.api.answers.answerCallbackQuery
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.deleteMessage
 import dev.inmo.tgbotapi.extensions.api.edit.reply_markup.editMessageReplyMarkup
@@ -20,33 +20,50 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
-import dev.inmo.tgbotapi.types.chat.Chat
 import dev.inmo.tgbotapi.types.chat.User
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import dev.inmo.tgbotapi.utils.RiskFeature
 import dev.inmo.tgbotapi.utils.row
+import kotlinx.coroutines.sync.withLock
 import me.centralhardware.znatoki.studyRussianBot.objects.TelegramUser
+import me.centralhardware.znatoki.studyRussianBot.objects.profileText
+import java.util.concurrent.ConcurrentHashMap
 import me.centralhardware.znatoki.studyRussianBot.objects.enums.UserStatus.*
 import org.flywaydb.core.Flyway
 
-val users: MutableMap<Chat, TelegramUser> = mutableMapOf()
+/** In-progress tests, by user id. Handlers run concurrently. */
+val users = ConcurrentHashMap<Long, TelegramUser>()
+
+private val HELP =
+    """
+    Доступные команды:
+     - /start: стартовая команда. Сбрасывает текущее тестирование
+     - /help: показать данное сообщение.
+     - /rules: показать меню выбора правил для начала тестирования.
+     - /profile: показать информацию об профиле.
+     - /menu: показать меню.
+     Автор - @centralhardware
+    """
+        .trimIndent()
 
 private fun migrate() {
-    Flyway.configure()
-        .dataSource(
-            System.getenv("POSTGRES_URL"),
-            System.getenv("POSTGRES_USERNAME"),
-            System.getenv("POSTGRES_PASSWORD"),
-        )
-        .load()
-        .migrate()
+    Flyway.configure().dataSource(Db.dataSource).load().migrate()
+}
+
+suspend fun profile(chatId: Long): String {
+    val checked = Progress.checkedRules(chatId)
+    return profileText(
+        Progress.getRightCount(chatId),
+        Progress.getWrongCount(chatId),
+        WordMapper.getRules().map { it.name }.filter { it in checked },
+    )
 }
 
 @OptIn(RiskFeature::class, Warning::class, PreviewFeature::class)
 suspend fun main() {
     migrate()
 
-    longPolling ("studyRussianBot") {
+    longPolling("studyRussianBot") {
             setMyCommands(
                 BotCommand("start", "Стартовая команда. Сбрасывает текущее тестирование"),
                 BotCommand("help", "Справка"),
@@ -55,168 +72,152 @@ suspend fun main() {
                 BotCommand("menu", "показать меню"),
             )
             onCommand("start") {
-                getUser(it.from).reset()
+                val user = getUser(it.from) ?: return@onCommand
+                user.lock.withLock { user.reset() }
                 send(
                     it.chat,
                     text = "Здравствуйте, это бот для тренировки правил русского языка",
                     replyMarkup = InlineKeyboard.getMenu(),
                 )
             }
-            onCommand("help") {
-                sendTextMessage(
-                    it.chat,
-                    """
-                Доступные команды: 
-                 - /start: стартовая команда. Сбрасывает текущее тестирование
-                 - /help: показать данное сообщение.
-                 - /rules: показать меню выбора правил для начала тестирования.
-                 - /profile: показать информацию об профиле.
-                 - /menu: показать меню.
-                 Автор - @centralhardware
-            """
-                        .trimIndent(),
-                )
-            }
+            onCommand("help") { sendTextMessage(it.chat, HELP) }
             onCommand("rules") {
-                send(it.chat, text = "правила", replyMarkup = InlineKeyboard.getRules(0, it.from!!))
+                val from = it.from ?: return@onCommand
+                send(it.chat, text = "правила", replyMarkup = InlineKeyboard.getRules(0, from.rowId()))
             }
             onCommand("profile") {
-                sendTextMessage(it.chat, getUser(it.from).getProfile())
+                val from = it.from ?: return@onCommand
+                sendTextMessage(it.chat, profile(from.rowId()))
             }
-            onCommand("menu") {
-                send(it.chat, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
-            }
-            onUnhandledCommand {
-                sendTextMessage(it.chat, "команда не распознана")
-            }
+            onCommand("menu") { send(it.chat, text = "Меню", replyMarkup = InlineKeyboard.getMenu()) }
+            onUnhandledCommand { sendTextMessage(it.chat, "команда не распознана") }
             onDataCallbackQuery("reset_testing") {
-                deleteMessage(it.from.id, it.message!!.messageId)
-                getUser(it.from).reset()
+                answerCallbackQuery(it)
+                it.message?.let { m -> deleteMessage(it.from.id, m.messageId) }
+                val user = getUser(it.from)!!
+                user.lock.withLock { user.reset() }
                 send(it.from, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
             }
             onDataCallbackQuery("noreset_testing") {
-                deleteMessage(it.from.id, it.message!!.messageId)
-                sendTextMessage(it.from, getUser(it.from).words[0].name)
+                answerCallbackQuery(it)
+                it.message?.let { m -> deleteMessage(it.from.id, m.messageId) }
+                val user = getUser(it.from)!!
+                // Pick up where the user was: the current word, or the count
+                // question if the test has not started yet.
+                val current = user.lock.withLock { user.words.firstOrNull()?.name ?: user.status }
+                when (current) {
+                    is String -> sendTextMessage(it.from, current)
+                    WAIT_COUNT_OF_WORD -> sendTextMessage(it.from, "введите количество слов для тестирования")
+                    else -> send(it.from, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
+                }
             }
             onDataCallbackQuery("testing") {
-                send(it.from, text = "правила", replyMarkup = InlineKeyboard.getRules(0, it.from))
+                answerCallbackQuery(it)
+                send(it.from, text = "правила", replyMarkup = InlineKeyboard.getRules(0, it.from.rowId()))
             }
             onDataCallbackQuery("profile") {
-                sendTextMessage(it.from, getUser(it.from).getProfile())
+                answerCallbackQuery(it)
+                sendTextMessage(it.from, profile(it.from.rowId()))
             }
             onDataCallbackQuery("help") {
-                sendTextMessage(
-                    it.from,
-                    """
-                Доступные команды: 
-                 - /start: стартовая команда. Сбрасывает текущее тестирование
-                 - /help: показать данное сообщение.
-                 - /rules: показать меню выбора правил для начала тестирования.
-                 - /profile: показать информацию об профиле.
-                 - /menu: показать меню.
-                 Автор - @centralhardware
-            """
-                        .trimIndent(),
-                )
+                answerCallbackQuery(it)
+                sendTextMessage(it.from, HELP)
             }
             onDataCallbackQuery("menu") {
-                val user = getUser(it.from)
+                answerCallbackQuery(it)
+                val user = getUser(it.from)!!
                 if (user.status !== TESTING && user.status !== WAIT_COUNT_OF_WORD) {
-                    deleteMessage(it.from.id, it.message!!.messageId)
+                    it.message?.let { m -> deleteMessage(it.from.id, m.messageId) }
                     send(it.from, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
                 }
             }
             onDataCallbackQuery(Regex("to_\\d+")) {
-                val user = getUser(it.from)
+                answerCallbackQuery(it)
+                val user = getUser(it.from)!!
+                val page = it.data.removePrefix("to_").toIntOrNull() ?: return@onDataCallbackQuery
+                val message = it.message ?: return@onDataCallbackQuery
                 if (user.status !== WAIT_COUNT_OF_WORD && user.status !== TESTING) {
                     editMessageReplyMarkup(
                         it.from,
-                        it.message!!.messageId,
-                        replyMarkup =
-                            InlineKeyboard.getRules(it.data.replace("to_", "").toInt(), it.from),
+                        message.messageId,
+                        replyMarkup = InlineKeyboard.getRules(page, it.from.rowId()),
                     )
                 }
             }
             onUnhandledDataCallbackQuery {
-                val user = getUser(it.from)
-                when {
-                    user.status === NONE -> {
-                        WordMapper.getRuleById(it.data.toInt())?.let { rule ->
-                            getUser(it.from).status = WAIT_COUNT_OF_WORD
-                            getUser(it.from).currRule = rule
-                            sendTextMessage(it.from, "вы выбрали правило: ${rule.name}")
-                            sendTextMessage(it.from, "введите количество слов для тестирования")
-                            return@onUnhandledDataCallbackQuery
-                        }
+                answerCallbackQuery(it)
+                val user = getUser(it.from)!!
+                // Stale or foreign buttons carry data that is not a rule id.
+                val ruleId = it.data.toIntOrNull() ?: return@onUnhandledDataCallbackQuery
+                if (user.status === NONE) {
+                    val rule = WordMapper.getRuleById(ruleId) ?: return@onUnhandledDataCallbackQuery
+                    user.lock.withLock {
+                        user.status = WAIT_COUNT_OF_WORD
+                        user.currRule = rule
                     }
-                    user.status !== NONE -> {
-                        deleteMessage(it.from.id, it.message!!.messageId)
-                        send(
-                            it.from,
-                            "хотите завершить задание?",
-                            replyMarkup =
-                                inlineKeyboard {
-                                    row {
-                                        dataButton("да", "reset_testing")
-                                        dataButton("нет", "noreset_testing")
-                                    }
-                                },
-                        )
-                    }
+                    sendTextMessage(it.from, "вы выбрали правило: ${rule.name}")
+                    sendTextMessage(it.from, "введите количество слов для тестирования")
+                } else {
+                    it.message?.let { m -> deleteMessage(it.from.id, m.messageId) }
+                    send(
+                        it.from,
+                        "хотите завершить задание?",
+                        replyMarkup =
+                            inlineKeyboard {
+                                row {
+                                    dataButton("да", "reset_testing")
+                                    dataButton("нет", "noreset_testing")
+                                }
+                            },
+                    )
                 }
             }
             onText(initialFilter = CommonMessageFilterExcludeCommand()) {
-                val text = it.text!!
-                when (getUser(it.from).status) {
-                    WAIT_COUNT_OF_WORD -> {
-                        val count = text.toIntOrNull()
-                        val user = getUser(it.from)
-                        if (count == null) {
-                            sendTextMessage(it.chat, "введите число")
-                            return@onText
-                        }
-                        if (count <= 0) {
-                            sendTextMessage(it.chat, "Введите число больше нуля")
-                            return@onText
-                        }
-
-                        user.count = count
-                        if (count > user.currRule!!.words.size) {
-                            sendTextMessage(it.chat, "к сожалению, у нас нет столько слов")
-                            user.status = NONE
-                            user.words.clear()
-                        } else {
-                            user.status = TESTING
-                            user.words.addAll(user.currRule!!.getWord(count))
-                            sendTextMessage(it.chat, user.words[0].name)
-                        }
-                    }
-                    TESTING -> {
-                        val user = getUser(it.from)
-                        if (user.words[0].answer.equals(text, ignoreCase = true)) {
-                            sendTextMessage(it.chat, "правильно")
-                            user.words.removeAt(0)
-                            if (user.words.isEmpty()) {
-                                sendTextMessage(it.chat, "вы завершили прохождение правила")
-                                sendTextMessage(it.chat, user.getTestingResult())
-                                Progress.markRuleAsComplete(user)
-                                send(it.chat, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
-                                user.reset()
+                val text = it.text ?: return@onText
+                val user = getUser(it.from) ?: return@onText
+                user.lock.withLock {
+                    when (user.status) {
+                        WAIT_COUNT_OF_WORD -> {
+                            val count = text.trim().toIntOrNull()
+                            if (count == null) {
+                                sendTextMessage(it.chat, "введите число")
                                 return@onText
                             }
-                            sendTextMessage(it.chat, user.words[0].name)
-                            Progress.markWordAsRight(user)
-                        } else {
-                            sendTextMessage(it.chat, "неправильно")
-                            Progress.markWordAsWrong(user)
-                            val temp = user.words[0]
-                            user.words.removeAt(0)
-                            user.words.add(temp)
-                            user.wrongWords.add(temp)
-                            sendTextMessage(it.chat, user.words[0].name)
+                            if (count <= 0) {
+                                sendTextMessage(it.chat, "Введите число больше нуля")
+                                return@onText
+                            }
+                            val words = WordMapper.getWords(user.currRule!!.id)
+                            if (count > words.size) {
+                                sendTextMessage(it.chat, "к сожалению, у нас нет столько слов")
+                                user.reset()
+                            } else {
+                                user.start(words.shuffled().take(count))
+                                sendTextMessage(it.chat, user.words[0].name)
+                            }
                         }
+                        TESTING -> {
+                            val outcome = user.answer(text)
+                            if (outcome.correct) {
+                                Progress.markWordAsRight(user.chatId, outcome.word)
+                                sendTextMessage(it.chat, "правильно")
+                            } else {
+                                Progress.markWordAsWrong(user.chatId, outcome.word)
+                                sendTextMessage(it.chat, "неправильно")
+                            }
+                            val next = outcome.next
+                            if (next == null) {
+                                sendTextMessage(it.chat, "вы завершили прохождение правила")
+                                sendTextMessage(it.chat, user.getTestingResult())
+                                Progress.markRuleAsComplete(user.chatId, user.currRule!!)
+                                send(it.chat, text = "Меню", replyMarkup = InlineKeyboard.getMenu())
+                                user.reset()
+                            } else {
+                                sendTextMessage(it.chat, next.name)
+                            }
+                        }
+                        else -> {}
                     }
-                    else -> {}
                 }
             }
         }
@@ -224,8 +225,5 @@ suspend fun main() {
         .join()
 }
 
-fun getUser(chat: User?): TelegramUser =
-    chat?.let {
-        users.putIfAbsent(it, TelegramUser(chat.rowId()))
-        users[it]
-    }!!
+fun getUser(user: User?): TelegramUser? =
+    user?.let { users.computeIfAbsent(it.rowId()) { id -> TelegramUser(id) } }
