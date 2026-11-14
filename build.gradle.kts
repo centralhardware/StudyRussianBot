@@ -12,9 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.centralhardware:ktgbotapi-commons:62e73250")
-    // tgbotapi 37 defaults to the ktor Java engine; commons only brings OkHttp
-    runtimeOnly("io.ktor:ktor-client-java:3.6.1")
+    implementation("com.github.centralhardware:ktgbotapi-commons:6018de0c")
     implementation("org.postgresql:postgresql:42.7.14")
     implementation("org.flywaydb:flyway-core:13.12.1")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:13.12.1")
