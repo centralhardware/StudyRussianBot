@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     implementation("com.github.centralhardware:ktgbotapi-commons:6018de0c")
-    implementation("org.postgresql:postgresql:42.7.14")
+    implementation("org.postgresql:postgresql:42.7.15")
     implementation("org.flywaydb:flyway-core:13.13.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:13.13.0")
     implementation("com.github.seratch:kotliquery:1.9.1")
